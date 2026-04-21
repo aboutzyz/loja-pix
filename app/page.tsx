@@ -239,7 +239,7 @@ export default function Home() {
             flexWrap: "wrap",
           }}
         >
-          <h1 style={{ margin: 0 }}>⚡ BOUT TEC</h1>
+          <h1 style={{ margin: 0 }}>💎 BOUT TEC</h1>
 
           <div
             style={{
