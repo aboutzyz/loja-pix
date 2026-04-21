@@ -209,91 +209,37 @@ export default function Home() {
   }
 
   return (
-<header
-  style={{
-    position: "sticky",
-    top: 0,
-    zIndex: 20,
-    background: "#111",
-    color: "white",
-    padding: "16px 20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-  }}
->
-  <div
-    style={{
-      maxWidth: 1200,
-      margin: "0 auto",
-      display: "flex",
-      gap: 12,
-      alignItems: "center",
-      justifyContent: "space-between",
-      flexWrap: "wrap",
-    }}
-  >
-    {/* NOME */}
-    <h1
-      style={{
-        fontWeight: "bold",
-        fontSize: "26px",
-        background: "linear-gradient(90deg, #00ffcc, #00ff88)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        margin: 0,
-      }}
-    >
-      ⚡ BOUT TEC
-    </h1>
-
-    {/* BUSCA + CARRINHO */}
     <div
       style={{
-        display: "flex",
-        gap: 10,
-        alignItems: "center",
-        flexWrap: "wrap",
+        minHeight: "100vh",
+        background: "#f5f5f5",
+        color: "#111",
+        fontFamily: "Arial, sans-serif",
       }}
     >
-      <input
-        type="text"
-        placeholder="Pesquisar produto..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setCurrentPage(1);
-        }}
+      <header
         style={{
-          padding: "10px 12px",
-          borderRadius: 10,
-          border: "1px solid #ccc",
-          minWidth: 260,
-          outline: "none",
-        }}
-      />
-
-      <button
-        onClick={() => {
-          setShowCart(!showCart);
-          setShowCheckout(false);
-        }}
-        style={{
-          background: "#22c55e",
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          background: "#111",
           color: "white",
-          border: "none",
-          borderRadius: 10,
-          padding: "10px 14px",
-          cursor: "pointer",
-          fontWeight: "bold",
+          padding: "16px 20px",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
         }}
       >
-        Carrinho ({cartCount})
-      </button>
-    </div>
-  </div>
-</header>
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+          }}
+        >
+          <h1 style={{ margin: 0 }}>⚡ BOUT TEC</h1>
 
           <div
             style={{
