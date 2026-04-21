@@ -51,6 +51,9 @@ export default function Home() {
   const [complement, setComplement] = useState("");
   const [reference, setReference] = useState("");
 
+  const [columns, setColumns] = useState(3);
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     loadProducts();
     loadCart();
@@ -59,6 +62,18 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    function updateLayout() {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setColumns(mobile ? 2 : 3);
+    }
+
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
 
   async function loadProducts() {
     const { data, error } = await supabase
@@ -289,7 +304,7 @@ export default function Home() {
           zIndex: 20,
           background: "rgba(8, 6, 16, 0.88)",
           color: "white",
-          padding: "16px 20px",
+          padding: isMobile ? "14px 12px" : "16px 20px",
           boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
           backdropFilter: "blur(10px)",
@@ -310,7 +325,7 @@ export default function Home() {
             style={{
               margin: 0,
               fontWeight: "bold",
-              fontSize: 36,
+              fontSize: isMobile ? 24 : 36,
               letterSpacing: "1px",
               color: "#ffffff",
               textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
@@ -325,6 +340,7 @@ export default function Home() {
               gap: 10,
               alignItems: "center",
               flexWrap: "wrap",
+              width: isMobile ? "100%" : "auto",
             }}
           >
             <input
@@ -336,10 +352,11 @@ export default function Home() {
                 setCurrentPage(1);
               }}
               style={{
-                padding: "10px 12px",
+                padding: isMobile ? "9px 10px" : "10px 12px",
                 borderRadius: 14,
                 border: "1px solid rgba(173, 133, 255, 0.25)",
-                minWidth: 260,
+                minWidth: isMobile ? 0 : 260,
+                width: isMobile ? "100%" : 260,
                 outline: "none",
                 background: "rgba(18, 12, 32, 0.92)",
                 color: "#fff",
@@ -358,10 +375,11 @@ export default function Home() {
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
-                padding: "10px 14px",
+                padding: isMobile ? "9px 12px" : "10px 14px",
                 cursor: "pointer",
                 fontWeight: "bold",
                 boxShadow: "0 0 18px rgba(124, 58, 237, 0.45)",
+                width: isMobile ? "100%" : "auto",
               }}
             >
               Carrinho ({cartCount})
@@ -374,7 +392,7 @@ export default function Home() {
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: 20,
+          padding: isMobile ? 12 : 20,
           position: "relative",
           zIndex: 1,
         }}
@@ -384,7 +402,7 @@ export default function Home() {
             <section style={{ marginBottom: 24 }}>
               <h2
                 style={{
-                  fontSize: 30,
+                  fontSize: isMobile ? 22 : 30,
                   marginBottom: 8,
                   color: "#ffffff",
                   textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
@@ -392,7 +410,7 @@ export default function Home() {
               >
                 Produtos
               </h2>
-              <p style={{ color: "#d1d5db", marginTop: 0 }}>
+              <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
                 Escolha seus produtos e adicione ao carrinho.
               </p>
             </section>
@@ -400,12 +418,12 @@ export default function Home() {
             <section
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: 18,
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                gap: isMobile ? 12 : 18,
                 background: "rgba(10, 8, 20, 0.55)",
                 border: "1px solid rgba(168, 85, 247, 0.12)",
-                borderRadius: 24,
-                padding: 22,
+                borderRadius: isMobile ? 18 : 24,
+                padding: isMobile ? 12 : 22,
                 boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
               }}
             >
@@ -415,22 +433,24 @@ export default function Home() {
                   style={{
                     width: "100%",
                     maxWidth: "100%",
+                    minWidth: 0,
                     background: "rgba(12, 8, 24, 0.92)",
-                    borderRadius: 18,
+                    borderRadius: isMobile ? 14 : 18,
                     overflow: "hidden",
                     boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
                     border: "1px solid rgba(159, 122, 234, 0.18)",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
                   }}
                 >
                   <div
                     style={{
                       background:
                         "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                      padding: 12,
+                      padding: isMobile ? 10 : 12,
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      minHeight: 190,
+                      minHeight: isMobile ? 120 : 190,
                     }}
                   >
                     <img
@@ -438,21 +458,27 @@ export default function Home() {
                       alt={product.name}
                       style={{
                         width: "100%",
-                        maxWidth: 160,
+                        maxWidth: isMobile ? 92 : 160,
+                        maxHeight: isMobile ? 92 : 160,
                         objectFit: "contain",
                         borderRadius: 12,
                       }}
                     />
                   </div>
 
-                  <div style={{ padding: 16 }}>
+                  <div style={{ padding: isMobile ? 10 : 16 }}>
                     <h3
                       style={{
-                        margin: "0 0 10px 0",
-                        fontSize: 16,
+                        margin: "0 0 8px 0",
+                        fontSize: isMobile ? 14 : 16,
                         lineHeight: 1.35,
-                        minHeight: 44,
+                        minHeight: isMobile ? "auto" : 44,
                         color: "#ffffff",
+                        wordBreak: "break-word",
+                        display: "-webkit-box",
+                        WebkitLineClamp: isMobile ? 5 : 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
                       }}
                     >
                       {product.name}
@@ -460,9 +486,9 @@ export default function Home() {
 
                     <p
                       style={{
-                        margin: "0 0 14px 0",
+                        margin: "0 0 12px 0",
                         color: "#d8b4fe",
-                        fontSize: 28,
+                        fontSize: isMobile ? 18 : 28,
                         fontWeight: "bold",
                         textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
                       }}
@@ -475,15 +501,17 @@ export default function Home() {
                       style={{
                         width: "100%",
                         background:
-                          "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
+                          "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
                         color: "white",
-                        border: "1px solid rgba(216, 180, 254, 0.25)",
-                        borderRadius: 14,
-                        padding: "11px 14px",
+                        border: "1px solid rgba(216, 180, 254, 0.28)",
+                        borderRadius: isMobile ? 12 : 14,
+                        padding: isMobile ? "10px 10px" : "12px 14px",
                         cursor: "pointer",
                         fontWeight: "bold",
-                        fontSize: 16,
-                        boxShadow: "0 0 20px rgba(126, 34, 206, 0.45)",
+                        fontSize: isMobile ? 14 : 16,
+                        boxShadow:
+                          "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
+                        letterSpacing: "0.2px",
                       }}
                     >
                       Comprar
@@ -506,7 +534,7 @@ export default function Home() {
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 style={{
-                  padding: "10px 14px",
+                  padding: isMobile ? "9px 12px" : "10px 14px",
                   borderRadius: 12,
                   border: "1px solid rgba(196, 181, 253, 0.22)",
                   background:
@@ -522,7 +550,7 @@ export default function Home() {
 
               <div
                 style={{
-                  padding: "10px 14px",
+                  padding: isMobile ? "9px 12px" : "10px 14px",
                   borderRadius: 12,
                   background: "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
                   color: "white",
@@ -539,7 +567,7 @@ export default function Home() {
                 }
                 disabled={currentPage === totalPages}
                 style={{
-                  padding: "10px 14px",
+                  padding: isMobile ? "9px 12px" : "10px 14px",
                   borderRadius: 12,
                   border: "1px solid rgba(196, 181, 253, 0.22)",
                   background:
