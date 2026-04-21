@@ -98,10 +98,6 @@ export default function Home() {
 
     setLastAddedProduct(product);
     setShowMiniCart(true);
-
-    setTimeout(() => {
-      setShowMiniCart(false);
-    }, 5000);
   }
 
   function removeFromCart(productId: string) {
@@ -320,7 +316,7 @@ export default function Home() {
               textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
             }}
           >
-            💎 BOUT TEC TESTE
+            💎 BOUT TEC
           </h1>
 
           <div
@@ -891,27 +887,26 @@ export default function Home() {
         <div
           style={{
             position: "fixed",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)",
+            bottom: 10,
+            right: 10,
             background: "linear-gradient(135deg, #6d28d9, #9333ea)",
             color: "white",
-            padding: "14px 18px",
-            borderRadius: 16,
+            padding: "8px 16px",
+            borderRadius: 14,
             display: "flex",
             alignItems: "center",
-            gap: 14,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+            gap: 12,
+            boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
             zIndex: 999,
-            flexWrap: "wrap",
-            maxWidth: "95%",
-            border: "1px solid rgba(255,255,255,0.15)",
+            fontSize: 12,
+            minWidth: 260,
+            maxWidth: 320,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <strong style={{ fontSize: 14 }}>🛒 Produto adicionado</strong>
-            <span style={{ fontSize: 13 }}>
-              {lastAddedProduct.name} | Quantidade: {lastAddedQuantity}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <strong style={{ fontSize: 12 }}>🛒 Produto adicionado</strong>
+            <span style={{ fontSize: 11 }}>
+              {lastAddedProduct.name} ({lastAddedQuantity})
             </span>
           </div>
 
@@ -921,13 +916,14 @@ export default function Home() {
               background: "white",
               color: "#6d28d9",
               border: "none",
-              padding: "8px 12px",
-              borderRadius: 10,
+              padding: "4px 8px",
+              borderRadius: 6,
               cursor: "pointer",
               fontWeight: "bold",
+              fontSize: 12,
             }}
           >
-            Ver carrinho
+            Ver
           </button>
 
           <button
@@ -935,14 +931,15 @@ export default function Home() {
             style={{
               background: "#1f123c",
               color: "white",
-              border: "1px solid rgba(255,255,255,0.15)",
-              padding: "8px 12px",
-              borderRadius: 10,
+              border: "none",
+              padding: "4px 8px",
+              borderRadius: 6,
               cursor: "pointer",
               fontWeight: "bold",
+              fontSize: 12,
             }}
           >
-            Finalizar pedido
+            Finalizar
           </button>
 
           <button
@@ -952,7 +949,7 @@ export default function Home() {
               border: "none",
               color: "white",
               cursor: "pointer",
-              fontSize: 18,
+              fontSize: 14,
               lineHeight: 1,
             }}
           >
