@@ -331,7 +331,7 @@ export default function Home() {
               textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
             }}
           >
-            💎 BOUT TEC
+            💎 BtTech
           </h1>
 
           <div
