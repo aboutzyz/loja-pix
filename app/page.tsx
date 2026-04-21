@@ -208,21 +208,22 @@ export default function Home() {
     window.open(`https://wa.me/5541996265158?text=${message}`, "_blank");
   }
 
-  const diamonds = Array.from({ length: 18 }, (_, i) => ({
-    id: i,
-    left: `${(i * 5.3 + 3) % 100}%`,
-    duration: `${12 + (i % 7) * 3}s`,
-    delay: `${(i % 6) * 1.4}s`,
-    size: `${18 + (i % 5) * 8}px`,
-    opacity: 0.15 + (i % 4) * 0.08,
-  }));
-
+const diamonds = Array.from({ length: 22 }, (_, i) => ({
+  id: i,
+  left: `${(i * 4.7 + 2) % 100}%`,
+  duration: `${14 + (i % 6) * 3}s`,
+  delay: `${(i % 7) * 1.2}s`,
+  size: `${28 + (i % 6) * 16}px`,
+  opacity: 0.22 + (i % 4) * 0.12,
+  rotate: `${-18 + (i % 7) * 8}deg`,
+  blur: i % 5 === 0 ? "1px" : "0px",
+}));
   return (
     <div
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(circle at 20% 20%, rgba(139,92,246,0.18), transparent 24%), radial-gradient(circle at 80% 30%, rgba(168,85,247,0.14), transparent 22%), radial-gradient(circle at 30% 80%, rgba(91,33,182,0.18), transparent 24%), linear-gradient(180deg, #06040d 0%, #12081f 50%, #090511 100%)",
+  "radial-gradient(circle at 15% 20%, rgba(168,85,247,0.22), transparent 22%), radial-gradient(circle at 85% 22%, rgba(192,132,252,0.18), transparent 20%), radial-gradient(circle at 30% 75%, rgba(91,33,182,0.24), transparent 22%), radial-gradient(circle at 70% 80%, rgba(124,58,237,0.16), transparent 18%), linear-gradient(180deg, #05030b 0%, #12081f 48%, #08040f 100%)",
         color: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
@@ -238,21 +239,25 @@ export default function Home() {
           overflow: "hidden",
         }}
       >
-        {diamonds.map((diamond) => (
-          <span
-            key={diamond.id}
-            className="diamond-rain"
-            style={{
-              left: diamond.left,
-              animationDuration: diamond.duration,
-              animationDelay: diamond.delay,
-              fontSize: diamond.size,
-              opacity: diamond.opacity,
-            }}
-          >
-            💎
-          </span>
-        ))}
+{diamonds.map((diamond) => (
+  <img
+    key={diamond.id}
+    src="/diamond.png"
+    alt=""
+    className="diamond-rain"
+    style={{
+      left: diamond.left,
+      animationDuration: diamond.duration,
+      animationDelay: diamond.delay,
+      width: diamond.size,
+      opacity: diamond.opacity,
+      transform: `rotate(${diamond.rotate})`,
+      filter: `drop-shadow(0 0 10px rgba(180,120,255,0.35))
+               drop-shadow(0 0 22px rgba(120,70,255,0.28))
+               blur(${diamond.blur})`,
+    }}
+  />
+))}
       </div>
 
       <header
@@ -845,27 +850,35 @@ export default function Home() {
         )}
       </main>
 
-      <style jsx>{`
-        .diamond-rain {
-          position: absolute;
-          top: -10%;
-          transform: rotate(-18deg);
-          animation-name: diamondFall;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          filter: drop-shadow(0 0 10px rgba(216, 180, 254, 0.2));
-          user-select: none;
-        }
+<style jsx>{`
+  .diamond-rain {
+    position: absolute;
+    top: -14%;
+    animation-name: diamondFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    user-select: none;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
 
-        @keyframes diamondFall {
-          0% {
-            transform: translateY(-10vh) rotate(-18deg);
-          }
-          100% {
-            transform: translateY(120vh) rotate(18deg);
-          }
-        }
-      `}</style>
+  @keyframes diamondFall {
+    0% {
+      transform: translate3d(0, -12vh, 0) rotate(-12deg) scale(0.9);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    50% {
+      transform: translate3d(12px, 50vh, 0) rotate(6deg) scale(1);
+    }
+    100% {
+      transform: translate3d(-16px, 120vh, 0) rotate(18deg) scale(0.92);
+      opacity: 0;
+    }
+  }
+`}</style>
     </div>
   );
 }
