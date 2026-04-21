@@ -217,29 +217,45 @@ export default function Home() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "#111",
-          color: "white",
-          padding: "16px 20px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            display: "flex",
-            gap: 12,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-          }}
-        >
-          <h1 style={{ margin: 0, fontSize: 28 }}>Minha Loja</h1>
+<header
+  style={{
+    position: "sticky",
+    top: 0,
+    zIndex: 20,
+    background: "#111",
+    color: "white",
+    padding: "16px 20px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+  }}
+>
+  <div
+    style={{
+      maxWidth: 1200,
+      margin: "0 auto",
+      display: "flex",
+      gap: 12,
+      alignItems: "center",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+    }}
+  >
+    <h1
+      style={{
+        fontWeight: "bold",
+        fontSize: "26px",
+        background: "linear-gradient(90deg, #00ffcc, #00ff88)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        margin: 0
+      }}
+    >
+      ⚡ BOUT TEC
+    </h1>
+  </div>
+</header>
 
           <div
             style={{
