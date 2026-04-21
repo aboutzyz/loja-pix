@@ -20,7 +20,7 @@ type CartItem = Product & {
   quantity: number;
 };
 
-const PRODUCTS_PER_PAGE = 6;
+const PRODUCTS_PER_PAGE = 9;
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -36,6 +36,8 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [showMiniCart, setShowMiniCart] = useState(false);
+  const [lastAddedProduct, setLastAddedProduct] = useState<Product | null>(null);
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -94,7 +96,12 @@ export default function Home() {
       return [...prev, { ...product, quantity: 1 }];
     });
 
-    setShowCart(true);
+    setLastAddedProduct(product);
+    setShowMiniCart(true);
+
+    setTimeout(() => {
+      setShowMiniCart(false);
+    }, 5000);
   }
 
   function removeFromCart(productId: string) {
@@ -126,6 +133,7 @@ export default function Home() {
   function clearCart() {
     setCart([]);
     localStorage.removeItem("cart");
+    setShowMiniCart(false);
   }
 
   const filteredProducts = useMemo(() => {
@@ -152,6 +160,11 @@ export default function Home() {
     0
   );
 
+  const lastAddedQuantity =
+    lastAddedProduct
+      ? cart.find((item) => item.id === lastAddedProduct.id)?.quantity ?? 1
+      : 0;
+
   function goToCheckout() {
     if (cart.length === 0) {
       alert("Seu carrinho está vazio.");
@@ -160,10 +173,22 @@ export default function Home() {
 
     setShowCheckout(true);
     setShowCart(false);
+    setShowMiniCart(false);
 
     setTimeout(() => {
       const checkoutSection = document.getElementById("checkout");
       checkoutSection?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }
+
+  function openCartArea() {
+    setShowCart(true);
+    setShowCheckout(false);
+    setShowMiniCart(false);
+
+    setTimeout(() => {
+      const cartSection = document.getElementById("cart-area");
+      cartSection?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   }
 
@@ -208,22 +233,23 @@ export default function Home() {
     window.open(`https://wa.me/5541996265158?text=${message}`, "_blank");
   }
 
-const diamonds = Array.from({ length: 22 }, (_, i) => ({
-  id: i,
-  left: `${(i * 4.7 + 2) % 100}%`,
-  duration: `${14 + (i % 6) * 3}s`,
-  delay: `${(i % 7) * 1.2}s`,
-  size: `${28 + (i % 6) * 16}px`,
-  opacity: 0.22 + (i % 4) * 0.12,
-  rotate: `${-18 + (i % 7) * 8}deg`,
-  blur: i % 5 === 0 ? "1px" : "0px",
-}));
+  const diamonds = Array.from({ length: 22 }, (_, i) => ({
+    id: i,
+    left: `${(i * 4.7 + 2) % 100}%`,
+    duration: `${14 + (i % 6) * 3}s`,
+    delay: `${(i % 7) * 1.2}s`,
+    size: `${28 + (i % 6) * 16}px`,
+    opacity: 0.22 + (i % 4) * 0.12,
+    rotate: `${-18 + (i % 7) * 8}deg`,
+    blur: i % 5 === 0 ? "1px" : "0px",
+  }));
+
   return (
     <div
       style={{
         minHeight: "100vh",
         background:
-  "radial-gradient(circle at 15% 20%, rgba(168,85,247,0.22), transparent 22%), radial-gradient(circle at 85% 22%, rgba(192,132,252,0.18), transparent 20%), radial-gradient(circle at 30% 75%, rgba(91,33,182,0.24), transparent 22%), radial-gradient(circle at 70% 80%, rgba(124,58,237,0.16), transparent 18%), linear-gradient(180deg, #05030b 0%, #12081f 48%, #08040f 100%)",
+          "radial-gradient(circle at 15% 20%, rgba(168,85,247,0.22), transparent 22%), radial-gradient(circle at 85% 22%, rgba(192,132,252,0.18), transparent 20%), radial-gradient(circle at 30% 75%, rgba(91,33,182,0.24), transparent 22%), radial-gradient(circle at 70% 80%, rgba(124,58,237,0.16), transparent 18%), linear-gradient(180deg, #05030b 0%, #12081f 48%, #08040f 100%)",
         color: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
@@ -239,25 +265,25 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
           overflow: "hidden",
         }}
       >
-{diamonds.map((diamond) => (
-  <img
-    key={diamond.id}
-    src="/diamond.png"
-    alt=""
-    className="diamond-rain"
-    style={{
-      left: diamond.left,
-      animationDuration: diamond.duration,
-      animationDelay: diamond.delay,
-      width: diamond.size,
-      opacity: diamond.opacity,
-      transform: `rotate(${diamond.rotate})`,
-      filter: `drop-shadow(0 0 10px rgba(180,120,255,0.35))
-               drop-shadow(0 0 22px rgba(120,70,255,0.28))
-               blur(${diamond.blur})`,
-    }}
-  />
-))}
+        {diamonds.map((diamond) => (
+          <img
+            key={diamond.id}
+            src="/diamond.png"
+            alt=""
+            className="diamond-rain"
+            style={{
+              left: diamond.left,
+              animationDuration: diamond.duration,
+              animationDelay: diamond.delay,
+              width: diamond.size,
+              opacity: diamond.opacity,
+              transform: `rotate(${diamond.rotate})`,
+              filter: `drop-shadow(0 0 10px rgba(180,120,255,0.35))
+                       drop-shadow(0 0 22px rgba(120,70,255,0.28))
+                       blur(${diamond.blur})`,
+            }}
+          />
+        ))}
       </div>
 
       <header
@@ -294,7 +320,7 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
               textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
             }}
           >
-            💎 BOUT TEC
+            💎 BOUT TEC TESTE
           </h1>
 
           <div
@@ -329,6 +355,7 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
               onClick={() => {
                 setShowCart(!showCart);
                 setShowCheckout(false);
+                setShowMiniCart(false);
               }}
               style={{
                 background: "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
@@ -377,7 +404,7 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
             <section
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
                 gap: 18,
                 background: "rgba(10, 8, 20, 0.55)",
                 border: "1px solid rgba(168, 85, 247, 0.12)",
@@ -390,12 +417,13 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
                 <div
                   key={product.id}
                   style={{
+                    width: "100%",
+                    maxWidth: "100%",
                     background: "rgba(12, 8, 24, 0.92)",
                     borderRadius: 18,
                     overflow: "hidden",
                     boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
                     border: "1px solid rgba(159, 122, 234, 0.18)",
-                    maxWidth: 290,
                   }}
                 >
                   <div
@@ -535,6 +563,7 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
 
         {showCart && !showCheckout && (
           <section
+            id="cart-area"
             style={{
               marginTop: 30,
               background: "rgba(12, 8, 24, 0.92)",
@@ -615,7 +644,13 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
                           -
                         </button>
 
-                        <span style={{ minWidth: 24, textAlign: "center", color: "#fff" }}>
+                        <span
+                          style={{
+                            minWidth: 24,
+                            textAlign: "center",
+                            color: "#fff",
+                          }}
+                        >
                           {item.quantity}
                         </span>
 
@@ -658,7 +693,8 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
                     <button
                       onClick={goToCheckout}
                       style={{
-                        background: "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
+                        background:
+                          "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
                         color: "white",
                         border: "1px solid rgba(216, 180, 254, 0.25)",
                         borderRadius: 12,
@@ -668,7 +704,7 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
                         boxShadow: "0 0 18px rgba(126, 34, 206, 0.35)",
                       }}
                     >
-                      Ir para checkout
+                      Finalizar pedido
                     </button>
 
                     <button
@@ -833,7 +869,8 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
               <button
                 onClick={finishOrder}
                 style={{
-                  background: "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
+                  background:
+                    "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
                   color: "white",
                   border: "1px solid rgba(216, 180, 254, 0.25)",
                   borderRadius: 12,
@@ -850,35 +887,109 @@ const diamonds = Array.from({ length: 22 }, (_, i) => ({
         )}
       </main>
 
-<style jsx>{`
-  .diamond-rain {
-    position: absolute;
-    top: -14%;
-    animation-name: diamondFall;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    user-select: none;
-    pointer-events: none;
-    will-change: transform, opacity;
-  }
+      {showMiniCart && lastAddedProduct && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(135deg, #6d28d9, #9333ea)",
+            color: "white",
+            padding: "14px 18px",
+            borderRadius: 16,
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
+            zIndex: 999,
+            flexWrap: "wrap",
+            maxWidth: "95%",
+            border: "1px solid rgba(255,255,255,0.15)",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <strong style={{ fontSize: 14 }}>🛒 Produto adicionado</strong>
+            <span style={{ fontSize: 13 }}>
+              {lastAddedProduct.name} | Quantidade: {lastAddedQuantity}
+            </span>
+          </div>
 
-  @keyframes diamondFall {
-    0% {
-      transform: translate3d(0, -12vh, 0) rotate(-12deg) scale(0.9);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    50% {
-      transform: translate3d(12px, 50vh, 0) rotate(6deg) scale(1);
-    }
-    100% {
-      transform: translate3d(-16px, 120vh, 0) rotate(18deg) scale(0.92);
-      opacity: 0;
-    }
-  }
-`}</style>
+          <button
+            onClick={openCartArea}
+            style={{
+              background: "white",
+              color: "#6d28d9",
+              border: "none",
+              padding: "8px 12px",
+              borderRadius: 10,
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            Ver carrinho
+          </button>
+
+          <button
+            onClick={goToCheckout}
+            style={{
+              background: "#1f123c",
+              color: "white",
+              border: "1px solid rgba(255,255,255,0.15)",
+              padding: "8px 12px",
+              borderRadius: 10,
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            Finalizar pedido
+          </button>
+
+          <button
+            onClick={() => setShowMiniCart(false)}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "white",
+              cursor: "pointer",
+              fontSize: 18,
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <style jsx>{`
+        .diamond-rain {
+          position: absolute;
+          top: -14%;
+          animation-name: diamondFall;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          user-select: none;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+
+        @keyframes diamondFall {
+          0% {
+            transform: translate3d(0, -12vh, 0) rotate(-12deg) scale(0.9);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          50% {
+            transform: translate3d(12px, 50vh, 0) rotate(6deg) scale(1);
+          }
+          100% {
+            transform: translate3d(-16px, 120vh, 0) rotate(18deg) scale(0.92);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
