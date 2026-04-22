@@ -17,14 +17,12 @@ type Product = {
   image: string;
   stock: number;
   category_id?: string | number | null;
-  created_at?: string;
 };
 
 type Category = {
   id: string | number;
   name: string;
   image: string;
-  created_at?: string;
 };
 
 type CartItem = Product & {
@@ -45,23 +43,17 @@ export default function CategoriaPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [showMiniCart, setShowMiniCart] = useState(false);
-  const [lastAddedProduct, setLastAddedProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    function updateLayout() {
-      setIsMobile(window.innerWidth <= 768);
-    }
-
-    updateLayout();
-    window.addEventListener("resize", updateLayout);
-    return () => window.removeEventListener("resize", updateLayout);
+    setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", () =>
+      setIsMobile(window.innerWidth <= 768)
+    );
   }, []);
 
   useEffect(() => {
-    if (!categoryId) return;
     loadCategory();
     loadProducts();
     loadCart();
@@ -72,475 +64,180 @@ export default function CategoriaPage() {
   }, [cart]);
 
   async function loadCategory() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("categories")
       .select("*")
       .eq("id", categoryId)
       .single();
 
-    if (error) {
-      console.error("Erro ao buscar categoria:", error);
-      return;
-    }
-
-    setCategory(data as Category);
+    setCategory(data);
   }
 
   async function loadProducts() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("products")
       .select("*")
-      .eq("category_id", categoryId)
-      .order("created_at", { ascending: false });
+      .eq("category_id", categoryId);
 
-    if (error) {
-      console.error("Erro ao buscar produtos da categoria:", error);
-      return;
-    }
-
-    setProducts((data as Product[]) || []);
+    setProducts(data || []);
   }
 
   function loadCart() {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
+    const saved = localStorage.getItem("cart");
+    if (saved) setCart(JSON.parse(saved));
   }
 
   function addToCart(product: Product) {
     if ((product.stock ?? 0) <= 0) return;
 
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-
-      if (existing) {
-        if (existing.quantity >= (product.stock ?? 0)) {
-          return prev;
-        }
-
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+      const exist = prev.find((i) => i.id === product.id);
+      if (exist) {
+        if (exist.quantity >= product.stock) return prev;
+        return prev.map((i) =>
+          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-
       return [...prev, { ...product, quantity: 1 }];
     });
-
-    setLastAddedProduct(product);
-    setShowMiniCart(true);
   }
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
+    return products.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [products, search]);
-
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-
-  const lastAddedQuantity =
-    lastAddedProduct
-      ? cart.find((item) => item.id === lastAddedProduct.id)?.quantity ?? 1
-      : 0;
 
   return (
     <div
       style={{
         minHeight: "100vh",
         background: `
-          radial-gradient(circle at 20% 30%, rgba(168,85,247,0.35), transparent 30%),
-          radial-gradient(circle at 80% 20%, rgba(139,92,246,0.25), transparent 25%),
-          radial-gradient(circle at 50% 80%, rgba(124,58,237,0.25), transparent 30%),
-          linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)
+          radial-gradient(circle at 25% 20%, rgba(170,60,255,0.2), transparent),
+          linear-gradient(180deg,#090114,#100022)
         `,
-        color: "#f5f5f5",
-        fontFamily: "Arial, sans-serif",
         position: "relative",
-        overflow: "hidden",
       }}
     >
+      {/* QUADRICULADO */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `
+            linear-gradient(rgba(179,77,255,0.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(179,77,255,0.12) 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          opacity: 0.5,
+        }}
+      />
+
+      {/* HEADER */}
       <header
         style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "rgba(8, 6, 16, 0.62)",
-          color: "white",
-          padding: isMobile ? "14px 12px" : "16px 20px",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
-          borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
-          backdropFilter: "blur(14px)",
+          padding: "15px",
+          background: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(168,85,247,0.2)",
         }}
       >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            display: "flex",
-            gap: 12,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              margin: 0,
-              fontWeight: "bold",
-              fontSize: isMobile ? 28 : 36,
-              letterSpacing: "1px",
-              color: "#ffffff",
-              textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
-              textDecoration: "none",
-            }}
-          >
-            💎 BtTech
-          </Link>
-
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              alignItems: "center",
-              flexWrap: "wrap",
-              width: isMobile ? "100%" : "auto",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Pesquisar produto..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                padding: isMobile ? "9px 10px" : "10px 12px",
-                borderRadius: 14,
-                border: "1px solid rgba(173, 133, 255, 0.25)",
-                minWidth: isMobile ? 0 : 260,
-                width: isMobile ? "100%" : 260,
-                outline: "none",
-                background: "rgba(18, 12, 32, 0.72)",
-                color: "#fff",
-                backdropFilter: "blur(12px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
-              }}
-            />
-
-            <Link
-              href="/"
-              style={{
-                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-                color: "white",
-                border: "1px solid rgba(196, 181, 253, 0.35)",
-                borderRadius: 14,
-                padding: isMobile ? "9px 12px" : "10px 14px",
-                fontWeight: "bold",
-                boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
-                textDecoration: "none",
-                transition: "all 0.25s ease",
-              }}
-            >
-              Voltar
-            </Link>
-
-            <div
-              style={{
-                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-                color: "white",
-                border: "1px solid rgba(196, 181, 253, 0.35)",
-                borderRadius: 14,
-                padding: isMobile ? "9px 12px" : "10px 14px",
-                fontWeight: "bold",
-                boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
-              }}
-            >
-              Carrinho ({cartCount})
-            </div>
-          </div>
-        </div>
+        <Link href="/" style={{ color: "#fff", fontWeight: "bold" }}>
+          ← Início
+        </Link>
       </header>
 
-      <main
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: isMobile ? 12 : 20,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {category && (
-          <section
-            className="fade-in"
-            style={{
-              position: "relative",
-              border: "1px solid rgba(216, 180, 254, 0.16)",
-              borderRadius: 28,
-              overflow: "hidden",
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(16px)",
-              minHeight: isMobile ? 180 : 240,
-              boxShadow: "0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(124,58,237,0.16)",
-              marginBottom: 28,
-            }}
-          >
-            <img
-              src={category.image}
-              alt={category.name}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
+      <main style={{ padding: 20 }}>
+        <h1 style={{ color: "#fff" }}>
+          {category?.name || "Categoria"}
+        </h1>
 
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(180deg, rgba(10,6,20,0.10) 0%, rgba(10,6,20,0.18) 28%, rgba(10,6,20,0.92) 100%)",
-              }}
-            />
-
-            <div
-              style={{
-                position: "relative",
-                zIndex: 2,
-                padding: isMobile ? 16 : 24,
-                minHeight: isMobile ? 180 : 240,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-              }}
-            >
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: isMobile ? 28 : 42,
-                  fontWeight: "bold",
-                  color: "#ffffff",
-                  lineHeight: 1.05,
-                  textShadow:
-                    "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
-                  wordBreak: "break-word",
-                }}
-              >
-                {category.name}
-              </h1>
-            </div>
-          </section>
-        )}
-
-        {filteredProducts.length === 0 ? (
-          <section
-            className="fade-in"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(168, 85, 247, 0.12)",
-              borderRadius: 24,
-              padding: 22,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
-              color: "#fff",
-              fontSize: 18,
-            }}
-          >
-            Nenhum produto encontrado nessa categoria.
-          </section>
-        ) : (
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: isMobile
-                ? "repeat(2, minmax(0, 1fr))"
-                : "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: isMobile ? 12 : 18,
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(168, 85, 247, 0.12)",
-              borderRadius: 24,
-              padding: isMobile ? 12 : 22,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
-            }}
-          >
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/produto/${product.id}`}
-                className="fade-in"
-                style={{
-                  width: "100%",
-                  minWidth: 0,
-                  maxWidth: "100%",
-                  background: "rgba(255,255,255,0.04)",
-                  backdropFilter: "blur(14px)",
-                  borderRadius: isMobile ? 14 : 18,
-                  overflow: "hidden",
-                  boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
-                  border: "1px solid rgba(159, 122, 234, 0.18)",
-                  transition: "all 0.25s ease",
-                  textDecoration: "none",
-                  display: "block",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
-                    e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
-                  }
-                }}
-              >
-                <div
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                    padding: 0,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: isMobile ? 140 : 220,
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: "100%",
-                      height: isMobile ? 140 : 220,
-                      objectFit: "cover",
-                      borderRadius: 0,
-                      display: "block",
-                    }}
-                  />
-                </div>
-
-                <div style={{ padding: isMobile ? 10 : 16 }}>
-                  <h3
-                    style={{
-                      margin: "0 0 8px 0",
-                      fontSize: isMobile ? 14 : 16,
-                      lineHeight: 1.35,
-                      minHeight: isMobile ? "auto" : 44,
-                      color: "#ffffff",
-                      wordBreak: "break-word",
-                      display: "-webkit-box",
-                      WebkitLineClamp: isMobile ? 4 : 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textShadow: "0 0 14px rgba(168,85,247,0.18)",
-                    }}
-                  >
-                    {product.name}
-                  </h3>
-
-                  <p
-                    style={{
-                      margin: "0 0 12px 0",
-                      color: "#d8b4fe",
-                      fontSize: isMobile ? 18 : 28,
-                      fontWeight: "bold",
-                      textShadow: "0 0 18px rgba(168, 85, 247, 0.42)",
-                    }}
-                  >
-                    {formatPrice(Number(product.price))}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: isMobile ? 11 : 12,
-                      color: "#d8b4fe",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {product.stock > 0
-                      ? `Estoque disponível: ${product.stock}`
-                      : "Sem estoque"}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </section>
-        )}
-      </main>
-
-      {showMiniCart && lastAddedProduct && (
-        <div
-          className="fade-in"
+        <input
+          placeholder="Buscar produto..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           style={{
-            position: "fixed",
-            bottom: 12,
-            right: 12,
-            background: "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
-            color: "white",
-            padding: isMobile ? "8px 12px" : "10px 16px",
-            borderRadius: 16,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            boxShadow: "0 0 28px rgba(168,85,247,0.65)",
-            zIndex: 999,
-            fontSize: 12,
-            minWidth: isMobile ? 220 : 260,
-            maxWidth: isMobile ? 280 : 320,
-            border: "1px solid rgba(255,255,255,0.1)",
-            backdropFilter: "blur(12px)",
+            width: "100%",
+            padding: 10,
+            borderRadius: 12,
+            marginTop: 10,
+            background: "rgba(255,255,255,0.05)",
+            color: "#fff",
+            border: "1px solid rgba(168,85,247,0.3)",
+          }}
+        />
+
+        <div
+          style={{
+            marginTop: 20,
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3,1fr)",
+            gap: 15,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <strong style={{ fontSize: 12, textShadow: "0 0 10px rgba(255,255,255,0.25)" }}>
-              🛒 Produto adicionado
-            </strong>
-            <span style={{ fontSize: 11 }}>
-              {lastAddedProduct.name} ({lastAddedQuantity})
-            </span>
-          </div>
+          {filteredProducts.map((product) => {
+            const inCart =
+              cart.find((i) => i.id === product.id)?.quantity || 0;
+            const estoque = product.stock - inCart;
 
-          <button
-            onClick={() => setShowMiniCart(false)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "white",
-              cursor: "pointer",
-              fontSize: 14,
-              lineHeight: 1,
-            }}
-          >
-            ✕
-          </button>
+            return (
+              <div
+                key={product.id}
+                style={{
+                  background: "rgba(20,6,40,0.7)",
+                  border: "1px solid rgba(168,85,247,0.3)",
+                  borderRadius: 18,
+                  padding: 10,
+                  backdropFilter: "blur(12px)",
+                  boxShadow: "0 0 20px rgba(168,85,247,0.2)",
+                }}
+              >
+                <img
+                  src={product.image}
+                  style={{
+                    width: "100%",
+                    height: 120,
+                    objectFit: "contain",
+                  }}
+                />
+
+                <h3 style={{ color: "#fff", fontSize: 14 }}>
+                  {product.name}
+                </h3>
+
+                <p style={{ color: "#d8b4fe", fontWeight: "bold" }}>
+                  {formatPrice(product.price)}
+                </p>
+
+                <p style={{ color: "#aaa", fontSize: 12 }}>
+                  {estoque > 0
+                    ? `Estoque: ${estoque}`
+                    : "Sem estoque"}
+                </p>
+
+                <button
+                  onClick={() => addToCart(product)}
+                  disabled={estoque <= 0}
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                    borderRadius: 12,
+                    background:
+                      estoque <= 0
+                        ? "#333"
+                        : "linear-gradient(#a855f7,#6d28d9)",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Comprar
+                </button>
+              </div>
+            );
+          })}
         </div>
-      )}
-
-      <style jsx>{`
-        .fade-in {
-          animation: fadeIn 0.6s ease;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      </main>
     </div>
   );
 }
