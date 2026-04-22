@@ -48,6 +48,17 @@ export default function CategoriaPage() {
   const [showMiniCart, setShowMiniCart] = useState(false);
   const [lastAddedProduct, setLastAddedProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function updateLayout() {
+      setIsMobile(window.innerWidth <= 768);
+    }
+
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
 
   useEffect(() => {
     if (!categoryId) return;
@@ -158,7 +169,7 @@ export default function CategoriaPage() {
           zIndex: 20,
           background: "rgba(8, 6, 16, 0.62)",
           color: "white",
-          padding: "16px 20px",
+          padding: isMobile ? "14px 12px" : "16px 20px",
           boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
           backdropFilter: "blur(14px)",
@@ -180,7 +191,7 @@ export default function CategoriaPage() {
             style={{
               margin: 0,
               fontWeight: "bold",
-              fontSize: 36,
+              fontSize: isMobile ? 28 : 36,
               letterSpacing: "1px",
               color: "#ffffff",
               textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
@@ -196,6 +207,7 @@ export default function CategoriaPage() {
               gap: 10,
               alignItems: "center",
               flexWrap: "wrap",
+              width: isMobile ? "100%" : "auto",
             }}
           >
             <input
@@ -204,10 +216,11 @@ export default function CategoriaPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
-                padding: "10px 12px",
+                padding: isMobile ? "9px 10px" : "10px 12px",
                 borderRadius: 14,
                 border: "1px solid rgba(173, 133, 255, 0.25)",
-                minWidth: 260,
+                minWidth: isMobile ? 0 : 260,
+                width: isMobile ? "100%" : 260,
                 outline: "none",
                 background: "rgba(18, 12, 32, 0.72)",
                 color: "#fff",
@@ -224,7 +237,7 @@ export default function CategoriaPage() {
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
-                padding: "10px 14px",
+                padding: isMobile ? "9px 12px" : "10px 14px",
                 fontWeight: "bold",
                 boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
                 textDecoration: "none",
@@ -240,7 +253,7 @@ export default function CategoriaPage() {
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
-                padding: "10px 14px",
+                padding: isMobile ? "9px 12px" : "10px 14px",
                 fontWeight: "bold",
                 boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
               }}
@@ -255,7 +268,7 @@ export default function CategoriaPage() {
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: 20,
+          padding: isMobile ? 12 : 20,
           position: "relative",
           zIndex: 1,
         }}
@@ -270,7 +283,7 @@ export default function CategoriaPage() {
               overflow: "hidden",
               background: "rgba(255,255,255,0.04)",
               backdropFilter: "blur(16px)",
-              minHeight: 240,
+              minHeight: isMobile ? 180 : 240,
               boxShadow: "0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(124,58,237,0.16)",
               marginBottom: 28,
             }}
@@ -300,8 +313,8 @@ export default function CategoriaPage() {
               style={{
                 position: "relative",
                 zIndex: 2,
-                padding: 24,
-                minHeight: 240,
+                padding: isMobile ? 16 : 24,
+                minHeight: isMobile ? 180 : 240,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
@@ -331,7 +344,7 @@ export default function CategoriaPage() {
               <h1
                 style={{
                   margin: 0,
-                  fontSize: 42,
+                  fontSize: isMobile ? 28 : 42,
                   fontWeight: "bold",
                   color: "#ffffff",
                   lineHeight: 1.05,
@@ -349,7 +362,7 @@ export default function CategoriaPage() {
         <section className="fade-in" style={{ marginBottom: 24 }}>
           <h2
             style={{
-              fontSize: 30,
+              fontSize: isMobile ? 24 : 30,
               marginBottom: 8,
               color: "#ffffff",
               textShadow: "0 0 20px rgba(168, 85, 247, 0.68)",
@@ -357,7 +370,7 @@ export default function CategoriaPage() {
           >
             Produtos da categoria
           </h2>
-          <p style={{ color: "#d1d5db", marginTop: 0, fontSize: 16 }}>
+          <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 14 : 16 }}>
             Escolha seus produtos e adicione ao carrinho.
           </p>
           <div style={{ color: "#fff", marginTop: 10, fontSize: 14 }}>
@@ -385,13 +398,15 @@ export default function CategoriaPage() {
           <section
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-              gap: 18,
+              gridTemplateColumns: isMobile
+                ? "repeat(2, minmax(0, 1fr))"
+                : "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: isMobile ? 12 : 18,
               background: "rgba(255,255,255,0.04)",
               backdropFilter: "blur(16px)",
               border: "1px solid rgba(168, 85, 247, 0.12)",
               borderRadius: 24,
-              padding: 22,
+              padding: isMobile ? 12 : 22,
               boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
             }}
           >
@@ -407,32 +422,37 @@ export default function CategoriaPage() {
                   style={{
                     width: "100%",
                     minWidth: 0,
+                    maxWidth: "100%",
                     background: "rgba(255,255,255,0.04)",
                     backdropFilter: "blur(14px)",
-                    borderRadius: 18,
+                    borderRadius: isMobile ? 14 : 18,
                     overflow: "hidden",
                     boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
                     border: "1px solid rgba(159, 122, 234, 0.18)",
                     transition: "all 0.25s ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
-                    e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
+                      e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
+                    if (!isMobile) {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
+                    }
                   }}
                 >
                   <div
                     style={{
                       background:
                         "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                      padding: 12,
+                      padding: isMobile ? 10 : 12,
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      minHeight: 190,
+                      minHeight: isMobile ? 120 : 190,
                     }}
                   >
                     <img
@@ -440,25 +460,25 @@ export default function CategoriaPage() {
                       alt={product.name}
                       style={{
                         width: "100%",
-                        maxWidth: 160,
-                        maxHeight: 160,
+                        maxWidth: isMobile ? 95 : 160,
+                        maxHeight: isMobile ? 95 : 160,
                         objectFit: "contain",
                         borderRadius: 12,
                       }}
                     />
                   </div>
 
-                  <div style={{ padding: 16 }}>
+                  <div style={{ padding: isMobile ? 10 : 16 }}>
                     <h3
                       style={{
                         margin: "0 0 8px 0",
-                        fontSize: 16,
+                        fontSize: isMobile ? 14 : 16,
                         lineHeight: 1.35,
-                        minHeight: 44,
+                        minHeight: isMobile ? "auto" : 44,
                         color: "#ffffff",
                         wordBreak: "break-word",
                         display: "-webkit-box",
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp: isMobile ? 4 : 3,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         textShadow: "0 0 14px rgba(168,85,247,0.18)",
@@ -471,7 +491,7 @@ export default function CategoriaPage() {
                       style={{
                         margin: "0 0 12px 0",
                         color: "#d8b4fe",
-                        fontSize: 28,
+                        fontSize: isMobile ? 18 : 28,
                         fontWeight: "bold",
                         textShadow: "0 0 18px rgba(168, 85, 247, 0.42)",
                       }}
@@ -482,7 +502,7 @@ export default function CategoriaPage() {
                     <p
                       style={{
                         margin: "0 0 8px 0",
-                        fontSize: 12,
+                        fontSize: isMobile ? 11 : 12,
                         color: "#d8b4fe",
                         fontWeight: "bold",
                       }}
@@ -504,10 +524,10 @@ export default function CategoriaPage() {
                         color: "white",
                         border: "1px solid rgba(216, 180, 254, 0.28)",
                         borderRadius: 14,
-                        padding: "12px 14px",
+                        padding: isMobile ? "10px 10px" : "12px 14px",
                         cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
                         fontWeight: "bold",
-                        fontSize: 16,
+                        fontSize: isMobile ? 14 : 16,
                         boxShadow:
                           remainingStock <= 0
                             ? "0 0 18px rgba(59,42,85,0.35)"
@@ -536,7 +556,7 @@ export default function CategoriaPage() {
             right: 12,
             background: "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
             color: "white",
-            padding: "10px 16px",
+            padding: isMobile ? "8px 12px" : "10px 16px",
             borderRadius: 16,
             display: "flex",
             alignItems: "center",
@@ -544,8 +564,8 @@ export default function CategoriaPage() {
             boxShadow: "0 0 28px rgba(168,85,247,0.65)",
             zIndex: 999,
             fontSize: 12,
-            minWidth: 260,
-            maxWidth: 320,
+            minWidth: isMobile ? 220 : 260,
+            maxWidth: isMobile ? 280 : 320,
             border: "1px solid rgba(255,255,255,0.1)",
             backdropFilter: "blur(12px)",
           }}
