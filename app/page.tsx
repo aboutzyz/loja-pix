@@ -14,6 +14,14 @@ type Product = {
   price: number;
   image: string;
   stock: number;
+  category_id?: string | null;
+  created_at?: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+  image: string;
   created_at?: string;
 };
 
@@ -32,6 +40,8 @@ function formatPrice(value: number) {
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,6 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     loadProducts();
+    loadCategories();
     loadCart();
   }, []);
 
@@ -88,6 +99,20 @@ export default function Home() {
     }
 
     setProducts((data as Product[]) || []);
+  }
+
+  async function loadCategories() {
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Erro ao buscar categorias:", error);
+      return;
+    }
+
+    setCategories((data as Category[]) || []);
   }
 
   function loadCart() {
@@ -162,10 +187,17 @@ export default function Home() {
   }
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [products, search]);
+    return products.filter((product) => {
+      const matchSearch = product.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+      const matchCategory =
+        selectedCategory === "all" || product.category_id === selectedCategory;
+
+      return matchSearch && matchCategory;
+    });
+  }, [products, search, selectedCategory]);
 
   const totalPages = Math.max(
     1,
@@ -428,6 +460,88 @@ export default function Home() {
                 Escolha seus produtos e adicione ao carrinho.
               </p>
             </section>
+
+            {categories.length > 0 && (
+              <section
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  flexWrap: "wrap",
+                  marginBottom: 18,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    border: "1px solid rgba(216, 180, 254, 0.22)",
+                    borderRadius: 14,
+                    padding: isMobile ? "10px 12px" : "10px 14px",
+                    cursor: "pointer",
+                    background:
+                      selectedCategory === "all"
+                        ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
+                        : "rgba(18, 12, 32, 0.92)",
+                    color: "white",
+                    fontWeight: "bold",
+                    boxShadow:
+                      selectedCategory === "all"
+                        ? "0 0 18px rgba(126, 34, 206, 0.35)"
+                        : "none",
+                  }}
+                >
+                  Todas
+                </button>
+
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      setCurrentPage(1);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      border: "1px solid rgba(216, 180, 254, 0.22)",
+                      borderRadius: 14,
+                      padding: isMobile ? "10px 12px" : "10px 14px",
+                      cursor: "pointer",
+                      background:
+                        selectedCategory === category.id
+                          ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
+                          : "rgba(18, 12, 32, 0.92)",
+                      color: "white",
+                      fontWeight: "bold",
+                      boxShadow:
+                        selectedCategory === category.id
+                          ? "0 0 18px rgba(126, 34, 206, 0.35)"
+                          : "none",
+                    }}
+                  >
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      style={{
+                        width: 22,
+                        height: 22,
+                        objectFit: "contain",
+                        borderRadius: 6,
+                        background: "rgba(255,255,255,0.08)",
+                        padding: 2,
+                      }}
+                    />
+                    <span>{category.name}</span>
+                  </button>
+                ))}
+              </section>
+            )}
 
             <section
               style={{
