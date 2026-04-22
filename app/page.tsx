@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
 
@@ -41,7 +42,6 @@ function formatPrice(value: number) {
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -187,17 +187,10 @@ export default function Home() {
   }
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchSearch = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      const matchCategory =
-        selectedCategory === "all" || product.category_id === selectedCategory;
-
-      return matchSearch && matchCategory;
-    });
-  }, [products, search, selectedCategory]);
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [products, search]);
 
   const totalPages = Math.max(
     1,
@@ -480,30 +473,21 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      setSelectedCategory("all");
-                      setCurrentPage(1);
-                    }}
+                  <Link
+                    href="/"
                     style={{
                       border: "1px solid rgba(216, 180, 254, 0.22)",
                       borderRadius: 14,
                       padding: isMobile ? "10px 14px" : "10px 16px",
                       cursor: "pointer",
-                      background:
-                        selectedCategory === "all"
-                          ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
-                          : "rgba(18, 12, 32, 0.92)",
+                      background: "rgba(18, 12, 32, 0.92)",
                       color: "white",
                       fontWeight: "bold",
-                      boxShadow:
-                        selectedCategory === "all"
-                          ? "0 0 18px rgba(126, 34, 206, 0.35)"
-                          : "none",
+                      textDecoration: "none",
                     }}
                   >
                     Ver tudo
-                  </button>
+                  </Link>
                 </div>
 
                 <div
@@ -515,123 +499,109 @@ export default function Home() {
                     gap: 16,
                   }}
                 >
-                  {categories.map((category) => {
-                    const isActive = selectedCategory === category.id;
-
-                    return (
-                      <button
-                        key={category.id}
-                        onClick={() => {
-                          setSelectedCategory(category.id);
-                          setCurrentPage(1);
-                        }}
+                  {categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={`/categoria/${category.id}`}
+                      style={{
+                        position: "relative",
+                        border: "1px solid rgba(216, 180, 254, 0.16)",
+                        borderRadius: 24,
+                        overflow: "hidden",
+                        padding: 0,
+                        cursor: "pointer",
+                        background: "rgba(12, 8, 24, 0.92)",
+                        minHeight: isMobile ? 180 : 220,
+                        textAlign: "left",
+                        boxShadow: "0 14px 30px rgba(0,0,0,0.30)",
+                        transition: "all 0.2s ease",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <img
+                        src={category.image}
+                        alt={category.name}
                         style={{
-                          position: "relative",
-                          border: isActive
-                            ? "1px solid rgba(216, 180, 254, 0.55)"
-                            : "1px solid rgba(216, 180, 254, 0.16)",
-                          borderRadius: 24,
-                          overflow: "hidden",
-                          padding: 0,
-                          cursor: "pointer",
-                          background: "rgba(12, 8, 24, 0.92)",
-                          minHeight: isMobile ? 180 : 220,
-                          textAlign: "left",
-                          boxShadow: isActive
-                            ? "0 0 28px rgba(126, 34, 206, 0.35)"
-                            : "0 14px 30px rgba(0,0,0,0.30)",
-                          transform: isActive ? "translateY(-2px)" : "none",
-                          transition: "all 0.2s ease",
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background:
+                            "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.12) 28%, rgba(10,6,20,0.90) 100%)",
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-end",
+                          padding: isMobile ? 16 : 18,
                         }}
                       >
-                        <img
-                          src={category.image}
-                          alt={category.name}
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-
                         <div
                           style={{
-                            position: "absolute",
-                            inset: 0,
-                            background: isActive
-                              ? "linear-gradient(180deg, rgba(10,6,20,0.10) 0%, rgba(10,6,20,0.18) 28%, rgba(10,6,20,0.92) 100%)"
-                              : "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.12) 28%, rgba(10,6,20,0.90) 100%)",
-                          }}
-                        />
-
-                        <div
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "flex-end",
-                            padding: isMobile ? 16 : 18,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 8,
+                            width: "fit-content",
+                            marginBottom: 10,
+                            padding: "6px 10px",
+                            borderRadius: 999,
+                            background: "rgba(12, 8, 24, 0.58)",
+                            border: "1px solid rgba(255,255,255,0.10)",
+                            backdropFilter: "blur(8px)",
+                            color: "#f3e8ff",
+                            fontWeight: "bold",
+                            fontSize: 12,
                           }}
                         >
-                          <div
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 8,
-                              width: "fit-content",
-                              marginBottom: 10,
-                              padding: "6px 10px",
-                              borderRadius: 999,
-                              background: "rgba(12, 8, 24, 0.58)",
-                              border: "1px solid rgba(255,255,255,0.10)",
-                              backdropFilter: "blur(8px)",
-                              color: "#f3e8ff",
-                              fontWeight: "bold",
-                              fontSize: 12,
-                            }}
-                          >
-                            {isActive ? "Selecionada" : "Categoria"}
-                          </div>
-
-                          <div
-                            style={{
-                              fontSize: isMobile ? 24 : 30,
-                              fontWeight: "bold",
-                              color: "#ffffff",
-                              lineHeight: 1.05,
-                              textShadow: "0 2px 16px rgba(0,0,0,0.55)",
-                              wordBreak: "break-word",
-                            }}
-                          >
-                            {category.name}
-                          </div>
-
-                          <div
-                            style={{
-                              marginTop: 10,
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 8,
-                              width: "fit-content",
-                              padding: "8px 12px",
-                              borderRadius: 12,
-                              background: isActive
-                                ? "rgba(139, 44, 245, 0.26)"
-                                : "rgba(255,255,255,0.08)",
-                              color: "#ffffff",
-                              fontWeight: "bold",
-                              fontSize: 13,
-                            }}
-                          >
-                            Ver produtos
-                          </div>
+                          Categoria
                         </div>
-                      </button>
-                    );
-                  })}
+
+                        <div
+                          style={{
+                            fontSize: isMobile ? 24 : 30,
+                            fontWeight: "bold",
+                            color: "#ffffff",
+                            lineHeight: 1.05,
+                            textShadow: "0 2px 16px rgba(0,0,0,0.55)",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {category.name}
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: 10,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 8,
+                            width: "fit-content",
+                            padding: "8px 12px",
+                            borderRadius: 12,
+                            background: "rgba(255,255,255,0.08)",
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                            fontSize: 13,
+                          }}
+                        >
+                          Abrir categoria
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </section>
             )}
@@ -645,7 +615,7 @@ export default function Home() {
                   textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
                 }}
               >
-                {selectedCategory === "all" ? "Produtos" : "Produtos da categoria"}
+                Produtos
               </h2>
               <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
                 Escolha seus produtos e adicione ao carrinho.
