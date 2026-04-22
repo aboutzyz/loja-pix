@@ -16,10 +16,7 @@ type Product = {
   price: number;
   image: string;
   stock: number;
-};
-
-type CartItem = Product & {
-  quantity: number;
+  description?: string | null;
 };
 
 function formatPrice(value: number) {
@@ -34,201 +31,173 @@ export default function ProdutoPage() {
   const productId = String(params?.id ?? "");
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [showQty, setShowQty] = useState(false);
-  const [qty, setQty] = useState(1);
-  const [showCart, setShowCart] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    loadProduct();
-    loadCart();
+    function updateLayout() {
+      setIsMobile(window.innerWidth <= 768);
+    }
+
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    if (!productId) return;
+    loadProduct();
+  }, [productId]);
 
   async function loadProduct() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("products")
       .select("*")
       .eq("id", productId)
       .single();
 
+    if (error) {
+      console.error(error);
+      return;
+    }
+
     setProduct(data);
   }
 
-  function loadCart() {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }
-
-  function addToCart() {
+  function sendWhatsApp() {
     if (!product) return;
 
-    setCart((prev) => {
-      const exist = prev.find((i) => i.id === product.id);
+    const text = ${product.name} - ${formatPrice(Number(product.price))};
 
-      if (exist) {
-        return prev.map((i) =>
-          i.id === product.id
-            ? { ...i, quantity: i.quantity + qty }
-            : i
-        );
-      }
-
-      return [...prev, { ...product, quantity: qty }];
-    });
-
-    setShowQty(false);
-    setQty(1);
-  }
-
-  function sendWhatsApp() {
-    const text = cart
-      .map(
-        (i) =>
-          `${i.name} x${i.quantity} - ${formatPrice(
-            i.price * i.quantity
-          )}`
-      )
-      .join("%0A");
-
+    // ✅ CORRIGIDO (com crase)
     window.open(
       https://wa.me/5541996265158?text=Pedido:%0A${text},
       "_blank"
     );
   }
 
-  const total = cart.reduce(
-    (acc, i) => acc + i.price * i.quantity,
-    0
-  );
+  if (!product) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background:
+            "linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)",
+          color: "white",
+          padding: 40,
+        }}
+      >
+        Carregando...
+      </div>
+    );
+  }
 
-  if (!product) return <div style={{ color: "white" }}>Carregando...</div>;
+  const productDescription =
+    product.description?.trim() ||
+    "Produto digital disponível para envio rápido. Após o pagamento, o pedido será combinado pelo WhatsApp.";
 
   return (
-    <div style={{ padding: 20, color: "white" }}>
-      <Link href="/">← Voltar</Link>
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)",
+        color: "white",
+        padding: isMobile ? 12 : 20,
+        fontFamily: "Arial",
+      }}
+    >
+      <Link
+        href="/"
+        style={{
+          color: "#c084fc",
+          fontWeight: "bold",
+          textDecoration: "none",
+        }}
+      >
+        ← Voltar
+      </Link>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: 20,
+          marginTop: 20,
+          background: "rgba(255,255,255,0.04)",
+          borderRadius: 20,
+          padding: 20,
+          backdropFilter: "blur(10px)",
+        }}
+      >
         {/* IMAGEM */}
         <div>
           <img
             src={product.image}
-            style={{ width: "100%", borderRadius: 12 }}
+            alt={product.name}
+            style={{
+              width: "100%",
+              height: isMobile ? 250 : 500,
+              objectFit: "cover",
+              borderRadius: 16,
+            }}
           />
 
-          <button
-            onClick={() => setShowQty(true)}
-            style={{
-              marginTop: 10,
-              width: "100%",
-              padding: 12,
-              background: "#7c3aed",
-              color: "white",
-              borderRadius: 10,
-              fontWeight: "bold",
-            }}
-          >
-            Adicionar ao carrinho
-          </button>
-        </div>
-
-        {/* INFO */}
-        <div>
-          <h1>{product.name}</h1>
-          <h2>{formatPrice(product.price)}</h2>
-          <p>Estoque: {product.stock}</p>
-
-          <p style={{ marginTop: 20 }}>
-            Produto digital. Entrega rápida via WhatsApp.
-          </p>
-        </div>
-      </div>
-
-      {/* POPUP QUANTIDADE */}
-      {showQty && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.6)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ background: "#111", padding: 20, borderRadius: 12 }}>
-            <h3>Quantidade</h3>
-
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
-              <span>{qty}</span>
-              <button onClick={() => setQty(qty + 1)}>+</button>
-            </div>
-
-            <button
-              onClick={addToCart}
-              style={{ marginTop: 10, background: "#7c3aed", color: "white" }}
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* BOTÃO FLUTUANTE */}
-      {cart.length > 0 && (
-        <button
-          onClick={() => setShowCart(!showCart)}
-          style={{
-            position: "fixed",
-            bottom: 20,
-            right: 20,
-            width: 60,
-            height: 60,
-            borderRadius: "50%",
-            background: "#7c3aed",
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          🛒
-        </button>
-      )}
-
-      {/* CARRINHO */}
-      {showCart && (
-        <div
-          style={{
-            position: "fixed",
-            right: 20,
-            bottom: 90,
-            background: "#111",
-            padding: 15,
-            borderRadius: 12,
-            width: 250,
-          }}
-        >
-          <h3>Carrinho</h3>
-
-          {cart.map((i) => (
-            <div key={i.id}>
-              {i.name} x{i.quantity}
-            </div>
-          ))}
-
-          <p>Total: {formatPrice(total)}</p>
-
+          {/* BOTÃO EMBAIXO DA IMAGEM */}
           <button
             onClick={sendWhatsApp}
-            style={{ width: "100%", background: "#22c55e", color: "white" }}
+            style={{
+              width: "100%",
+              marginTop: 12,
+              padding: 14,
+              borderRadius: 12,
+              border: "none",
+              fontWeight: "bold",
+              fontSize: 16,
+              background:
+                "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+              color: "white",
+              boxShadow: "0 0 20px rgba(168,85,247,0.8)",
+              cursor: "pointer",
+            }}
           >
-            Finalizar no WhatsApp
+            Enviar pedido no WhatsApp
           </button>
         </div>
-      )}
+
+        {/* INFO DIREITA */}
+        <div>
+          <h1 style={{ fontSize: 32 }}>{product.name}</h1>
+
+          <p
+            style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              color: "#d8b4fe",
+            }}
+          >
+            {formatPrice(product.price)}
+          </p>
+
+          <p>
+            {product.stock > 0
+              ? Estoque: ${product.stock}
+              : "Sem estoque"}
+          </p>
+
+          {/* DESCRIÇÃO */}
+          <div
+            style={{
+              marginTop: 20,
+              padding: 16,
+              background: "rgba(255,255,255,0.05)",
+              borderRadius: 12,
+            }}
+          >
+            <h3>Descrição</h3>
+            <p>{productDescription}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
