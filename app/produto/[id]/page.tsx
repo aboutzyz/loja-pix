@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,24 +16,37 @@ type Product = {
   price: number;
   image: string;
   stock: number;
+  description?: string | null;
 };
 
 type CartItem = Product & { quantity: number };
 
+function formatPrice(v: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(v);
+}
+
 export default function ProdutoPage() {
-  const params = useParams();
-  const productId = String(params?.id ?? "");
+  const { id } = useParams();
+  const productId = String(id);
 
   const [product, setProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [showQty, setShowQty] = useState(false);
   const [qty, setQty] = useState(1);
+  const [showQty, setShowQty] = useState(false);
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     loadProduct();
-    loadCart();
+    const saved = localStorage.getItem("cart");
+    if (saved) setCart(JSON.parse(saved));
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   async function loadProduct() {
     const { data } = await supabase
@@ -41,18 +54,7 @@ export default function ProdutoPage() {
       .select("*")
       .eq("id", productId)
       .single();
-
     setProduct(data);
-  }
-
-  function loadCart() {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }
-
-  function saveCart(newCart: CartItem[]) {
-    setCart(newCart);
-    localStorage.setItem("cart", JSON.stringify(newCart));
   }
 
   function addToCart() {
@@ -63,74 +65,63 @@ export default function ProdutoPage() {
     let newCart;
 
     if (existing) {
+      const newQty = Math.min(existing.quantity + qty, product.stock);
       newCart = cart.map((i) =>
-        i.id === product.id
-          ? { ...i, quantity: i.quantity + qty }
-          : i
+        i.id === product.id ? { ...i, quantity: newQty } : i
       );
     } else {
       newCart = [...cart, { ...product, quantity: qty }];
     }
 
-    saveCart(newCart);
+    setCart(newCart);
     setShowQty(false);
     setQty(1);
   }
 
-  function changeQty(id: string, amount: number) {
-    const newCart = cart.map((item) =>
-      item.id === id
-        ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-        : item
+  function updateQty(id: string, amount: number) {
+    setCart((prev) =>
+      prev.map((i) => {
+        if (i.id !== id) return i;
+        const newQ = Math.max(1, Math.min(i.quantity + amount, i.stock));
+        return { ...i, quantity: newQ };
+      })
     );
-    saveCart(newCart);
   }
 
   function removeItem(id: string) {
-    saveCart(cart.filter((i) => i.id !== id));
+    setCart((prev) => prev.filter((i) => i.id !== id));
   }
 
-  function checkout() {
-    const text = cart
-      .map(
-        (i) =>
-          `🛒 ${i.name}%0AQuantidade: ${i.quantity}%0ATotal: R$${i.price *
-            i.quantity}%0A------`
-      )
-      .join("%0A");
-
-    window.open(
-      `https://wa.me/5541996265158?text=🔥 Pedido:%0A${text}`,
-      "_blank"
-    );
-  }
-
-  const total = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
+  const total = useMemo(
+    () => cart.reduce((acc, i) => acc + i.price * i.quantity, 0),
+    [cart]
   );
 
-  if (!product) return <div style={{ color: "white" }}>Carregando...</div>;
+  if (!product) return <div style={{ color: "#fff" }}>Carregando...</div>;
 
   return (
     <div style={bg}>
-      <Link href="/" style={voltar}>← Voltar</Link>
+      <Link href="/" style={back}>← Voltar</Link>
 
-      <div style={container}>
+      <div style={grid}>
         {/* IMAGEM */}
         <div style={card}>
           <img src={product.image} style={img} />
 
-          <button onClick={() => setShowQty(true)} style={btnMain}>
-            💜 Adicionar ao carrinho
+          <button style={btn} onClick={() => setShowQty(true)}>
+            Adicionar ao carrinho
           </button>
         </div>
 
         {/* INFO */}
         <div style={card}>
           <h1 style={title}>{product.name}</h1>
-          <h2 style={price}>R$ {product.price}</h2>
-          <p style={stock}>Estoque: {product.stock}</p>
+          <h2 style={price}>{formatPrice(product.price)}</h2>
+          <p>Estoque: {product.stock}</p>
+
+          <div style={descBox}>
+            {product.description || "Produto digital com entrega rápida."}
+          </div>
         </div>
       </div>
 
@@ -138,120 +129,103 @@ export default function ProdutoPage() {
       {showQty && (
         <div style={overlay}>
           <div style={popup}>
-            <h2>Quantidade</h2>
+            <h3>Quantidade</h3>
 
             <div style={qtyBox}>
-              <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
+              <button onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
               <span>{qty}</span>
-              <button onClick={() => setQty(qty + 1)}>+</button>
+              <button
+                onClick={() =>
+                  setQty(Math.min(product.stock, qty + 1))
+                }
+              >
+                +
+              </button>
             </div>
 
-            <button onClick={addToCart} style={btnMain}>
+            <button style={btn} onClick={addToCart}>
               Confirmar
             </button>
           </div>
         </div>
       )}
 
-      {/* BOTÃO FLUTUANTE */}
+      {/* BOTÃO CARRINHO */}
       <div style={floating} onClick={() => setShowCart(true)}>
         🛒
         {cart.length > 0 && <span style={badge}>{cart.length}</span>}
       </div>
 
-      {/* CARRINHO */}
-      {showCart && (
-        <div style={overlay}>
-          <div style={cartBox}>
-            <h2>Seu Carrinho</h2>
+      {/* CARRINHO LATERAL */}
+      <div style={{ ...cartPanel, right: showCart ? 0 : -400 }}>
+        <h2>Seu carrinho</h2>
 
-            {cart.map((item) => (
-              <div key={item.id} style={itemBox}>
-                <strong>{item.name}</strong>
+        {cart.map((i) => (
+          <div key={i.id} style={item}>
+            <img src={i.image} style={miniImg} />
 
-                <div>
-                  <button onClick={() => changeQty(item.id, -1)}>-</button>
-                  {item.quantity}
-                  <button onClick={() => changeQty(item.id, 1)}>+</button>
-                </div>
+            <div style={{ flex: 1 }}>
+              <div>{i.name}</div>
+              <div>{formatPrice(i.price)}</div>
 
-                <button onClick={() => removeItem(item.id)}>❌</button>
+              <div style={qtyBoxSmall}>
+                <button onClick={() => updateQty(i.id, -1)}>−</button>
+                <span>{i.quantity}</span>
+                <button onClick={() => updateQty(i.id, 1)}>+</button>
               </div>
-            ))}
+            </div>
 
-            <h3>Total: R$ {total}</h3>
-
-            <button onClick={checkout} style={btnMain}>
-              Finalizar no WhatsApp
-            </button>
-
-            <button onClick={() => setShowCart(false)}>Fechar</button>
+            <button onClick={() => removeItem(i.id)}>✕</button>
           </div>
-        </div>
-      )}
+        ))}
+
+        <h3>Total: {formatPrice(total)}</h3>
+
+        <button style={btn}>Finalizar pedido</button>
+        <button onClick={() => setShowCart(false)}>Fechar</button>
+      </div>
     </div>
   );
 }
 
-/* 🎨 ESTILO ULTRA */
+/* 🎨 ESTILO BONITO */
+const bg = { background: "#070314", minHeight: "100vh", padding: 20, color: "#fff" };
 
-const bg = {
-  background: "linear-gradient(180deg,#020014,#0b041a)",
-  minHeight: "100vh",
-  padding: 20,
-  color: "white",
-};
-
-const container = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: 20,
-};
+const grid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 };
 
 const card = {
   background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(15px)",
+  backdropFilter: "blur(12px)",
   borderRadius: 20,
   padding: 20,
-  boxShadow: "0 0 25px rgba(168,85,247,0.4)",
 };
 
-const img = {
-  width: "100%",
-  borderRadius: 15,
-};
+const img = { width: "100%", borderRadius: 12 };
 
-const btnMain = {
-  marginTop: 15,
-  padding: 14,
-  width: "100%",
-  borderRadius: 12,
+const btn = {
+  marginTop: 10,
+  padding: 12,
+  borderRadius: 10,
   border: "none",
-  background: "linear-gradient(180deg,#a855f7,#6d28d9)",
-  color: "white",
-  fontWeight: "bold",
+  background: "#a855f7",
+  color: "#fff",
   cursor: "pointer",
-  boxShadow: "0 0 20px #a855f7",
 };
 
-const title = {
-  fontSize: 28,
-  textShadow: "0 0 15px #a855f7",
-};
+const title = { fontSize: 28 };
+const price = { fontSize: 22, color: "#c084fc" };
 
-const price = {
-  fontSize: 24,
-  color: "#c084fc",
-};
-
-const stock = {
-  opacity: 0.7,
+const descBox = {
+  marginTop: 15,
+  background: "rgba(255,255,255,0.04)",
+  padding: 10,
+  borderRadius: 10,
 };
 
 const overlay = {
   position: "fixed" as const,
   inset: 0,
-  background: "rgba(0,0,0,0.7)",
+  background: "rgba(0,0,0,0.6)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -259,31 +233,28 @@ const overlay = {
 
 const popup = {
   background: "#120826",
-  padding: 30,
-  borderRadius: 15,
-  boxShadow: "0 0 25px #a855f7",
+  padding: 20,
+  borderRadius: 10,
 };
 
 const qtyBox = {
   display: "flex",
-  justifyContent: "center",
   gap: 10,
-  marginBottom: 10,
+  justifyContent: "center",
+  alignItems: "center",
 };
 
 const floating = {
   position: "fixed" as const,
   bottom: 20,
   right: 20,
-  width: 65,
-  height: 65,
+  width: 60,
+  height: 60,
   borderRadius: "50%",
   background: "#a855f7",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  fontSize: 26,
-  boxShadow: "0 0 25px #a855f7",
   cursor: "pointer",
 };
 
@@ -293,21 +264,31 @@ const badge = {
   right: -5,
   background: "red",
   borderRadius: "50%",
-  padding: "4px 8px",
+  padding: "4px 6px",
 };
 
-const cartBox = {
+const cartPanel = {
+  position: "fixed" as const,
+  top: 0,
+  width: 350,
+  height: "100%",
   background: "#120826",
   padding: 20,
-  borderRadius: 15,
-  width: 320,
+  transition: "0.3s",
 };
 
-const itemBox = {
+const item = {
+  display: "flex",
+  gap: 10,
   marginBottom: 10,
 };
 
-const voltar = {
-  color: "#a855f7",
-  textDecoration: "none",
+const miniImg = { width: 50, borderRadius: 8 };
+
+const qtyBoxSmall = {
+  display: "flex",
+  gap: 5,
+  alignItems: "center",
 };
+
+const back = { color: "#a855f7", textDecoration: "none" };
