@@ -13,6 +13,7 @@ type Product = {
   name: string;
   price: number;
   image: string;
+  stock: number;
   created_at?: string;
 };
 
@@ -97,10 +98,16 @@ export default function Home() {
   }
 
   function addToCart(product: Product) {
+    if ((product.stock ?? 0) <= 0) return;
+
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
 
       if (existing) {
+        if (existing.quantity >= (product.stock ?? 0)) {
+          return prev;
+        }
+
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
@@ -133,11 +140,18 @@ export default function Home() {
 
   function increaseQuantity(productId: string) {
     setCart((prev) =>
-      prev.map((item) =>
-        item.id === productId
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
+      prev.map((item) => {
+        if (item.id !== productId) return item;
+
+        const currentProduct = products.find((product) => product.id === productId);
+        const availableStock = currentProduct?.stock ?? item.stock ?? 0;
+
+        if (item.quantity >= availableStock) {
+          return item;
+        }
+
+        return { ...item, quantity: item.quantity + 1 };
+      })
     );
   }
 
@@ -496,22 +510,39 @@ export default function Home() {
                       {formatPrice(Number(product.price))}
                     </p>
 
+                    <p
+                      style={{
+                        margin: "0 0 8px 0",
+                        fontSize: isMobile ? 11 : 12,
+                        color: "#d8b4fe",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {(product.stock ?? 0) > 0
+                        ? `Estoque disponível: ${product.stock}`
+                        : "Sem estoque"}
+                    </p>
+
                     <button
                       onClick={() => addToCart(product)}
+                      disabled={(product.stock ?? 0) <= 0}
                       style={{
                         width: "100%",
                         background:
-                          "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
+                          (product.stock ?? 0) <= 0
+                            ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
+                            : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
                         color: "white",
                         border: "1px solid rgba(216, 180, 254, 0.28)",
                         borderRadius: isMobile ? 12 : 14,
                         padding: isMobile ? "10px 10px" : "12px 14px",
-                        cursor: "pointer",
+                        cursor: (product.stock ?? 0) <= 0 ? "not-allowed" : "pointer",
                         fontWeight: "bold",
                         fontSize: isMobile ? 14 : 16,
                         boxShadow:
                           "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
                         letterSpacing: "0.2px",
+                        opacity: (product.stock ?? 0) <= 0 ? 0.7 : 1,
                       }}
                     >
                       Comprar
@@ -604,110 +635,118 @@ export default function Home() {
             ) : (
               <>
                 <div style={{ display: "grid", gap: 14 }}>
-                  {cart.map((item) => (
-                    <div
-                      key={item.id}
-                      style={{
-                        display: "flex",
-                        gap: 14,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: 12,
-                        padding: 12,
-                        flexWrap: "wrap",
-                        background: "rgba(255,255,255,0.02)",
-                      }}
-                    >
+                  {cart.map((item) => {
+                    const currentProduct = products.find((product) => product.id === item.id);
+                    const availableStock = currentProduct?.stock ?? item.stock ?? 0;
+                    const reachedStockLimit = item.quantity >= availableStock;
+
+                    return (
                       <div
+                        key={item.id}
                         style={{
                           display: "flex",
-                          gap: 12,
+                          gap: 14,
                           alignItems: "center",
+                          justifyContent: "space-between",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          borderRadius: 12,
+                          padding: 12,
+                          flexWrap: "wrap",
+                          background: "rgba(255,255,255,0.02)",
                         }}
                       >
-                        <img
-                          src={item.image}
-                          alt={item.name}
+                        <div
                           style={{
-                            width: 80,
-                            height: 80,
-                            objectFit: "contain",
-                            borderRadius: 10,
-                            background: "#1a1333",
-                            padding: 6,
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "center",
                           }}
-                        />
-                        <div>
-                          <strong style={{ color: "#fff" }}>{item.name}</strong>
-                          <div style={{ color: "#d8b4fe", marginTop: 6 }}>
-                            {formatPrice(Number(item.price))}
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            style={{
+                              width: 80,
+                              height: 80,
+                              objectFit: "contain",
+                              borderRadius: 10,
+                              background: "#1a1333",
+                              padding: 6,
+                            }}
+                          />
+                          <div>
+                            <strong style={{ color: "#fff" }}>{item.name}</strong>
+                            <div style={{ color: "#d8b4fe", marginTop: 6 }}>
+                              {formatPrice(Number(item.price))}
+                            </div>
                           </div>
                         </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <button
+                            onClick={() => decreaseQuantity(item.id)}
+                            style={{
+                              border: "none",
+                              background: "#2a1a48",
+                              color: "#fff",
+                              borderRadius: 8,
+                              padding: "8px 12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            -
+                          </button>
+
+                          <span
+                            style={{
+                              minWidth: 24,
+                              textAlign: "center",
+                              color: "#fff",
+                            }}
+                          >
+                            {item.quantity}
+                          </span>
+
+                          <button
+                            onClick={() => increaseQuantity(item.id)}
+                            disabled={reachedStockLimit}
+                            style={{
+                              border: "none",
+                              background: "#2a1a48",
+                              color: "#fff",
+                              borderRadius: 8,
+                              padding: "8px 12px",
+                              cursor: reachedStockLimit ? "not-allowed" : "pointer",
+                              opacity: reachedStockLimit ? 0.5 : 1,
+                            }}
+                          >
+                            +
+                          </button>
+
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            style={{
+                              border: "none",
+                              background: "#ef4444",
+                              color: "white",
+                              borderRadius: 8,
+                              padding: "8px 12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Remover
+                          </button>
+                        </div>
                       </div>
-
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 8,
-                          alignItems: "center",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <button
-                          onClick={() => decreaseQuantity(item.id)}
-                          style={{
-                            border: "none",
-                            background: "#2a1a48",
-                            color: "#fff",
-                            borderRadius: 8,
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          -
-                        </button>
-
-                        <span
-                          style={{
-                            minWidth: 24,
-                            textAlign: "center",
-                            color: "#fff",
-                          }}
-                        >
-                          {item.quantity}
-                        </span>
-
-                        <button
-                          onClick={() => increaseQuantity(item.id)}
-                          style={{
-                            border: "none",
-                            background: "#2a1a48",
-                            color: "#fff",
-                            borderRadius: 8,
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          +
-                        </button>
-
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          style={{
-                            border: "none",
-                            background: "#ef4444",
-                            color: "white",
-                            borderRadius: 8,
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Remover
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div style={{ marginTop: 20 }}>
