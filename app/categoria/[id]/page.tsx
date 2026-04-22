@@ -42,10 +42,6 @@ export default function CategoriaPage({
 }: {
   params: { id: string };
 }) {
-const { data: products, error } = await supabase
-  .from("products")
-  .select("*")
-  .eq("category_id", params.id);
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -67,7 +63,7 @@ const { data: products, error } = await supabase
     const { data, error } = await supabase
       .from("categories")
       .select("*")
-      .eq("id", categoryFilterValue)
+      .eq("id", params.id)
       .single();
 
     if (error) {
@@ -82,7 +78,7 @@ const { data: products, error } = await supabase
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("category_id", categoryFilterValue)
+      .eq("category_id", params.id)
       .order("created_at", { ascending: false });
 
     if (error) {
