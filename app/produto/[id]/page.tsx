@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import { CSSProperties } from "react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -215,53 +216,55 @@ export default function ProdutoPage() {
   );
 }
 
-/* 🎨 ESTILO */
+/* 🎨 ESTILOS TIPADOS */
 
-const bg = {
+const bg: CSSProperties = {
   minHeight: "100vh",
   padding: 20,
   color: "#fff",
-  background:
-    "linear-gradient(180deg,#020014,#0b041a)",
+  background: "linear-gradient(180deg,#020014,#0b041a)",
 };
 
-const container = {
+const container: CSSProperties = {
   display: "grid",
   gridTemplateColumns: "1.2fr 1fr 0.8fr",
   gap: 20,
 };
 
-const mobileContainer = {
+const mobileContainer: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 15,
 };
 
-const glass = {
+const glass: CSSProperties = {
   background: "rgba(255,255,255,0.05)",
   backdropFilter: "blur(16px)",
   borderRadius: 16,
   padding: 20,
 };
 
-const img = {
+const img: CSSProperties = {
   width: "100%",
   maxHeight: 300,
   objectFit: "contain",
 };
 
-const title = { fontSize: 24 };
+const title: CSSProperties = { fontSize: 24 };
 
-const stock = {
+const stock: CSSProperties = {
   background: "#6d28d9",
   padding: "4px 10px",
   borderRadius: 10,
   display: "inline-block",
 };
 
-const price = { fontSize: 26, color: "#c084fc" };
+const price: CSSProperties = {
+  fontSize: 26,
+  color: "#c084fc",
+};
 
-const buyBtn = {
+const buyBtn: CSSProperties = {
   marginTop: 15,
   padding: 14,
   borderRadius: 12,
@@ -270,7 +273,7 @@ const buyBtn = {
   fontWeight: "bold",
 };
 
-const cartBtn = {
+const cartBtn: CSSProperties = {
   marginTop: 10,
   padding: 14,
   borderRadius: 12,
@@ -279,13 +282,13 @@ const cartBtn = {
   color: "#fff",
 };
 
-const sideBox = {
+const sideBox: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 10,
 };
 
-const floating = {
+const floating: CSSProperties = {
   position: "fixed",
   bottom: 20,
   right: 20,
@@ -300,13 +303,13 @@ const floating = {
   cursor: "pointer",
 };
 
-const overlay = {
+const overlay: CSSProperties = {
   position: "fixed",
   inset: 0,
   background: "rgba(0,0,0,0.6)",
 };
 
-const cartPanel = {
+const cartPanel: CSSProperties = {
   position: "fixed",
   top: 0,
   height: "100%",
@@ -317,7 +320,7 @@ const cartPanel = {
   transition: "0.3s",
 };
 
-const itemBox = {
+const itemBox: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 12,
@@ -327,19 +330,19 @@ const itemBox = {
   background: "rgba(255,255,255,0.04)",
 };
 
-const itemImg = {
+const itemImg: CSSProperties = {
   width: 60,
   height: 60,
   borderRadius: 10,
 };
 
-const qtyBox = {
+const qtyBox: CSSProperties = {
   display: "flex",
   gap: 8,
   alignItems: "center",
 };
 
-const qtyBtn = {
+const qtyBtn: CSSProperties = {
   width: 38,
   height: 38,
   borderRadius: 10,
@@ -349,13 +352,13 @@ const qtyBtn = {
   fontSize: 18,
 };
 
-const qtyNumber = {
+const qtyNumber: CSSProperties = {
   minWidth: 30,
   textAlign: "center",
   fontWeight: "bold",
 };
 
-const removeBtn = {
+const removeBtn: CSSProperties = {
   background: "#ef4444",
   border: "none",
   color: "#fff",
@@ -363,18 +366,18 @@ const removeBtn = {
   padding: "6px 10px",
 };
 
-const footer = {
+const footer: CSSProperties = {
   borderTop: "1px solid rgba(255,255,255,0.1)",
   paddingTop: 10,
 };
 
-const totalStyle = {
+const totalStyle: CSSProperties = {
   fontSize: 20,
   marginBottom: 10,
   color: "#c084fc",
 };
 
-const finishBtn = {
+const finishBtn: CSSProperties = {
   width: "100%",
   padding: 14,
   borderRadius: 12,
