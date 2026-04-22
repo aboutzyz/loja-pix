@@ -187,8 +187,10 @@ export default function Home() {
   }
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
+    return products.filter(
+      (product) =>
+        !product.category_id &&
+        product.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [products, search]);
 
@@ -283,17 +285,6 @@ export default function Home() {
     window.open(`https://wa.me/5541996265158?text=${message}`, "_blank");
   }
 
-  const diamonds = Array.from({ length: 22 }, (_, i) => ({
-    id: i,
-    left: `${(i * 4.7 + 2) % 100}%`,
-    duration: `${14 + (i % 6) * 3}s`,
-    delay: `${(i % 7) * 1.2}s`,
-    size: `${28 + (i % 6) * 16}px`,
-    opacity: 0.22 + (i % 4) * 0.12,
-    rotate: `${-18 + (i % 7) * 8}deg`,
-    blur: i % 5 === 0 ? "1px" : "0px",
-  }));
-
   return (
     <div
       style={{
@@ -323,36 +314,6 @@ export default function Home() {
           zIndex: 0,
         }}
       />
-
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          overflow: "hidden",
-        }}
-      >
-        {diamonds.map((diamond) => (
-          <img
-            key={diamond.id}
-            src="/diamond.png"
-            alt=""
-            className="diamond-rain"
-            style={{
-              left: diamond.left,
-              animationDuration: diamond.duration,
-              animationDelay: diamond.delay,
-              width: diamond.size,
-              opacity: diamond.opacity,
-              transform: `rotate(${diamond.rotate})`,
-              filter: `drop-shadow(0 0 12px rgba(180,120,255,0.45))
-                       drop-shadow(0 0 28px rgba(120,70,255,0.38))
-                       blur(${diamond.blur})`,
-            }}
-          />
-        ))}
-      </div>
 
       <header
         style={{
@@ -570,213 +531,217 @@ export default function Home() {
               </section>
             )}
 
-            <section style={{ marginBottom: 24 }}>
-              <h2
-                style={{
-                  fontSize: isMobile ? 22 : 30,
-                  marginBottom: 8,
-                  color: "#ffffff",
-                  textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
-                }}
-              >
-                Produtos
-              </h2>
-              <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
-                Escolha seus produtos e adicione ao carrinho.
-              </p>
-            </section>
-
-            <section
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                gap: isMobile ? 12 : 18,
-                background: "rgba(10, 8, 20, 0.55)",
-                border: "1px solid rgba(168, 85, 247, 0.12)",
-                borderRadius: isMobile ? 18 : 24,
-                padding: isMobile ? 12 : 22,
-                boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-                backdropFilter: "blur(14px)",
-              }}
-            >
-              {paginatedProducts.map((product) => {
-                const cartItem = cart.find((item) => item.id === product.id);
-                const quantityInCart = cartItem?.quantity ?? 0;
-                const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
-
-                return (
-                  <div
-                    key={product.id}
+            {filteredProducts.length > 0 && (
+              <>
+                <section style={{ marginBottom: 24 }}>
+                  <h2
                     style={{
-                      width: "100%",
-                      maxWidth: "100%",
-                      minWidth: 0,
-                      background: "rgba(12, 8, 24, 0.92)",
-                      borderRadius: isMobile ? 14 : 18,
-                      overflow: "hidden",
-                      boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
-                      border: "1px solid rgba(159, 122, 234, 0.18)",
-                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      fontSize: isMobile ? 22 : 30,
+                      marginBottom: 8,
+                      color: "#ffffff",
+                      textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
                     }}
                   >
-                    <div
-                      style={{
-                        background:
-                          "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                        padding: isMobile ? 10 : 12,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        minHeight: isMobile ? 120 : 190,
-                      }}
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
+                    Produtos
+                  </h2>
+                  <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
+                    Escolha seus produtos e adicione ao carrinho.
+                  </p>
+                </section>
+
+                <section
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                    gap: isMobile ? 12 : 18,
+                    background: "rgba(10, 8, 20, 0.55)",
+                    border: "1px solid rgba(168, 85, 247, 0.12)",
+                    borderRadius: isMobile ? 18 : 24,
+                    padding: isMobile ? 12 : 22,
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                    backdropFilter: "blur(14px)",
+                  }}
+                >
+                  {paginatedProducts.map((product) => {
+                    const cartItem = cart.find((item) => item.id === product.id);
+                    const quantityInCart = cartItem?.quantity ?? 0;
+                    const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
+
+                    return (
+                      <div
+                        key={product.id}
                         style={{
                           width: "100%",
-                          maxWidth: isMobile ? 92 : 160,
-                          maxHeight: isMobile ? 92 : 160,
-                          objectFit: "contain",
-                          borderRadius: 12,
-                        }}
-                      />
-                    </div>
-
-                    <div style={{ padding: isMobile ? 10 : 16 }}>
-                      <h3
-                        style={{
-                          margin: "0 0 8px 0",
-                          fontSize: isMobile ? 14 : 16,
-                          lineHeight: 1.35,
-                          minHeight: isMobile ? "auto" : 44,
-                          color: "#ffffff",
-                          wordBreak: "break-word",
-                          display: "-webkit-box",
-                          WebkitLineClamp: isMobile ? 5 : 3,
-                          WebkitBoxOrient: "vertical",
+                          maxWidth: "100%",
+                          minWidth: 0,
+                          background: "rgba(12, 8, 24, 0.92)",
+                          borderRadius: isMobile ? 14 : 18,
                           overflow: "hidden",
+                          boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
+                          border: "1px solid rgba(159, 122, 234, 0.18)",
+                          transition: "transform 0.2s ease, box-shadow 0.2s ease",
                         }}
                       >
-                        {product.name}
-                      </h3>
+                        <div
+                          style={{
+                            background:
+                              "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
+                            padding: isMobile ? 10 : 12,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            minHeight: isMobile ? 120 : 190,
+                          }}
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            style={{
+                              width: "100%",
+                              maxWidth: isMobile ? 92 : 160,
+                              maxHeight: isMobile ? 92 : 160,
+                              objectFit: "contain",
+                              borderRadius: 12,
+                            }}
+                          />
+                        </div>
 
-                      <p
-                        style={{
-                          margin: "0 0 12px 0",
-                          color: "#d8b4fe",
-                          fontSize: isMobile ? 18 : 28,
-                          fontWeight: "bold",
-                          textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
-                        }}
-                      >
-                        {formatPrice(Number(product.price))}
-                      </p>
+                        <div style={{ padding: isMobile ? 10 : 16 }}>
+                          <h3
+                            style={{
+                              margin: "0 0 8px 0",
+                              fontSize: isMobile ? 14 : 16,
+                              lineHeight: 1.35,
+                              minHeight: isMobile ? "auto" : 44,
+                              color: "#ffffff",
+                              wordBreak: "break-word",
+                              display: "-webkit-box",
+                              WebkitLineClamp: isMobile ? 5 : 3,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {product.name}
+                          </h3>
 
-                      <p
-                        style={{
-                          margin: "0 0 8px 0",
-                          fontSize: isMobile ? 11 : 12,
-                          color: "#d8b4fe",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {remainingStock > 0
-                          ? `Estoque disponível: ${remainingStock}`
-                          : "Sem estoque"}
-                      </p>
+                          <p
+                            style={{
+                              margin: "0 0 12px 0",
+                              color: "#d8b4fe",
+                              fontSize: isMobile ? 18 : 28,
+                              fontWeight: "bold",
+                              textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
+                            }}
+                          >
+                            {formatPrice(Number(product.price))}
+                          </p>
 
-                      <button
-                        onClick={() => addToCart(product)}
-                        disabled={remainingStock <= 0}
-                        style={{
-                          width: "100%",
-                          background:
-                            remainingStock <= 0
-                              ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
-                              : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
-                          color: "white",
-                          border: "1px solid rgba(216, 180, 254, 0.28)",
-                          borderRadius: isMobile ? 12 : 14,
-                          padding: isMobile ? "10px 10px" : "12px 14px",
-                          cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
-                          fontWeight: "bold",
-                          fontSize: isMobile ? 14 : 16,
-                          boxShadow:
-                            "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
-                          letterSpacing: "0.2px",
-                          opacity: remainingStock <= 0 ? 0.7 : 1,
-                        }}
-                      >
-                        Comprar
-                      </button>
-                    </div>
+                          <p
+                            style={{
+                              margin: "0 0 8px 0",
+                              fontSize: isMobile ? 11 : 12,
+                              color: "#d8b4fe",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {remainingStock > 0
+                              ? `Estoque disponível: ${remainingStock}`
+                              : "Sem estoque"}
+                          </p>
+
+                          <button
+                            onClick={() => addToCart(product)}
+                            disabled={remainingStock <= 0}
+                            style={{
+                              width: "100%",
+                              background:
+                                remainingStock <= 0
+                                  ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
+                                  : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
+                              color: "white",
+                              border: "1px solid rgba(216, 180, 254, 0.28)",
+                              borderRadius: isMobile ? 12 : 14,
+                              padding: isMobile ? "10px 10px" : "12px 14px",
+                              cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
+                              fontWeight: "bold",
+                              fontSize: isMobile ? 14 : 16,
+                              boxShadow:
+                                "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
+                              letterSpacing: "0.2px",
+                              opacity: remainingStock <= 0 ? 0.7 : 1,
+                            }}
+                          >
+                            Comprar
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </section>
+
+                <section
+                  style={{
+                    marginTop: 28,
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 10,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: isMobile ? "9px 12px" : "10px 14px",
+                      borderRadius: 12,
+                      border: "1px solid rgba(196, 181, 253, 0.22)",
+                      background:
+                        currentPage === 1
+                          ? "rgba(60, 60, 70, 0.6)"
+                          : "rgba(18, 12, 32, 0.92)",
+                      color: "#fff",
+                      cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Página anterior
+                  </button>
+
+                  <div
+                    style={{
+                      padding: isMobile ? "9px 12px" : "10px 14px",
+                      borderRadius: 12,
+                      background: "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
+                      color: "white",
+                      fontWeight: "bold",
+                      border: "1px solid rgba(168, 85, 247, 0.18)",
+                    }}
+                  >
+                    Página {currentPage} de {totalPages}
                   </div>
-                );
-              })}
-            </section>
 
-            <section
-              style={{
-                marginTop: 28,
-                display: "flex",
-                justifyContent: "center",
-                gap: 10,
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                style={{
-                  padding: isMobile ? "9px 12px" : "10px 14px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(196, 181, 253, 0.22)",
-                  background:
-                    currentPage === 1
-                      ? "rgba(60, 60, 70, 0.6)"
-                      : "rgba(18, 12, 32, 0.92)",
-                  color: "#fff",
-                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                }}
-              >
-                Página anterior
-              </button>
-
-              <div
-                style={{
-                  padding: isMobile ? "9px 12px" : "10px 14px",
-                  borderRadius: 12,
-                  background: "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
-                  color: "white",
-                  fontWeight: "bold",
-                  border: "1px solid rgba(168, 85, 247, 0.18)",
-                }}
-              >
-                Página {currentPage} de {totalPages}
-              </div>
-
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                }
-                disabled={currentPage === totalPages}
-                style={{
-                  padding: isMobile ? "9px 12px" : "10px 14px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(196, 181, 253, 0.22)",
-                  background:
-                    currentPage === totalPages
-                      ? "rgba(60, 60, 70, 0.6)"
-                      : "rgba(18, 12, 32, 0.92)",
-                  color: "#fff",
-                  cursor:
-                    currentPage === totalPages ? "not-allowed" : "pointer",
-                }}
-              >
-                Próxima página
-              </button>
-            </section>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    style={{
+                      padding: isMobile ? "9px 12px" : "10px 14px",
+                      borderRadius: 12,
+                      border: "1px solid rgba(196, 181, 253, 0.22)",
+                      background:
+                        currentPage === totalPages
+                          ? "rgba(60, 60, 70, 0.6)"
+                          : "rgba(18, 12, 32, 0.92)",
+                      color: "#fff",
+                      cursor:
+                        currentPage === totalPages ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Próxima página
+                  </button>
+                </section>
+              </>
+            )}
           </>
         )}
 
@@ -1161,17 +1126,6 @@ export default function Home() {
       )}
 
       <style jsx>{`
-        .diamond-rain {
-          position: absolute;
-          top: -14%;
-          animation-name: diamondFall;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          user-select: none;
-          pointer-events: none;
-          will-change: transform, opacity;
-        }
-
         .fade-in {
           animation: fadeIn 0.6s ease;
         }
@@ -1184,23 +1138,6 @@ export default function Home() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @keyframes diamondFall {
-          0% {
-            transform: translate3d(0, -12vh, 0) rotate(-12deg) scale(0.9);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          50% {
-            transform: translate3d(12px, 50vh, 0) rotate(6deg) scale(1);
-          }
-          100% {
-            transform: translate3d(-16px, 120vh, 0) rotate(18deg) scale(0.92);
-            opacity: 0;
           }
         }
       `}</style>
