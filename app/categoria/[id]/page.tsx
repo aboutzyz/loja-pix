@@ -320,27 +320,6 @@ export default function CategoriaPage() {
                 justifyContent: "flex-end",
               }}
             >
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  width: "fit-content",
-                  marginBottom: 10,
-                  padding: "6px 10px",
-                  borderRadius: 999,
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  backdropFilter: "blur(10px)",
-                  color: "#f3e8ff",
-                  fontWeight: "bold",
-                  fontSize: 12,
-                  boxShadow: "0 0 16px rgba(168,85,247,0.18)",
-                }}
-              >
-                Categoria
-              </div>
-
               <h1
                 style={{
                   margin: 0,
@@ -358,25 +337,6 @@ export default function CategoriaPage() {
             </div>
           </section>
         )}
-
-        <section className="fade-in" style={{ marginBottom: 24 }}>
-          <h2
-            style={{
-              fontSize: isMobile ? 24 : 30,
-              marginBottom: 8,
-              color: "#ffffff",
-              textShadow: "0 0 20px rgba(168, 85, 247, 0.68)",
-            }}
-          >
-            Produtos da categoria
-          </h2>
-          <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 14 : 16 }}>
-            Escolha seus produtos e adicione ao carrinho.
-          </p>
-          <div style={{ color: "#fff", marginTop: 10, fontSize: 14 }}>
-            Produtos encontrados: {filteredProducts.length}
-          </div>
-        </section>
 
         {filteredProducts.length === 0 ? (
           <section
@@ -410,139 +370,109 @@ export default function CategoriaPage() {
               boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
             }}
           >
-            {filteredProducts.map((product) => {
-              const cartItem = cart.find((item) => item.id === product.id);
-              const quantityInCart = cartItem?.quantity ?? 0;
-              const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
-
-              return (
+            {filteredProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/produto/${product.id}`}
+                className="fade-in"
+                style={{
+                  width: "100%",
+                  minWidth: 0,
+                  maxWidth: "100%",
+                  background: "rgba(255,255,255,0.04)",
+                  backdropFilter: "blur(14px)",
+                  borderRadius: isMobile ? 14 : 18,
+                  overflow: "hidden",
+                  boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
+                  border: "1px solid rgba(159, 122, 234, 0.18)",
+                  transition: "all 0.25s ease",
+                  textDecoration: "none",
+                  display: "block",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
+                    e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
+                  }
+                }}
+              >
                 <div
-                  key={product.id}
-                  className="fade-in"
                   style={{
-                    width: "100%",
-                    minWidth: 0,
-                    maxWidth: "100%",
-                    background: "rgba(255,255,255,0.04)",
-                    backdropFilter: "blur(14px)",
-                    borderRadius: isMobile ? 14 : 18,
+                    background:
+                      "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
+                    padding: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: isMobile ? 140 : 220,
                     overflow: "hidden",
-                    boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
-                    border: "1px solid rgba(159, 122, 234, 0.18)",
-                    transition: "all 0.25s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
-                      e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile) {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
-                    }
                   }}
                 >
-                  <div
+                  <img
+                    src={product.image}
+                    alt={product.name}
                     style={{
-                      background:
-                        "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                      padding: isMobile ? 10 : 12,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      minHeight: isMobile ? 120 : 190,
+                      width: "100%",
+                      height: isMobile ? 140 : 220,
+                      objectFit: "cover",
+                      borderRadius: 0,
+                      display: "block",
+                    }}
+                  />
+                </div>
+
+                <div style={{ padding: isMobile ? 10 : 16 }}>
+                  <h3
+                    style={{
+                      margin: "0 0 8px 0",
+                      fontSize: isMobile ? 14 : 16,
+                      lineHeight: 1.35,
+                      minHeight: isMobile ? "auto" : 44,
+                      color: "#ffffff",
+                      wordBreak: "break-word",
+                      display: "-webkit-box",
+                      WebkitLineClamp: isMobile ? 4 : 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textShadow: "0 0 14px rgba(168,85,247,0.18)",
                     }}
                   >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      style={{
-                        width: "100%",
-                        maxWidth: isMobile ? 95 : 160,
-                        maxHeight: isMobile ? 95 : 160,
-                        objectFit: "contain",
-                        borderRadius: 12,
-                      }}
-                    />
-                  </div>
+                    {product.name}
+                  </h3>
 
-                  <div style={{ padding: isMobile ? 10 : 16 }}>
-                    <h3
-                      style={{
-                        margin: "0 0 8px 0",
-                        fontSize: isMobile ? 14 : 16,
-                        lineHeight: 1.35,
-                        minHeight: isMobile ? "auto" : 44,
-                        color: "#ffffff",
-                        wordBreak: "break-word",
-                        display: "-webkit-box",
-                        WebkitLineClamp: isMobile ? 4 : 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        textShadow: "0 0 14px rgba(168,85,247,0.18)",
-                      }}
-                    >
-                      {product.name}
-                    </h3>
+                  <p
+                    style={{
+                      margin: "0 0 12px 0",
+                      color: "#d8b4fe",
+                      fontSize: isMobile ? 18 : 28,
+                      fontWeight: "bold",
+                      textShadow: "0 0 18px rgba(168, 85, 247, 0.42)",
+                    }}
+                  >
+                    {formatPrice(Number(product.price))}
+                  </p>
 
-                    <p
-                      style={{
-                        margin: "0 0 12px 0",
-                        color: "#d8b4fe",
-                        fontSize: isMobile ? 18 : 28,
-                        fontWeight: "bold",
-                        textShadow: "0 0 18px rgba(168, 85, 247, 0.42)",
-                      }}
-                    >
-                      {formatPrice(Number(product.price))}
-                    </p>
-
-                    <p
-                      style={{
-                        margin: "0 0 8px 0",
-                        fontSize: isMobile ? 11 : 12,
-                        color: "#d8b4fe",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {remainingStock > 0
-                        ? `Estoque disponível: ${remainingStock}`
-                        : "Sem estoque"}
-                    </p>
-
-                    <button
-                      onClick={() => addToCart(product)}
-                      disabled={remainingStock <= 0}
-                      style={{
-                        width: "100%",
-                        background:
-                          remainingStock <= 0
-                            ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
-                            : "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-                        color: "white",
-                        border: "1px solid rgba(216, 180, 254, 0.28)",
-                        borderRadius: 14,
-                        padding: isMobile ? "10px 10px" : "12px 14px",
-                        cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
-                        fontWeight: "bold",
-                        fontSize: isMobile ? 14 : 16,
-                        boxShadow:
-                          remainingStock <= 0
-                            ? "0 0 18px rgba(59,42,85,0.35)"
-                            : "0 0 30px rgba(168, 85, 247, 0.9)",
-                        letterSpacing: "0.2px",
-                        opacity: remainingStock <= 0 ? 0.7 : 1,
-                        transition: "all 0.25s ease",
-                      }}
-                    >
-                      Comprar
-                    </button>
-                  </div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: isMobile ? 11 : 12,
+                      color: "#d8b4fe",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {product.stock > 0
+                      ? `Estoque disponível: ${product.stock}`
+                      : "Sem estoque"}
+                  </p>
                 </div>
-              );
-            })}
+              </Link>
+            ))}
           </section>
         )}
       </main>
