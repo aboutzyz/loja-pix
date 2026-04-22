@@ -14,7 +14,7 @@ type Product = {
   price: number;
   image: string;
   stock: number;
-  category_id?: string | null;
+  category_id?: string | number | null;
   created_at?: string;
 };
 
@@ -187,8 +187,8 @@ export default function AdminPage() {
   }
 
   async function saveProduct() {
-    if (!name || !price || !image) {
-      alert("Preencha nome, preço e imagem.");
+    if (!name || !price || !image || !categoryId) {
+      alert("Preencha nome, preço, imagem e categoria.");
       return;
     }
 
@@ -197,7 +197,7 @@ export default function AdminPage() {
       price: Number(price),
       image: image.trim(),
       stock: Number(stock || 0),
-      category_id: categoryId || null,
+      category_id: /^\d+$/.test(categoryId) ? Number(categoryId) : categoryId,
     };
 
     if (Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
@@ -280,7 +280,7 @@ export default function AdminPage() {
     setPrice(String(product.price));
     setStock(String(product.stock ?? 0));
     setImage(product.image);
-    setCategoryId(product.category_id ?? "");
+    setCategoryId(product.category_id != null ? String(product.category_id) : "");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -344,9 +344,9 @@ export default function AdminPage() {
     );
   }, [products, search]);
 
-  function getCategoryName(id?: string | null) {
-    if (!id) return "Sem categoria";
-    return categories.find((c) => c.id === id)?.name || "Sem categoria";
+  function getCategoryName(id?: string | number | null) {
+    if (id == null || id === "") return "Sem categoria";
+    return categories.find((c) => String(c.id) === String(id))?.name || "Sem categoria";
   }
 
   if (!logado) {
@@ -425,7 +425,7 @@ export default function AdminPage() {
                 onChange={(e) => setCategoryId(e.target.value)}
                 style={inputStyle}
               >
-                <option value="">Sem categoria</option>
+                <option value="">Selecione uma categoria</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}

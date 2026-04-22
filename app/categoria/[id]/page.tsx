@@ -10,17 +10,17 @@ const supabase = createClient(
 );
 
 type Product = {
-  id: string;
+  id: string | number;
   name: string;
   price: number;
   image: string;
   stock: number;
-  category_id?: string | null;
+  category_id?: string | number | null;
   created_at?: string;
 };
 
 type Category = {
-  id: string;
+  id: string | number;
   name: string;
   image: string;
   created_at?: string;
@@ -42,6 +42,9 @@ export default function CategoriaPage({
 }: {
   params: { id: string };
 }) {
+  const categoryFilterValue = /^\d+$/.test(params.id)
+    ? Number(params.id)
+    : params.id;
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -63,7 +66,7 @@ export default function CategoriaPage({
     const { data, error } = await supabase
       .from("categories")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", categoryFilterValue)
       .single();
 
     if (error) {
@@ -78,7 +81,7 @@ export default function CategoriaPage({
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("category_id", params.id)
+      .eq("category_id", categoryFilterValue)
       .order("created_at", { ascending: false });
 
     if (error) {
