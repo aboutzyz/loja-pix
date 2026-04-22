@@ -298,8 +298,12 @@ export default function Home() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at 15% 20%, rgba(168,85,247,0.22), transparent 22%), radial-gradient(circle at 85% 22%, rgba(192,132,252,0.18), transparent 20%), radial-gradient(circle at 30% 75%, rgba(91,33,182,0.24), transparent 22%), radial-gradient(circle at 70% 80%, rgba(124,58,237,0.16), transparent 18%), linear-gradient(180deg, #05030b 0%, #12081f 48%, #08040f 100%)",
+        background: `
+          radial-gradient(circle at 20% 30%, rgba(168,85,247,0.35), transparent 30%),
+          radial-gradient(circle at 80% 20%, rgba(139,92,246,0.25), transparent 25%),
+          radial-gradient(circle at 50% 80%, rgba(124,58,237,0.25), transparent 30%),
+          linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)
+        `,
         color: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
@@ -328,8 +332,8 @@ export default function Home() {
               width: diamond.size,
               opacity: diamond.opacity,
               transform: `rotate(${diamond.rotate})`,
-              filter: `drop-shadow(0 0 10px rgba(180,120,255,0.35))
-                       drop-shadow(0 0 22px rgba(120,70,255,0.28))
+              filter: `drop-shadow(0 0 12px rgba(180,120,255,0.45))
+                       drop-shadow(0 0 28px rgba(120,70,255,0.38))
                        blur(${diamond.blur})`,
             }}
           />
@@ -341,12 +345,12 @@ export default function Home() {
           position: "sticky",
           top: 0,
           zIndex: 20,
-          background: "rgba(8, 6, 16, 0.88)",
+          background: "rgba(8, 6, 16, 0.62)",
           color: "white",
           padding: isMobile ? "14px 12px" : "16px 20px",
           boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
-          backdropFilter: "blur(10px)",
+          backdropFilter: "blur(14px)",
         }}
       >
         <div
@@ -367,7 +371,7 @@ export default function Home() {
               fontSize: isMobile ? 24 : 36,
               letterSpacing: "1px",
               color: "#ffffff",
-              textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
+              textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
             }}
           >
             💎 BtTech
@@ -397,9 +401,10 @@ export default function Home() {
                 minWidth: isMobile ? 0 : 260,
                 width: isMobile ? "100%" : 260,
                 outline: "none",
-                background: "rgba(18, 12, 32, 0.92)",
+                background: "rgba(18, 12, 32, 0.72)",
                 color: "#fff",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.18)",
               }}
             />
 
@@ -410,15 +415,16 @@ export default function Home() {
                 setShowMiniCart(false);
               }}
               style={{
-                background: "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
+                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
                 padding: isMobile ? "9px 12px" : "10px 14px",
                 cursor: "pointer",
                 fontWeight: "bold",
-                boxShadow: "0 0 18px rgba(124, 58, 237, 0.45)",
+                boxShadow: "0 0 26px rgba(168, 85, 247, 0.82)",
                 width: isMobile ? "100%" : "auto",
+                transition: "all 0.25s ease",
               }}
             >
               Carrinho ({cartCount})
@@ -439,7 +445,7 @@ export default function Home() {
         {!showCheckout && (
           <>
             {categories.length > 0 && (
-              <section style={{ marginBottom: 28 }}>
+              <section className="fade-in" style={{ marginBottom: 28 }}>
                 <div
                   style={{
                     display: "flex",
@@ -456,7 +462,7 @@ export default function Home() {
                         fontSize: isMobile ? 24 : 32,
                         margin: 0,
                         color: "#ffffff",
-                        textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
+                        textShadow: "0 0 20px rgba(168, 85, 247, 0.68)",
                       }}
                     >
                       Categorias em destaque
@@ -480,10 +486,12 @@ export default function Home() {
                       borderRadius: 14,
                       padding: isMobile ? "10px 14px" : "10px 16px",
                       cursor: "pointer",
-                      background: "rgba(18, 12, 32, 0.92)",
+                      background: "rgba(255,255,255,0.04)",
+                      backdropFilter: "blur(12px)",
                       color: "white",
                       fontWeight: "bold",
                       textDecoration: "none",
+                      boxShadow: "0 0 18px rgba(124,58,237,0.18)",
                     }}
                   >
                     Ver tudo
@@ -503,6 +511,7 @@ export default function Home() {
                     <Link
                       key={category.id}
                       href={`/categoria/${category.id}`}
+                      className="fade-in"
                       style={{
                         position: "relative",
                         border: "1px solid rgba(216, 180, 254, 0.16)",
@@ -510,12 +519,21 @@ export default function Home() {
                         overflow: "hidden",
                         padding: 0,
                         cursor: "pointer",
-                        background: "rgba(12, 8, 24, 0.92)",
+                        background: "rgba(255,255,255,0.04)",
+                        backdropFilter: "blur(14px)",
                         minHeight: isMobile ? 180 : 220,
                         textAlign: "left",
                         boxShadow: "0 14px 30px rgba(0,0,0,0.30)",
-                        transition: "all 0.2s ease",
+                        transition: "all 0.25s ease",
                         textDecoration: "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-6px) scale(1.015)";
+                        e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.75)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.30)";
                       }}
                     >
                       <img
@@ -535,7 +553,7 @@ export default function Home() {
                           position: "absolute",
                           inset: 0,
                           background:
-                            "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.12) 28%, rgba(10,6,20,0.90) 100%)",
+                            "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.15) 28%, rgba(10,6,20,0.92) 100%)",
                         }}
                       />
 
@@ -558,12 +576,13 @@ export default function Home() {
                             marginBottom: 10,
                             padding: "6px 10px",
                             borderRadius: 999,
-                            background: "rgba(12, 8, 24, 0.58)",
+                            background: "rgba(255,255,255,0.08)",
                             border: "1px solid rgba(255,255,255,0.10)",
-                            backdropFilter: "blur(8px)",
+                            backdropFilter: "blur(10px)",
                             color: "#f3e8ff",
                             fontWeight: "bold",
                             fontSize: 12,
+                            boxShadow: "0 0 16px rgba(168,85,247,0.18)",
                           }}
                         >
                           Categoria
@@ -575,7 +594,7 @@ export default function Home() {
                             fontWeight: "bold",
                             color: "#ffffff",
                             lineHeight: 1.05,
-                            textShadow: "0 2px 16px rgba(0,0,0,0.55)",
+                            textShadow: "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
                             wordBreak: "break-word",
                           }}
                         >
@@ -591,10 +610,12 @@ export default function Home() {
                             width: "fit-content",
                             padding: "8px 12px",
                             borderRadius: 12,
-                            background: "rgba(255,255,255,0.08)",
+                            background: "rgba(255,255,255,0.10)",
                             color: "#ffffff",
                             fontWeight: "bold",
                             fontSize: 13,
+                            backdropFilter: "blur(10px)",
+                            boxShadow: "0 0 18px rgba(168, 85, 247, 0.28)",
                           }}
                         >
                           Abrir categoria
@@ -605,24 +626,26 @@ export default function Home() {
                 </div>
               </section>
             )}
-
-
           </>
         )}
 
         {showCart && !showCheckout && (
           <section
             id="cart-area"
+            className="fade-in"
             style={{
               marginTop: 30,
-              background: "rgba(12, 8, 24, 0.92)",
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(16px)",
               borderRadius: 20,
               padding: 20,
-              boxShadow: "0 8px 22px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
               border: "1px solid rgba(168, 85, 247, 0.16)",
             }}
           >
-            <h2 style={{ marginTop: 0, color: "#fff" }}>Seu Carrinho</h2>
+            <h2 style={{ marginTop: 0, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.5)" }}>
+              Seu Carrinho
+            </h2>
 
             {cart.length === 0 ? (
               <p style={{ color: "#d1d5db" }}>Seu carrinho está vazio.</p>
@@ -637,16 +660,19 @@ export default function Home() {
                     return (
                       <div
                         key={item.id}
+                        className="fade-in"
                         style={{
                           display: "flex",
                           gap: 14,
                           alignItems: "center",
                           justifyContent: "space-between",
                           border: "1px solid rgba(255,255,255,0.08)",
-                          borderRadius: 12,
-                          padding: 12,
+                          borderRadius: 16,
+                          padding: 14,
                           flexWrap: "wrap",
-                          background: "rgba(255,255,255,0.02)",
+                          background: "rgba(255,255,255,0.03)",
+                          backdropFilter: "blur(10px)",
+                          boxShadow: "0 0 18px rgba(124,58,237,0.08)",
                         }}
                       >
                         <div
@@ -663,9 +689,10 @@ export default function Home() {
                               width: 80,
                               height: 80,
                               objectFit: "contain",
-                              borderRadius: 10,
+                              borderRadius: 12,
                               background: "#1a1333",
                               padding: 6,
+                              boxShadow: "0 0 18px rgba(168,85,247,0.18)",
                             }}
                           />
                           <div>
@@ -690,9 +717,10 @@ export default function Home() {
                               border: "none",
                               background: "#2a1a48",
                               color: "#fff",
-                              borderRadius: 8,
+                              borderRadius: 10,
                               padding: "8px 12px",
                               cursor: "pointer",
+                              boxShadow: "0 0 14px rgba(124,58,237,0.18)",
                             }}
                           >
                             -
@@ -715,10 +743,11 @@ export default function Home() {
                               border: "none",
                               background: "#2a1a48",
                               color: "#fff",
-                              borderRadius: 8,
+                              borderRadius: 10,
                               padding: "8px 12px",
                               cursor: reachedStockLimit ? "not-allowed" : "pointer",
                               opacity: reachedStockLimit ? 0.5 : 1,
+                              boxShadow: "0 0 14px rgba(124,58,237,0.18)",
                             }}
                           >
                             +
@@ -730,9 +759,10 @@ export default function Home() {
                               border: "none",
                               background: "#ef4444",
                               color: "white",
-                              borderRadius: 8,
+                              borderRadius: 10,
                               padding: "8px 12px",
                               cursor: "pointer",
+                              boxShadow: "0 0 14px rgba(239,68,68,0.28)",
                             }}
                           >
                             Remover
@@ -744,21 +774,22 @@ export default function Home() {
                 </div>
 
                 <div style={{ marginTop: 20 }}>
-                  <h3 style={{ color: "#fff" }}>Total: {formatPrice(cartTotal)}</h3>
+                  <h3 style={{ color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.45)" }}>
+                    Total: {formatPrice(cartTotal)}
+                  </h3>
 
                   <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                     <button
                       onClick={goToCheckout}
                       style={{
-                        background:
-                          "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
+                        background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                         color: "white",
                         border: "1px solid rgba(216, 180, 254, 0.25)",
                         borderRadius: 12,
                         padding: "12px 16px",
                         cursor: "pointer",
                         fontWeight: "bold",
-                        boxShadow: "0 0 18px rgba(126, 34, 206, 0.35)",
+                        boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
                       }}
                     >
                       Finalizar pedido
@@ -767,13 +798,14 @@ export default function Home() {
                     <button
                       onClick={clearCart}
                       style={{
-                        background: "#111",
+                        background: "rgba(255,255,255,0.05)",
                         color: "white",
-                        border: "none",
+                        border: "1px solid rgba(255,255,255,0.1)",
                         borderRadius: 12,
                         padding: "12px 16px",
                         cursor: "pointer",
                         fontWeight: "bold",
+                        backdropFilter: "blur(10px)",
                       }}
                     >
                       Limpar carrinho
@@ -788,16 +820,20 @@ export default function Home() {
         {showCheckout && (
           <section
             id="checkout"
+            className="fade-in"
             style={{
               marginTop: 20,
-              background: "rgba(12, 8, 24, 0.92)",
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(16px)",
               borderRadius: 20,
               padding: 20,
-              boxShadow: "0 8px 22px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
               border: "1px solid rgba(168, 85, 247, 0.16)",
             }}
           >
-            <h2 style={{ marginTop: 0, color: "#fff" }}>Finalizar Pedido</h2>
+            <h2 style={{ marginTop: 0, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.5)" }}>
+              Finalizar Pedido
+            </h2>
             <p style={{ color: "#d1d5db" }}>
               Preencha seus dados para concluir a compra.
             </p>
@@ -809,84 +845,32 @@ export default function Home() {
                 gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
               }}
             >
-              <input
-                placeholder="Nome completo *"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Telefone *"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Email"
-                value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="CEP"
-                value={cep}
-                onChange={(e) => setCep(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Endereço *"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Número *"
-                value={number}
-                onChange={(e) => setNumber(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Bairro *"
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Cidade *"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Estado *"
-                value={stateName}
-                onChange={(e) => setStateName(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Complemento"
-                value={complement}
-                onChange={(e) => setComplement(e.target.value)}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Referência"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-                style={inputStyle}
-              />
+              <input placeholder="Nome completo *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} style={inputStyle} />
+              <input placeholder="Telefone *" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} style={inputStyle} />
+              <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} style={inputStyle} />
+              <input placeholder="CEP" value={cep} onChange={(e) => setCep(e.target.value)} style={inputStyle} />
+              <input placeholder="Endereço *" value={address} onChange={(e) => setAddress(e.target.value)} style={inputStyle} />
+              <input placeholder="Número *" value={number} onChange={(e) => setNumber(e.target.value)} style={inputStyle} />
+              <input placeholder="Bairro *" value={district} onChange={(e) => setDistrict(e.target.value)} style={inputStyle} />
+              <input placeholder="Cidade *" value={city} onChange={(e) => setCity(e.target.value)} style={inputStyle} />
+              <input placeholder="Estado *" value={stateName} onChange={(e) => setStateName(e.target.value)} style={inputStyle} />
+              <input placeholder="Complemento" value={complement} onChange={(e) => setComplement(e.target.value)} style={inputStyle} />
+              <input placeholder="Referência" value={reference} onChange={(e) => setReference(e.target.value)} style={inputStyle} />
             </div>
 
             <div
               style={{
                 marginTop: 20,
                 padding: 16,
-                borderRadius: 12,
+                borderRadius: 16,
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(10px)",
               }}
             >
-              <h3 style={{ color: "#fff" }}>Resumo do Pedido</h3>
+              <h3 style={{ color: "#fff", textShadow: "0 0 14px rgba(168,85,247,0.4)" }}>
+                Resumo do Pedido
+              </h3>
               <div style={{ display: "grid", gap: 8, color: "#d1d5db" }}>
                 {cart.map((item) => (
                   <div key={item.id}>
@@ -895,7 +879,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <h3 style={{ marginTop: 16, color: "#fff" }}>
+              <h3 style={{ marginTop: 16, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.45)" }}>
                 Total: {formatPrice(cartTotal)}
               </h3>
             </div>
@@ -911,13 +895,14 @@ export default function Home() {
               <button
                 onClick={() => setShowCheckout(false)}
                 style={{
-                  background: "#111",
+                  background: "rgba(255,255,255,0.05)",
                   color: "white",
-                  border: "none",
+                  border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   cursor: "pointer",
                   fontWeight: "bold",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 Voltar
@@ -926,15 +911,14 @@ export default function Home() {
               <button
                 onClick={finishOrder}
                 style={{
-                  background:
-                    "linear-gradient(180deg, #7e22ce 0%, #4c1d95 100%)",
+                  background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                   color: "white",
                   border: "1px solid rgba(216, 180, 254, 0.25)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   cursor: "pointer",
                   fontWeight: "bold",
-                  boxShadow: "0 0 18px rgba(126, 34, 206, 0.35)",
+                  boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
                 }}
               >
                 Enviar pedido no WhatsApp
@@ -946,26 +930,31 @@ export default function Home() {
 
       {showMiniCart && lastAddedProduct && (
         <div
+          className="fade-in"
           style={{
             position: "fixed",
-            bottom: 10,
-            right: 10,
-            background: "linear-gradient(135deg, #6d28d9, #9333ea)",
+            bottom: 12,
+            right: 12,
+            background: "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
             color: "white",
-            padding: "8px 16px",
-            borderRadius: 14,
+            padding: "10px 16px",
+            borderRadius: 16,
             display: "flex",
             alignItems: "center",
             gap: 12,
-            boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+            boxShadow: "0 0 28px rgba(168,85,247,0.65)",
             zIndex: 999,
             fontSize: 12,
             minWidth: 260,
-            maxWidth: 320,
+            maxWidth: 340,
+            border: "1px solid rgba(255,255,255,0.1)",
+            backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <strong style={{ fontSize: 12 }}>🛒 Produto adicionado</strong>
+            <strong style={{ fontSize: 12, textShadow: "0 0 10px rgba(255,255,255,0.25)" }}>
+              🛒 Produto adicionado
+            </strong>
             <span style={{ fontSize: 11 }}>
               {lastAddedProduct.name} ({lastAddedQuantity})
             </span>
@@ -978,7 +967,7 @@ export default function Home() {
               color: "#6d28d9",
               border: "none",
               padding: "4px 8px",
-              borderRadius: 6,
+              borderRadius: 8,
               cursor: "pointer",
               fontWeight: "bold",
               fontSize: 12,
@@ -994,10 +983,11 @@ export default function Home() {
               color: "white",
               border: "none",
               padding: "4px 8px",
-              borderRadius: 6,
+              borderRadius: 8,
               cursor: "pointer",
               fontWeight: "bold",
               fontSize: 12,
+              boxShadow: "0 0 14px rgba(168,85,247,0.28)",
             }}
           >
             Finalizar
@@ -1031,6 +1021,21 @@ export default function Home() {
           will-change: transform, opacity;
         }
 
+        .fade-in {
+          animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
         @keyframes diamondFall {
           0% {
             transform: translate3d(0, -12vh, 0) rotate(-12deg) scale(0.9);
@@ -1059,6 +1064,8 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid rgba(173, 133, 255, 0.25)",
   outline: "none",
   fontSize: 14,
-  background: "rgba(18, 12, 32, 0.92)",
+  background: "rgba(18, 12, 32, 0.72)",
   color: "#fff",
+  backdropFilter: "blur(12px)",
+  boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
 };

@@ -67,10 +67,6 @@ export default function CategoriaPage() {
       .eq("id", categoryId)
       .single();
 
-    console.log("CATEGORY ID URL:", categoryId);
-    console.log("CATEGORY DATA:", data);
-    console.log("CATEGORY ERROR:", error);
-
     if (error) {
       console.error("Erro ao buscar categoria:", error);
       return;
@@ -85,10 +81,6 @@ export default function CategoriaPage() {
       .select("*")
       .eq("category_id", categoryId)
       .order("created_at", { ascending: false });
-
-    console.log("PRODUCT CATEGORY ID URL:", categoryId);
-    console.log("PRODUCTS DATA:", data);
-    console.log("PRODUCTS ERROR:", error);
 
     if (error) {
       console.error("Erro ao buscar produtos da categoria:", error);
@@ -147,10 +139,16 @@ export default function CategoriaPage() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at 15% 20%, rgba(168,85,247,0.22), transparent 22%), radial-gradient(circle at 85% 22%, rgba(192,132,252,0.18), transparent 20%), radial-gradient(circle at 30% 75%, rgba(91,33,182,0.24), transparent 22%), radial-gradient(circle at 70% 80%, rgba(124,58,237,0.16), transparent 18%), linear-gradient(180deg, #05030b 0%, #12081f 48%, #08040f 100%)",
+        background: `
+          radial-gradient(circle at 20% 30%, rgba(168,85,247,0.35), transparent 30%),
+          radial-gradient(circle at 80% 20%, rgba(139,92,246,0.25), transparent 25%),
+          radial-gradient(circle at 50% 80%, rgba(124,58,237,0.25), transparent 30%),
+          linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)
+        `,
         color: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
       <header
@@ -158,12 +156,12 @@ export default function CategoriaPage() {
           position: "sticky",
           top: 0,
           zIndex: 20,
-          background: "rgba(8, 6, 16, 0.88)",
+          background: "rgba(8, 6, 16, 0.62)",
           color: "white",
           padding: "16px 20px",
           boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
-          backdropFilter: "blur(10px)",
+          backdropFilter: "blur(14px)",
         }}
       >
         <div
@@ -185,7 +183,7 @@ export default function CategoriaPage() {
               fontSize: 36,
               letterSpacing: "1px",
               color: "#ffffff",
-              textShadow: "0 0 18px rgba(192, 132, 252, 0.35)",
+              textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
               textDecoration: "none",
             }}
           >
@@ -211,23 +209,26 @@ export default function CategoriaPage() {
                 border: "1px solid rgba(173, 133, 255, 0.25)",
                 minWidth: 260,
                 outline: "none",
-                background: "rgba(18, 12, 32, 0.92)",
+                background: "rgba(18, 12, 32, 0.72)",
                 color: "#fff",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03)",
+                backdropFilter: "blur(12px)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
               }}
             />
 
             <Link
               href="/"
               style={{
-                background: "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
+                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
                 padding: "10px 14px",
                 fontWeight: "bold",
-                boxShadow: "0 0 18px rgba(124, 58, 237, 0.45)",
+                boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
                 textDecoration: "none",
+                transition: "all 0.25s ease",
               }}
             >
               Voltar
@@ -235,13 +236,13 @@ export default function CategoriaPage() {
 
             <div
               style={{
-                background: "linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)",
+                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                 color: "white",
                 border: "1px solid rgba(196, 181, 253, 0.35)",
                 borderRadius: 14,
                 padding: "10px 14px",
                 fontWeight: "bold",
-                boxShadow: "0 0 18px rgba(124, 58, 237, 0.45)",
+                boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
               }}
             >
               Carrinho ({cartCount})
@@ -255,18 +256,22 @@ export default function CategoriaPage() {
           maxWidth: 1200,
           margin: "0 auto",
           padding: 20,
+          position: "relative",
+          zIndex: 1,
         }}
       >
         {category && (
           <section
+            className="fade-in"
             style={{
               position: "relative",
               border: "1px solid rgba(216, 180, 254, 0.16)",
               borderRadius: 28,
               overflow: "hidden",
-              background: "rgba(12, 8, 24, 0.92)",
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(16px)",
               minHeight: 240,
-              boxShadow: "0 14px 30px rgba(0,0,0,0.30)",
+              boxShadow: "0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(124,58,237,0.16)",
               marginBottom: 28,
             }}
           >
@@ -311,12 +316,13 @@ export default function CategoriaPage() {
                   marginBottom: 10,
                   padding: "6px 10px",
                   borderRadius: 999,
-                  background: "rgba(12, 8, 24, 0.58)",
+                  background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.10)",
-                  backdropFilter: "blur(8px)",
+                  backdropFilter: "blur(10px)",
                   color: "#f3e8ff",
                   fontWeight: "bold",
                   fontSize: 12,
+                  boxShadow: "0 0 16px rgba(168,85,247,0.18)",
                 }}
               >
                 Categoria
@@ -329,7 +335,8 @@ export default function CategoriaPage() {
                   fontWeight: "bold",
                   color: "#ffffff",
                   lineHeight: 1.05,
-                  textShadow: "0 2px 16px rgba(0,0,0,0.55)",
+                  textShadow:
+                    "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
                   wordBreak: "break-word",
                 }}
               >
@@ -339,13 +346,13 @@ export default function CategoriaPage() {
           </section>
         )}
 
-        <section style={{ marginBottom: 24 }}>
+        <section className="fade-in" style={{ marginBottom: 24 }}>
           <h2
             style={{
               fontSize: 30,
               marginBottom: 8,
               color: "#ffffff",
-              textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
+              textShadow: "0 0 20px rgba(168, 85, 247, 0.68)",
             }}
           >
             Produtos da categoria
@@ -360,12 +367,14 @@ export default function CategoriaPage() {
 
         {filteredProducts.length === 0 ? (
           <section
+            className="fade-in"
             style={{
-              background: "rgba(10, 8, 20, 0.55)",
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(16px)",
               border: "1px solid rgba(168, 85, 247, 0.12)",
               borderRadius: 24,
               padding: 22,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
               color: "#fff",
               fontSize: 18,
             }}
@@ -378,11 +387,12 @@ export default function CategoriaPage() {
               display: "grid",
               gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
               gap: 18,
-              background: "rgba(10, 8, 20, 0.55)",
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(16px)",
               border: "1px solid rgba(168, 85, 247, 0.12)",
               borderRadius: 24,
               padding: 22,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
             }}
           >
             {filteredProducts.map((product) => {
@@ -393,14 +403,25 @@ export default function CategoriaPage() {
               return (
                 <div
                   key={product.id}
+                  className="fade-in"
                   style={{
                     width: "100%",
                     minWidth: 0,
-                    background: "rgba(12, 8, 24, 0.92)",
+                    background: "rgba(255,255,255,0.04)",
+                    backdropFilter: "blur(14px)",
                     borderRadius: 18,
                     overflow: "hidden",
                     boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
                     border: "1px solid rgba(159, 122, 234, 0.18)",
+                    transition: "all 0.25s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
+                    e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.8)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.35)";
                   }}
                 >
                   <div
@@ -440,6 +461,7 @@ export default function CategoriaPage() {
                         WebkitLineClamp: 3,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
+                        textShadow: "0 0 14px rgba(168,85,247,0.18)",
                       }}
                     >
                       {product.name}
@@ -451,7 +473,7 @@ export default function CategoriaPage() {
                         color: "#d8b4fe",
                         fontSize: 28,
                         fontWeight: "bold",
-                        textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
+                        textShadow: "0 0 18px rgba(168, 85, 247, 0.42)",
                       }}
                     >
                       {formatPrice(Number(product.price))}
@@ -478,7 +500,7 @@ export default function CategoriaPage() {
                         background:
                           remainingStock <= 0
                             ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
-                            : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
+                            : "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                         color: "white",
                         border: "1px solid rgba(216, 180, 254, 0.28)",
                         borderRadius: 14,
@@ -487,9 +509,12 @@ export default function CategoriaPage() {
                         fontWeight: "bold",
                         fontSize: 16,
                         boxShadow:
-                          "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
+                          remainingStock <= 0
+                            ? "0 0 18px rgba(59,42,85,0.35)"
+                            : "0 0 30px rgba(168, 85, 247, 0.9)",
                         letterSpacing: "0.2px",
                         opacity: remainingStock <= 0 ? 0.7 : 1,
+                        transition: "all 0.25s ease",
                       }}
                     >
                       Comprar
@@ -504,26 +529,31 @@ export default function CategoriaPage() {
 
       {showMiniCart && lastAddedProduct && (
         <div
+          className="fade-in"
           style={{
             position: "fixed",
-            bottom: 10,
-            right: 10,
-            background: "linear-gradient(135deg, #6d28d9, #9333ea)",
+            bottom: 12,
+            right: 12,
+            background: "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
             color: "white",
-            padding: "8px 16px",
-            borderRadius: 14,
+            padding: "10px 16px",
+            borderRadius: 16,
             display: "flex",
             alignItems: "center",
             gap: 12,
-            boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+            boxShadow: "0 0 28px rgba(168,85,247,0.65)",
             zIndex: 999,
             fontSize: 12,
             minWidth: 260,
             maxWidth: 320,
+            border: "1px solid rgba(255,255,255,0.1)",
+            backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <strong style={{ fontSize: 12 }}>🛒 Produto adicionado</strong>
+            <strong style={{ fontSize: 12, textShadow: "0 0 10px rgba(255,255,255,0.25)" }}>
+              🛒 Produto adicionado
+            </strong>
             <span style={{ fontSize: 11 }}>
               {lastAddedProduct.name} ({lastAddedQuantity})
             </span>
@@ -544,6 +574,23 @@ export default function CategoriaPage() {
           </button>
         </div>
       )}
+
+      <style jsx>{`
+        .fade-in {
+          animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
