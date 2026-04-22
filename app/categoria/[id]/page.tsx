@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,11 +38,10 @@ function formatPrice(value: number) {
   }).format(value);
 }
 
-export default function CategoriaPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function CategoriaPage() {
+  const params = useParams();
+  const categoryId = String(params?.id ?? "");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -50,10 +50,11 @@ export default function CategoriaPage({
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    if (!categoryId) return;
     loadCategory();
     loadProducts();
     loadCart();
-  }, [params.id]);
+  }, [categoryId]);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -63,8 +64,12 @@ export default function CategoriaPage({
     const { data, error } = await supabase
       .from("categories")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", categoryId)
       .single();
+
+    console.log("CATEGORY ID URL:", categoryId);
+    console.log("CATEGORY DATA:", data);
+    console.log("CATEGORY ERROR:", error);
 
     if (error) {
       console.error("Erro ao buscar categoria:", error);
@@ -78,12 +83,12 @@ export default function CategoriaPage({
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("category_id", params.id)
+      .eq("category_id", categoryId)
       .order("created_at", { ascending: false });
 
-    console.log("ID DA URL:", params.id);
-    console.log("PRODUTOS DA CATEGORIA:", data);
-    console.log("ERRO PRODUTOS:", error);
+    console.log("PRODUCT CATEGORY ID URL:", categoryId);
+    console.log("PRODUCTS DATA:", data);
+    console.log("PRODUCTS ERROR:", error);
 
     if (error) {
       console.error("Erro ao buscar produtos da categoria:", error);
