@@ -66,11 +66,11 @@ export default function ProdutoPage() {
   function sendWhatsApp() {
     if (!product) return;
 
-    const text = ${product.name} - ${formatPrice(Number(product.price))};
+    const text = `${product.name} - ${formatPrice(Number(product.price))}`;
 
     // ✅ CORRIGIDO (com crase)
     window.open(
-      https://wa.me/5541996265158?text=Pedido:%0A${text},
+      `https://wa.me/5541996265158?text=Pedido:%0A${text}`,
       "_blank"
     );
   }
@@ -180,7 +180,7 @@ export default function ProdutoPage() {
 
           <p>
             {product.stock > 0
-              ? Estoque: ${product.stock}
+              ? `Estoque: ${product.stock}`
               : "Sem estoque"}
           </p>
 
