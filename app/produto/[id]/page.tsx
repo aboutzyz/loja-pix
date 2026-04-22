@@ -88,12 +88,12 @@ export default function ProdutoPage() {
     <div style={bg}>
       <div style={container}>
         {/* IMAGEM */}
-        <div style={imageBox}>
+        <div style={glassBox}>
           <img src={product.image} style={image} />
         </div>
 
         {/* INFO */}
-        <div style={infoBox}>
+        <div style={glassBox}>
           <h1 style={title}>{product.name}</h1>
 
           <div style={stock}>
@@ -105,7 +105,7 @@ export default function ProdutoPage() {
           <h2 style={price}>R$ {product.price}</h2>
 
           <button style={buyBtn}>
-            Comprar agora
+            💸 Pagar com Pix
           </button>
 
           <button
@@ -118,17 +118,17 @@ export default function ProdutoPage() {
 
         {/* LADO DIREITO */}
         <div style={sideBox}>
-          <div style={sideCard}>
+          <div style={glassBox}>
             ⚡ Entrega imediata
             <p>Receba automaticamente</p>
           </div>
 
-          <div style={sideCard}>
+          <div style={glassBox}>
             🔒 Segurança total
             <p>Dados protegidos</p>
           </div>
 
-          <div style={sideCard}>
+          <div style={glassBox}>
             💳 Pagamento
             <p>Pix disponível</p>
           </div>
@@ -136,7 +136,7 @@ export default function ProdutoPage() {
       </div>
 
       {/* DESCRIÇÃO */}
-      <div style={descBox}>
+      <div style={glassBox}>
         <h2>Descrição</h2>
         <p>
           {product.description ||
@@ -155,7 +155,7 @@ export default function ProdutoPage() {
       {/* CARRINHO */}
       {openCart && (
         <div style={cartBox}>
-          <h2>Carrinho</h2>
+          <h2>🛒 Carrinho</h2>
 
           <div style={{ flex: 1, overflowY: "auto" }}>
             {cart.map((item) => (
@@ -198,7 +198,9 @@ export default function ProdutoPage() {
           </div>
 
           <div>
-            <p>Total: R$ {total.toFixed(2)}</p>
+            <p style={totalStyle}>
+              Total: R$ {total.toFixed(2)}
+            </p>
 
             <button style={finishBtn}>
               Finalizar compra
@@ -213,6 +215,26 @@ export default function ProdutoPage() {
           </button>
         </div>
       )}
+
+      {/* ANIMAÇÕES */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes pulse {
+          0% { box-shadow: 0 0 10px rgba(168,85,247,0.6); }
+          50% { box-shadow: 0 0 35px rgba(168,85,247,1); }
+          100% { box-shadow: 0 0 10px rgba(168,85,247,0.6); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -220,10 +242,14 @@ export default function ProdutoPage() {
 /* ESTILO */
 
 const bg = {
-  background: "linear-gradient(180deg,#020014,#0b041a)",
   minHeight: "100vh",
   padding: 20,
   color: "white",
+  background: `
+    radial-gradient(circle at 20% 30%, rgba(168,85,247,0.35), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(139,92,246,0.25), transparent 25%),
+    linear-gradient(180deg, #020014, #0b041a)
+  `,
 };
 
 const container = {
@@ -232,19 +258,15 @@ const container = {
   gap: 20,
 };
 
-const imageBox = {
-  background: "#1a0d2e",
-  padding: 10,
-  borderRadius: 12,
+const glassBox = {
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(16px)",
+  border: "1px solid rgba(168,85,247,0.2)",
+  borderRadius: 14,
+  padding: 20,
 };
 
 const image = { width: "100%", borderRadius: 10 };
-
-const infoBox = {
-  background: "#1a0d2e",
-  padding: 20,
-  borderRadius: 12,
-};
 
 const title = { fontSize: 26 };
 
@@ -255,26 +277,31 @@ const stock = {
   display: "inline-block",
 };
 
-const price = { fontSize: 28, color: "#c084fc" };
+const price = {
+  fontSize: 28,
+  color: "#c084fc",
+};
 
 const buyBtn = {
   marginTop: 15,
   width: "100%",
-  padding: 14,
-  background: "#a855f7",
+  padding: 16,
+  borderRadius: 14,
   border: "none",
-  borderRadius: 10,
-  color: "white",
+  background: "linear-gradient(135deg,#22c55e,#4ade80)",
+  color: "#000",
+  fontWeight: "bold",
   cursor: "pointer",
+  boxShadow: "0 0 25px rgba(34,197,94,0.9)",
 };
 
 const cartBtn = {
   marginTop: 10,
   width: "100%",
   padding: 14,
-  border: "1px solid #a855f7",
-  background: "transparent",
-  borderRadius: 10,
+  borderRadius: 14,
+  border: "1px solid rgba(168,85,247,0.4)",
+  background: "rgba(168,85,247,0.15)",
   color: "#fff",
   cursor: "pointer",
 };
@@ -285,44 +312,35 @@ const sideBox = {
   gap: 10,
 };
 
-const sideCard = {
-  background: "#1a0d2e",
-  padding: 15,
-  borderRadius: 10,
-};
-
-const descBox = {
-  marginTop: 30,
-  background: "#120622",
-  padding: 20,
-  borderRadius: 12,
-};
-
 const floatingBtn = {
   position: "fixed" as const,
   bottom: 20,
   right: 20,
-  width: 60,
-  height: 60,
+  width: 65,
+  height: 65,
   borderRadius: "50%",
-  background: "#a855f7",
+  background: "linear-gradient(135deg,#a855f7,#6d28d9)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: 24,
+  fontSize: 26,
   cursor: "pointer",
+  animation: "pulse 2s infinite",
 };
 
 const cartBox = {
   position: "fixed" as const,
   top: 0,
   right: 0,
-  width: 350,
+  width: 360,
   height: "100%",
-  background: "#0b041a",
+  background: "rgba(10,6,20,0.95)",
+  backdropFilter: "blur(18px)",
+  borderLeft: "1px solid rgba(168,85,247,0.3)",
   padding: 20,
   display: "flex",
   flexDirection: "column" as const,
+  animation: "slideIn 0.3s ease",
 };
 
 const itemRow = {
@@ -354,6 +372,11 @@ const removeBtn = {
   border: "none",
   color: "white",
   cursor: "pointer",
+};
+
+const totalStyle = {
+  fontSize: 18,
+  color: "#c084fc",
 };
 
 const finishBtn = {
