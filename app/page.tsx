@@ -445,6 +445,197 @@ export default function Home() {
       >
         {!showCheckout && (
           <>
+            {categories.length > 0 && (
+              <section style={{ marginBottom: 28 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    flexWrap: "wrap",
+                    marginBottom: 14,
+                  }}
+                >
+                  <div>
+                    <h2
+                      style={{
+                        fontSize: isMobile ? 24 : 32,
+                        margin: 0,
+                        color: "#ffffff",
+                        textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
+                      }}
+                    >
+                      Categorias em destaque
+                    </h2>
+                    <p
+                      style={{
+                        color: "#d1d5db",
+                        marginTop: 6,
+                        marginBottom: 0,
+                        fontSize: isMobile ? 14 : 16,
+                      }}
+                    >
+                      Escolha uma categoria para navegar mais rápido.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setSelectedCategory("all");
+                      setCurrentPage(1);
+                    }}
+                    style={{
+                      border: "1px solid rgba(216, 180, 254, 0.22)",
+                      borderRadius: 14,
+                      padding: isMobile ? "10px 14px" : "10px 16px",
+                      cursor: "pointer",
+                      background:
+                        selectedCategory === "all"
+                          ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
+                          : "rgba(18, 12, 32, 0.92)",
+                      color: "white",
+                      fontWeight: "bold",
+                      boxShadow:
+                        selectedCategory === "all"
+                          ? "0 0 18px rgba(126, 34, 206, 0.35)"
+                          : "none",
+                    }}
+                  >
+                    Ver tudo
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: isMobile
+                      ? "1fr"
+                      : "repeat(auto-fit, minmax(260px, 1fr))",
+                    gap: 16,
+                  }}
+                >
+                  {categories.map((category) => {
+                    const isActive = selectedCategory === category.id;
+
+                    return (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          setSelectedCategory(category.id);
+                          setCurrentPage(1);
+                        }}
+                        style={{
+                          position: "relative",
+                          border: isActive
+                            ? "1px solid rgba(216, 180, 254, 0.55)"
+                            : "1px solid rgba(216, 180, 254, 0.16)",
+                          borderRadius: 24,
+                          overflow: "hidden",
+                          padding: 0,
+                          cursor: "pointer",
+                          background: "rgba(12, 8, 24, 0.92)",
+                          minHeight: isMobile ? 180 : 220,
+                          textAlign: "left",
+                          boxShadow: isActive
+                            ? "0 0 28px rgba(126, 34, 206, 0.35)"
+                            : "0 14px 30px rgba(0,0,0,0.30)",
+                          transform: isActive ? "translateY(-2px)" : "none",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: isActive
+                              ? "linear-gradient(180deg, rgba(10,6,20,0.10) 0%, rgba(10,6,20,0.18) 28%, rgba(10,6,20,0.92) 100%)"
+                              : "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.12) 28%, rgba(10,6,20,0.90) 100%)",
+                          }}
+                        />
+
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "flex-end",
+                            padding: isMobile ? 16 : 18,
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 8,
+                              width: "fit-content",
+                              marginBottom: 10,
+                              padding: "6px 10px",
+                              borderRadius: 999,
+                              background: "rgba(12, 8, 24, 0.58)",
+                              border: "1px solid rgba(255,255,255,0.10)",
+                              backdropFilter: "blur(8px)",
+                              color: "#f3e8ff",
+                              fontWeight: "bold",
+                              fontSize: 12,
+                            }}
+                          >
+                            {isActive ? "Selecionada" : "Categoria"}
+                          </div>
+
+                          <div
+                            style={{
+                              fontSize: isMobile ? 24 : 30,
+                              fontWeight: "bold",
+                              color: "#ffffff",
+                              lineHeight: 1.05,
+                              textShadow: "0 2px 16px rgba(0,0,0,0.55)",
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {category.name}
+                          </div>
+
+                          <div
+                            style={{
+                              marginTop: 10,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 8,
+                              width: "fit-content",
+                              padding: "8px 12px",
+                              borderRadius: 12,
+                              background: isActive
+                                ? "rgba(139, 44, 245, 0.26)"
+                                : "rgba(255,255,255,0.08)",
+                              color: "#ffffff",
+                              fontWeight: "bold",
+                              fontSize: 13,
+                            }}
+                          >
+                            Ver produtos
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
             <section style={{ marginBottom: 24 }}>
               <h2
                 style={{
@@ -454,94 +645,12 @@ export default function Home() {
                   textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
                 }}
               >
-                Produtos
+                {selectedCategory === "all" ? "Produtos" : "Produtos da categoria"}
               </h2>
               <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
                 Escolha seus produtos e adicione ao carrinho.
               </p>
             </section>
-
-            {categories.length > 0 && (
-              <section
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  flexWrap: "wrap",
-                  marginBottom: 18,
-                }}
-              >
-                <button
-                  onClick={() => {
-                    setSelectedCategory("all");
-                    setCurrentPage(1);
-                  }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    border: "1px solid rgba(216, 180, 254, 0.22)",
-                    borderRadius: 14,
-                    padding: isMobile ? "10px 12px" : "10px 14px",
-                    cursor: "pointer",
-                    background:
-                      selectedCategory === "all"
-                        ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
-                        : "rgba(18, 12, 32, 0.92)",
-                    color: "white",
-                    fontWeight: "bold",
-                    boxShadow:
-                      selectedCategory === "all"
-                        ? "0 0 18px rgba(126, 34, 206, 0.35)"
-                        : "none",
-                  }}
-                >
-                  Todas
-                </button>
-
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => {
-                      setSelectedCategory(category.id);
-                      setCurrentPage(1);
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      border: "1px solid rgba(216, 180, 254, 0.22)",
-                      borderRadius: 14,
-                      padding: isMobile ? "10px 12px" : "10px 14px",
-                      cursor: "pointer",
-                      background:
-                        selectedCategory === category.id
-                          ? "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)"
-                          : "rgba(18, 12, 32, 0.92)",
-                      color: "white",
-                      fontWeight: "bold",
-                      boxShadow:
-                        selectedCategory === category.id
-                          ? "0 0 18px rgba(126, 34, 206, 0.35)"
-                          : "none",
-                    }}
-                  >
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      style={{
-                        width: 22,
-                        height: 22,
-                        objectFit: "contain",
-                        borderRadius: 6,
-                        background: "rgba(255,255,255,0.08)",
-                        padding: 2,
-                      }}
-                    />
-                    <span>{category.name}</span>
-                  </button>
-                ))}
-              </section>
-            )}
 
             <section
               style={{
