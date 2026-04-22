@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,75 +15,61 @@ type Product = {
   price: number;
   image: string;
   stock: number;
-  description?: string | null;
+  description?: string;
 };
-
-type CartItem = Product & { quantity: number };
-
-function formatPrice(v: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(v);
-}
 
 export default function ProdutoPage() {
   const { id } = useParams();
-  const productId = String(id);
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [qty, setQty] = useState(1);
-  const [showQty, setShowQty] = useState(false);
-  const [showCart, setShowCart] = useState(false);
+  const [cart, setCart] = useState<any[]>([]);
+  const [openCart, setOpenCart] = useState(false);
 
   useEffect(() => {
-    loadProduct();
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
+    load();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-
-  async function loadProduct() {
+  async function load() {
     const { data } = await supabase
       .from("products")
       .select("*")
-      .eq("id", productId)
+      .eq("id", id)
       .single();
+
     setProduct(data);
   }
 
-  function addToCart() {
-    if (!product) return;
+  function addToCart(product: Product) {
+    setCart((prev) => {
+      const exist = prev.find((i) => i.id === product.id);
 
-    const existing = cart.find((i) => i.id === product.id);
+      if (exist) {
+        return prev.map((i) =>
+          i.id === product.id
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        );
+      }
 
-    let newCart;
+      return [...prev, { ...product, quantity: 1 }];
+    });
 
-    if (existing) {
-      const newQty = Math.min(existing.quantity + qty, product.stock);
-      newCart = cart.map((i) =>
-        i.id === product.id ? { ...i, quantity: newQty } : i
-      );
-    } else {
-      newCart = [...cart, { ...product, quantity: qty }];
-    }
-
-    setCart(newCart);
-    setShowQty(false);
-    setQty(1);
+    setOpenCart(true);
   }
 
-  function updateQty(id: string, amount: number) {
+  function changeQty(id: string, type: "add" | "remove") {
     setCart((prev) =>
-      prev.map((i) => {
-        if (i.id !== id) return i;
-        const newQ = Math.max(1, Math.min(i.quantity + amount, i.stock));
-        return { ...i, quantity: newQ };
-      })
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity:
+                type === "add"
+                  ? item.quantity + 1
+                  : Math.max(1, item.quantity - 1),
+            }
+          : item
+      )
     );
   }
 
@@ -92,159 +77,228 @@ export default function ProdutoPage() {
     setCart((prev) => prev.filter((i) => i.id !== id));
   }
 
-  const total = useMemo(
-    () => cart.reduce((acc, i) => acc + i.price * i.quantity, 0),
-    [cart]
+  const total = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
   );
 
-  if (!product) return <div style={{ color: "#fff" }}>Carregando...</div>;
+  if (!product) return <div style={{ color: "white" }}>Carregando...</div>;
 
   return (
     <div style={bg}>
-      <Link href="/" style={back}>← Voltar</Link>
-
-      <div style={grid}>
+      <div style={container}>
         {/* IMAGEM */}
-        <div style={card}>
-          <img src={product.image} style={img} />
-
-          <button style={btn} onClick={() => setShowQty(true)}>
-            Adicionar ao carrinho
-          </button>
+        <div style={imageBox}>
+          <img src={product.image} style={image} />
         </div>
 
         {/* INFO */}
-        <div style={card}>
+        <div style={infoBox}>
           <h1 style={title}>{product.name}</h1>
-          <h2 style={price}>{formatPrice(product.price)}</h2>
-          <p>Estoque: {product.stock}</p>
 
-          <div style={descBox}>
-            {product.description || "Produto digital com entrega rápida."}
+          <div style={stock}>
+            {product.stock > 0
+              ? `${product.stock}+ em estoque`
+              : "Sem estoque"}
+          </div>
+
+          <h2 style={price}>R$ {product.price}</h2>
+
+          <button style={buyBtn}>
+            Comprar agora
+          </button>
+
+          <button
+            style={cartBtn}
+            onClick={() => addToCart(product)}
+          >
+            + Adicionar ao carrinho
+          </button>
+        </div>
+
+        {/* LADO DIREITO */}
+        <div style={sideBox}>
+          <div style={sideCard}>
+            ⚡ Entrega imediata
+            <p>Receba automaticamente</p>
+          </div>
+
+          <div style={sideCard}>
+            🔒 Segurança total
+            <p>Dados protegidos</p>
+          </div>
+
+          <div style={sideCard}>
+            💳 Pagamento
+            <p>Pix disponível</p>
           </div>
         </div>
       </div>
 
-      {/* POPUP QTD */}
-      {showQty && (
-        <div style={overlay}>
-          <div style={popup}>
-            <h3>Quantidade</h3>
+      {/* DESCRIÇÃO */}
+      <div style={descBox}>
+        <h2>Descrição</h2>
+        <p>
+          {product.description ||
+            "Produto digital com entrega rápida."}
+        </p>
+      </div>
 
-            <div style={qtyBox}>
-              <button onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
-              <span>{qty}</span>
-              <button
-                onClick={() =>
-                  setQty(Math.min(product.stock, qty + 1))
-                }
-              >
-                +
-              </button>
-            </div>
+      {/* BOTÃO FLUTUANTE */}
+      <div
+        onClick={() => setOpenCart(true)}
+        style={floatingBtn}
+      >
+        🛒
+      </div>
 
-            <button style={btn} onClick={addToCart}>
-              Confirmar
+      {/* CARRINHO */}
+      {openCart && (
+        <div style={cartBox}>
+          <h2>Carrinho</h2>
+
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            {cart.map((item) => (
+              <div key={item.id} style={itemRow}>
+                <img src={item.image} style={itemImg} />
+
+                <div style={{ flex: 1 }}>
+                  <p>{item.name}</p>
+                  <p style={{ color: "#c084fc" }}>
+                    R$ {item.price}
+                  </p>
+                </div>
+
+                <div style={qtyBox}>
+                  <button
+                    onClick={() => changeQty(item.id, "remove")}
+                    style={qtyBtn}
+                  >
+                    -
+                  </button>
+
+                  <div>{item.quantity}</div>
+
+                  <button
+                    onClick={() => changeQty(item.id, "add")}
+                    style={qtyBtn}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => removeItem(item.id)}
+                  style={removeBtn}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <p>Total: R$ {total.toFixed(2)}</p>
+
+            <button style={finishBtn}>
+              Finalizar compra
             </button>
           </div>
+
+          <button
+            onClick={() => setOpenCart(false)}
+            style={closeBtn}
+          >
+            ✕
+          </button>
         </div>
       )}
-
-      {/* BOTÃO CARRINHO */}
-      <div style={floating} onClick={() => setShowCart(true)}>
-        🛒
-        {cart.length > 0 && <span style={badge}>{cart.length}</span>}
-      </div>
-
-      {/* CARRINHO LATERAL */}
-      <div style={{ ...cartPanel, right: showCart ? 0 : -400 }}>
-        <h2>Seu carrinho</h2>
-
-        {cart.map((i) => (
-          <div key={i.id} style={item}>
-            <img src={i.image} style={miniImg} />
-
-            <div style={{ flex: 1 }}>
-              <div>{i.name}</div>
-              <div>{formatPrice(i.price)}</div>
-
-              <div style={qtyBoxSmall}>
-                <button onClick={() => updateQty(i.id, -1)}>−</button>
-                <span>{i.quantity}</span>
-                <button onClick={() => updateQty(i.id, 1)}>+</button>
-              </div>
-            </div>
-
-            <button onClick={() => removeItem(i.id)}>✕</button>
-          </div>
-        ))}
-
-        <h3>Total: {formatPrice(total)}</h3>
-
-        <button style={btn}>Finalizar pedido</button>
-        <button onClick={() => setShowCart(false)}>Fechar</button>
-      </div>
     </div>
   );
 }
 
-/* 🎨 ESTILO BONITO */
-const bg = { background: "#070314", minHeight: "100vh", padding: 20, color: "#fff" };
+/* ESTILO */
 
-const grid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 };
-
-const card = {
-  background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(12px)",
-  borderRadius: 20,
+const bg = {
+  background: "linear-gradient(180deg,#020014,#0b041a)",
+  minHeight: "100vh",
   padding: 20,
+  color: "white",
 };
 
-const img = { width: "100%", borderRadius: 12 };
+const container = {
+  display: "grid",
+  gridTemplateColumns: "1.2fr 1fr 0.8fr",
+  gap: 20,
+};
 
-const btn = {
-  marginTop: 10,
-  padding: 12,
+const imageBox = {
+  background: "#1a0d2e",
+  padding: 10,
+  borderRadius: 12,
+};
+
+const image = { width: "100%", borderRadius: 10 };
+
+const infoBox = {
+  background: "#1a0d2e",
+  padding: 20,
+  borderRadius: 12,
+};
+
+const title = { fontSize: 26 };
+
+const stock = {
+  background: "#6d28d9",
+  padding: "4px 10px",
   borderRadius: 10,
-  border: "none",
+  display: "inline-block",
+};
+
+const price = { fontSize: 28, color: "#c084fc" };
+
+const buyBtn = {
+  marginTop: 15,
+  width: "100%",
+  padding: 14,
   background: "#a855f7",
+  border: "none",
+  borderRadius: 10,
+  color: "white",
+  cursor: "pointer",
+};
+
+const cartBtn = {
+  marginTop: 10,
+  width: "100%",
+  padding: 14,
+  border: "1px solid #a855f7",
+  background: "transparent",
+  borderRadius: 10,
   color: "#fff",
   cursor: "pointer",
 };
 
-const title = { fontSize: 28 };
-const price = { fontSize: 22, color: "#c084fc" };
+const sideBox = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: 10,
+};
+
+const sideCard = {
+  background: "#1a0d2e",
+  padding: 15,
+  borderRadius: 10,
+};
 
 const descBox = {
-  marginTop: 15,
-  background: "rgba(255,255,255,0.04)",
-  padding: 10,
-  borderRadius: 10,
-};
-
-const overlay = {
-  position: "fixed" as const,
-  inset: 0,
-  background: "rgba(0,0,0,0.6)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const popup = {
-  background: "#120826",
+  marginTop: 30,
+  background: "#120622",
   padding: 20,
-  borderRadius: 10,
+  borderRadius: 12,
 };
 
-const qtyBox = {
-  display: "flex",
-  gap: 10,
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const floating = {
+const floatingBtn = {
   position: "fixed" as const,
   bottom: 20,
   right: 20,
@@ -253,42 +307,72 @@ const floating = {
   borderRadius: "50%",
   background: "#a855f7",
   display: "flex",
-  justifyContent: "center",
   alignItems: "center",
+  justifyContent: "center",
+  fontSize: 24,
   cursor: "pointer",
 };
 
-const badge = {
-  position: "absolute" as const,
-  top: -5,
-  right: -5,
-  background: "red",
-  borderRadius: "50%",
-  padding: "4px 6px",
-};
-
-const cartPanel = {
+const cartBox = {
   position: "fixed" as const,
   top: 0,
+  right: 0,
   width: 350,
   height: "100%",
-  background: "#120826",
+  background: "#0b041a",
   padding: 20,
-  transition: "0.3s",
+  display: "flex",
+  flexDirection: "column" as const,
 };
 
-const item = {
+const itemRow = {
   display: "flex",
   gap: 10,
-  marginBottom: 10,
+  marginBottom: 15,
+  alignItems: "center",
 };
 
-const miniImg = { width: 50, borderRadius: 8 };
+const itemImg = { width: 50 };
 
-const qtyBoxSmall = {
+const qtyBox = {
   display: "flex",
   gap: 5,
   alignItems: "center",
 };
 
-const back = { color: "#a855f7", textDecoration: "none" };
+const qtyBtn = {
+  width: 28,
+  height: 28,
+  background: "#6d28d9",
+  border: "none",
+  color: "#fff",
+  cursor: "pointer",
+};
+
+const removeBtn = {
+  background: "#ef4444",
+  border: "none",
+  color: "white",
+  cursor: "pointer",
+};
+
+const finishBtn = {
+  width: "100%",
+  padding: 14,
+  background: "#a855f7",
+  border: "none",
+  color: "white",
+  borderRadius: 10,
+  cursor: "pointer",
+};
+
+const closeBtn = {
+  position: "absolute" as const,
+  top: 10,
+  right: 10,
+  background: "transparent",
+  border: "none",
+  color: "white",
+  fontSize: 20,
+  cursor: "pointer",
+};
