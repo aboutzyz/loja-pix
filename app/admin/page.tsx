@@ -14,6 +14,14 @@ type Product = {
   price: number;
   image: string;
   stock: number;
+  category_id?: string | null;
+  created_at?: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+  image: string;
   created_at?: string;
 };
 
@@ -25,15 +33,24 @@ export default function AdminPage() {
   const [logado, setLogado] = useState(false);
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("0");
   const [image, setImage] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryImage, setCategoryImage] = useState("");
+
   const [uploading, setUploading] = useState(false);
+  const [uploadingCategory, setUploadingCategory] = useState(false);
 
   const [search, setSearch] = useState("");
 
@@ -64,9 +81,29 @@ export default function AdminPage() {
     setProducts((data as Product[]) || []);
   }
 
+  async function loadCategories() {
+    setLoadingCategories(true);
+
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    setLoadingCategories(false);
+
+    if (error) {
+      console.log(error);
+      alert("Erro ao carregar categorias");
+      return;
+    }
+
+    setCategories((data as Category[]) || []);
+  }
+
   useEffect(() => {
     if (logado) {
       loadProducts();
+      loadCategories();
     }
   }, [logado]);
 
@@ -75,7 +112,14 @@ export default function AdminPage() {
     setPrice("");
     setStock("0");
     setImage("");
+    setCategoryId("");
     setEditingId(null);
+  }
+
+  function clearCategoryForm() {
+    setCategoryName("");
+    setCategoryImage("");
+    setEditingCategoryId(null);
   }
 
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
@@ -110,6 +154,38 @@ export default function AdminPage() {
     alert("Imagem enviada com sucesso!");
   }
 
+  async function handleCategoryImageUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCategory(true);
+
+    const ext = file.name.split(".").pop();
+    const fileName = `category-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    setUploadingCategory(false);
+
+    if (uploadError) {
+      console.log(uploadError);
+      alert("Erro ao enviar imagem da categoria");
+      return;
+    }
+
+    const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+
+    setCategoryImage(data.publicUrl);
+    alert("Imagem da categoria enviada com sucesso!");
+  }
+
   async function saveProduct() {
     if (!name || !price || !image) {
       alert("Preencha nome, preço e imagem.");
@@ -121,6 +197,7 @@ export default function AdminPage() {
       price: Number(price),
       image: image.trim(),
       stock: Number(stock || 0),
+      category_id: categoryId || null,
     };
 
     if (Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
@@ -157,12 +234,61 @@ export default function AdminPage() {
     loadProducts();
   }
 
+  async function saveCategory() {
+    if (!categoryName || !categoryImage) {
+      alert("Preencha nome e imagem da categoria.");
+      return;
+    }
+
+    const payload = {
+      name: categoryName.trim(),
+      image: categoryImage.trim(),
+    };
+
+    if (editingCategoryId) {
+      const { error } = await supabase
+        .from("categories")
+        .update(payload)
+        .eq("id", editingCategoryId);
+
+      if (error) {
+        console.log(error);
+        alert("Erro ao editar categoria");
+        return;
+      }
+
+      alert("Categoria editada com sucesso!");
+    } else {
+      const { error } = await supabase.from("categories").insert([payload]);
+
+      if (error) {
+        console.log(error);
+        alert("Erro ao adicionar categoria");
+        return;
+      }
+
+      alert("Categoria adicionada com sucesso!");
+    }
+
+    clearCategoryForm();
+    loadCategories();
+  }
+
   function startEdit(product: Product) {
     setEditingId(product.id);
     setName(product.name);
     setPrice(String(product.price));
     setStock(String(product.stock ?? 0));
     setImage(product.image);
+    setCategoryId(product.category_id ?? "");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function startEditCategory(category: Category) {
+    setEditingCategoryId(category.id);
+    setCategoryName(category.name);
+    setCategoryImage(category.image);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -171,7 +297,10 @@ export default function AdminPage() {
     const ok = window.confirm(`Remover "${product.name}"?`);
     if (!ok) return;
 
-    const { error } = await supabase.from("products").delete().eq("id", product.id);
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", product.id);
 
     if (error) {
       console.log(error);
@@ -186,11 +315,39 @@ export default function AdminPage() {
     loadProducts();
   }
 
+  async function deleteCategory(category: Category) {
+    const ok = window.confirm(`Remover categoria "${category.name}"?`);
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from("categories")
+      .delete()
+      .eq("id", category.id);
+
+    if (error) {
+      console.log(error);
+      alert("Erro ao remover categoria");
+      return;
+    }
+
+    alert("Categoria removida!");
+    if (editingCategoryId === category.id) {
+      clearCategoryForm();
+    }
+    loadCategories();
+    loadProducts();
+  }
+
   const filteredProducts = useMemo(() => {
     return products.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [products, search]);
+
+  function getCategoryName(id?: string | null) {
+    if (!id) return "Sem categoria";
+    return categories.find((c) => c.id === id)?.name || "Sem categoria";
+  }
 
   if (!logado) {
     return (
@@ -263,6 +420,19 @@ export default function AdminPage() {
                 style={inputStyle}
               />
 
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                style={inputStyle}
+              >
+                <option value="">Sem categoria</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+
               <input
                 placeholder="Link da imagem"
                 value={image}
@@ -304,6 +474,69 @@ export default function AdminPage() {
               </button>
 
               <button onClick={clearForm} style={secondaryButtonStyle}>
+                Limpar
+              </button>
+            </div>
+          </div>
+
+          <div style={cardStyle}>
+            <h2 style={sectionTitleStyle}>
+              {editingCategoryId ? "Editar categoria" : "Nova categoria"}
+            </h2>
+
+            <div style={formGridStyle}>
+              <input
+                placeholder="Nome da categoria"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                style={inputStyle}
+              />
+
+              <input
+                placeholder="Link da imagem da categoria"
+                value={categoryImage}
+                onChange={(e) => setCategoryImage(e.target.value)}
+                style={inputStyle}
+              />
+
+              <label style={uploadBoxStyle}>
+                <span>
+                  {uploadingCategory
+                    ? "Enviando imagem da categoria..."
+                    : "Enviar imagem da categoria"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCategoryImageUpload}
+                  style={{ display: "none" }}
+                />
+              </label>
+
+              {categoryImage && (
+                <div style={previewBoxStyle}>
+                  <img
+                    src={categoryImage}
+                    alt="Prévia categoria"
+                    style={{
+                      width: 100,
+                      height: 100,
+                      objectFit: "contain",
+                      borderRadius: 10,
+                      background: "#0f081b",
+                      padding: 6,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+              <button onClick={saveCategory} style={primaryButtonStyle}>
+                {editingCategoryId ? "Salvar categoria" : "Adicionar categoria"}
+              </button>
+
+              <button onClick={clearCategoryForm} style={secondaryButtonStyle}>
                 Limpar
               </button>
             </div>
@@ -370,6 +603,9 @@ export default function AdminPage() {
                         <div style={smallMutedStyle}>
                           Estoque: {product.stock ?? 0}
                         </div>
+                        <div style={smallMutedStyle}>
+                          Categoria: {getCategoryName(product.category_id)}
+                        </div>
                       </div>
                     </div>
 
@@ -383,6 +619,67 @@ export default function AdminPage() {
 
                       <button
                         onClick={() => deleteProduct(product)}
+                        style={deleteButtonStyle}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={cardStyle}>
+            <h2 style={sectionTitleStyle}>Categorias cadastradas</h2>
+
+            {loadingCategories ? (
+              <p style={mutedStyle}>Carregando categorias...</p>
+            ) : categories.length === 0 ? (
+              <p style={mutedStyle}>Nenhuma categoria cadastrada.</p>
+            ) : (
+              <div style={{ display: "grid", gap: 12 }}>
+                {categories.map((category) => (
+                  <div key={category.id} style={productRowStyle}>
+                    <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0 }}>
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        style={{
+                          width: 72,
+                          height: 72,
+                          objectFit: "contain",
+                          borderRadius: 10,
+                          background: "#0f081b",
+                          padding: 6,
+                          flexShrink: 0,
+                        }}
+                      />
+
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontWeight: "bold",
+                            color: "#fff",
+                            marginBottom: 4,
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {category.name}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        onClick={() => startEditCategory(category)}
+                        style={editButtonStyle}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        onClick={() => deleteCategory(category)}
                         style={deleteButtonStyle}
                       >
                         Remover
