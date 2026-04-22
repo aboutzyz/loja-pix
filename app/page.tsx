@@ -299,10 +299,9 @@ export default function Home() {
       style={{
         minHeight: "100vh",
         background: `
-          radial-gradient(circle at 20% 30%, rgba(168,85,247,0.35), transparent 30%),
-          radial-gradient(circle at 80% 20%, rgba(139,92,246,0.25), transparent 25%),
-          radial-gradient(circle at 50% 80%, rgba(124,58,237,0.25), transparent 30%),
-          linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)
+          radial-gradient(circle at 25% 20%, rgba(170, 60, 255, 0.22), transparent 30%),
+          radial-gradient(circle at 85% 82%, rgba(208, 80, 255, 0.2), transparent 25%),
+          linear-gradient(180deg, #090114 0%, #100022 48%, #0a0117 100%)
         `,
         color: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
@@ -310,6 +309,21 @@ export default function Home() {
         overflow: "hidden",
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `
+            linear-gradient(rgba(179, 77, 255, 0.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(179, 77, 255, 0.12) 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          opacity: 0.6,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
       <div
         style={{
           position: "fixed",
@@ -404,7 +418,8 @@ export default function Home() {
                 background: "rgba(18, 12, 32, 0.72)",
                 color: "#fff",
                 backdropFilter: "blur(12px)",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.18)",
+                boxShadow:
+                  "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.18)",
               }}
             />
 
@@ -448,58 +463,6 @@ export default function Home() {
               <section className="fade-in" style={{ marginBottom: 28 }}>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    flexWrap: "wrap",
-                    marginBottom: 14,
-                  }}
-                >
-                  <div>
-                    <h2
-                      style={{
-                        fontSize: isMobile ? 24 : 32,
-                        margin: 0,
-                        color: "#ffffff",
-                        textShadow: "0 0 20px rgba(168, 85, 247, 0.68)",
-                      }}
-                    >
-                      Categorias em destaque
-                    </h2>
-                    <p
-                      style={{
-                        color: "#d1d5db",
-                        marginTop: 6,
-                        marginBottom: 0,
-                        fontSize: isMobile ? 14 : 16,
-                      }}
-                    >
-                      Escolha uma categoria para navegar mais rápido.
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/"
-                    style={{
-                      border: "1px solid rgba(216, 180, 254, 0.22)",
-                      borderRadius: 14,
-                      padding: isMobile ? "10px 14px" : "10px 16px",
-                      cursor: "pointer",
-                      background: "rgba(255,255,255,0.04)",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
-                      fontWeight: "bold",
-                      textDecoration: "none",
-                      boxShadow: "0 0 18px rgba(124,58,237,0.18)",
-                    }}
-                  >
-                    Ver tudo
-                  </Link>
-                </div>
-
-                <div
-                  style={{
                     display: "grid",
                     gridTemplateColumns: isMobile
                       ? "1fr"
@@ -519,11 +482,11 @@ export default function Home() {
                         overflow: "hidden",
                         padding: 0,
                         cursor: "pointer",
-                        background: "rgba(255,255,255,0.04)",
-                        backdropFilter: "blur(14px)",
+                        background: "rgba(20, 6, 40, 0.7)",
+                        backdropFilter: "blur(16px)",
                         minHeight: isMobile ? 180 : 220,
                         textAlign: "left",
-                        boxShadow: "0 14px 30px rgba(0,0,0,0.30)",
+                        boxShadow: "0 0 25px rgba(168, 85, 247, 0.25)",
                         transition: "all 0.25s ease",
                         textDecoration: "none",
                       }}
@@ -533,7 +496,7 @@ export default function Home() {
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = "scale(1)";
-                        e.currentTarget.style.boxShadow = "0 14px 30px rgba(0,0,0,0.30)";
+                        e.currentTarget.style.boxShadow = "0 0 25px rgba(168, 85, 247, 0.25)";
                       }}
                     >
                       <img
@@ -569,32 +532,12 @@ export default function Home() {
                       >
                         <div
                           style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 8,
-                            width: "fit-content",
-                            marginBottom: 10,
-                            padding: "6px 10px",
-                            borderRadius: 999,
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.10)",
-                            backdropFilter: "blur(10px)",
-                            color: "#f3e8ff",
-                            fontWeight: "bold",
-                            fontSize: 12,
-                            boxShadow: "0 0 16px rgba(168,85,247,0.18)",
-                          }}
-                        >
-                          Categoria
-                        </div>
-
-                        <div
-                          style={{
                             fontSize: isMobile ? 24 : 30,
                             fontWeight: "bold",
                             color: "#ffffff",
                             lineHeight: 1.05,
-                            textShadow: "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
+                            textShadow:
+                              "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
                             wordBreak: "break-word",
                           }}
                         >
@@ -626,6 +569,214 @@ export default function Home() {
                 </div>
               </section>
             )}
+
+            <section style={{ marginBottom: 24 }}>
+              <h2
+                style={{
+                  fontSize: isMobile ? 22 : 30,
+                  marginBottom: 8,
+                  color: "#ffffff",
+                  textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
+                }}
+              >
+                Produtos
+              </h2>
+              <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
+                Escolha seus produtos e adicione ao carrinho.
+              </p>
+            </section>
+
+            <section
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                gap: isMobile ? 12 : 18,
+                background: "rgba(10, 8, 20, 0.55)",
+                border: "1px solid rgba(168, 85, 247, 0.12)",
+                borderRadius: isMobile ? 18 : 24,
+                padding: isMobile ? 12 : 22,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                backdropFilter: "blur(14px)",
+              }}
+            >
+              {paginatedProducts.map((product) => {
+                const cartItem = cart.find((item) => item.id === product.id);
+                const quantityInCart = cartItem?.quantity ?? 0;
+                const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
+
+                return (
+                  <div
+                    key={product.id}
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      minWidth: 0,
+                      background: "rgba(12, 8, 24, 0.92)",
+                      borderRadius: isMobile ? 14 : 18,
+                      overflow: "hidden",
+                      boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
+                      border: "1px solid rgba(159, 122, 234, 0.18)",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                  >
+                    <div
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
+                        padding: isMobile ? 10 : 12,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        minHeight: isMobile ? 120 : 190,
+                      }}
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        style={{
+                          width: "100%",
+                          maxWidth: isMobile ? 92 : 160,
+                          maxHeight: isMobile ? 92 : 160,
+                          objectFit: "contain",
+                          borderRadius: 12,
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ padding: isMobile ? 10 : 16 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px 0",
+                          fontSize: isMobile ? 14 : 16,
+                          lineHeight: 1.35,
+                          minHeight: isMobile ? "auto" : 44,
+                          color: "#ffffff",
+                          wordBreak: "break-word",
+                          display: "-webkit-box",
+                          WebkitLineClamp: isMobile ? 5 : 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {product.name}
+                      </h3>
+
+                      <p
+                        style={{
+                          margin: "0 0 12px 0",
+                          color: "#d8b4fe",
+                          fontSize: isMobile ? 18 : 28,
+                          fontWeight: "bold",
+                          textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
+                        }}
+                      >
+                        {formatPrice(Number(product.price))}
+                      </p>
+
+                      <p
+                        style={{
+                          margin: "0 0 8px 0",
+                          fontSize: isMobile ? 11 : 12,
+                          color: "#d8b4fe",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {remainingStock > 0
+                          ? `Estoque disponível: ${remainingStock}`
+                          : "Sem estoque"}
+                      </p>
+
+                      <button
+                        onClick={() => addToCart(product)}
+                        disabled={remainingStock <= 0}
+                        style={{
+                          width: "100%",
+                          background:
+                            remainingStock <= 0
+                              ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
+                              : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
+                          color: "white",
+                          border: "1px solid rgba(216, 180, 254, 0.28)",
+                          borderRadius: isMobile ? 12 : 14,
+                          padding: isMobile ? "10px 10px" : "12px 14px",
+                          cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
+                          fontWeight: "bold",
+                          fontSize: isMobile ? 14 : 16,
+                          boxShadow:
+                            "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
+                          letterSpacing: "0.2px",
+                          opacity: remainingStock <= 0 ? 0.7 : 1,
+                        }}
+                      >
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+
+            <section
+              style={{
+                marginTop: 28,
+                display: "flex",
+                justifyContent: "center",
+                gap: 10,
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  padding: isMobile ? "9px 12px" : "10px 14px",
+                  borderRadius: 12,
+                  border: "1px solid rgba(196, 181, 253, 0.22)",
+                  background:
+                    currentPage === 1
+                      ? "rgba(60, 60, 70, 0.6)"
+                      : "rgba(18, 12, 32, 0.92)",
+                  color: "#fff",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                }}
+              >
+                Página anterior
+              </button>
+
+              <div
+                style={{
+                  padding: isMobile ? "9px 12px" : "10px 14px",
+                  borderRadius: 12,
+                  background: "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
+                  color: "white",
+                  fontWeight: "bold",
+                  border: "1px solid rgba(168, 85, 247, 0.18)",
+                }}
+              >
+                Página {currentPage} de {totalPages}
+              </div>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: isMobile ? "9px 12px" : "10px 14px",
+                  borderRadius: 12,
+                  border: "1px solid rgba(196, 181, 253, 0.22)",
+                  background:
+                    currentPage === totalPages
+                      ? "rgba(60, 60, 70, 0.6)"
+                      : "rgba(18, 12, 32, 0.92)",
+                  color: "#fff",
+                  cursor:
+                    currentPage === totalPages ? "not-allowed" : "pointer",
+                }}
+              >
+                Próxima página
+              </button>
+            </section>
           </>
         )}
 
