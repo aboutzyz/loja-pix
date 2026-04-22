@@ -29,11 +29,11 @@ function formatPrice(value: number) {
 
 function LightningIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <path
         d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -43,18 +43,18 @@ function LightningIcon() {
 
 function ShieldIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <path
         d="M12 3l7 3.5v5.8c0 4.6-2.9 7.8-7 8.9-4.1-1.1-7-4.3-7-8.9V6.5L12 3Z"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="m9.5 12 1.7 1.7 3.5-3.7"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -64,7 +64,7 @@ function ShieldIcon() {
 
 function CardIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <rect
         x="3"
         y="5"
@@ -72,29 +72,29 @@ function CardIcon() {
         height="14"
         rx="2.5"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
       />
-      <path d="M3 10h18" stroke="#d8b4fe" strokeWidth="2.2" />
-      <path d="M7 15h3" stroke="#d8b4fe" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M3 10h18" stroke="#d8b4fe" strokeWidth="2.1" />
+      <path d="M7 15h3" stroke="#d8b4fe" strokeWidth="2.1" strokeLinecap="round" />
     </svg>
   );
 }
 
 function SupportIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <path
         d="M4 13a8 8 0 1 1 16 0"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
       />
-      <rect x="3" y="12" width="4" height="6" rx="2" stroke="#d8b4fe" strokeWidth="2.2" />
-      <rect x="17" y="12" width="4" height="6" rx="2" stroke="#d8b4fe" strokeWidth="2.2" />
+      <rect x="3" y="12" width="4" height="6" rx="2" stroke="#d8b4fe" strokeWidth="2.1" />
+      <rect x="17" y="12" width="4" height="6" rx="2" stroke="#d8b4fe" strokeWidth="2.1" />
       <path
         d="M12 20a3 3 0 0 0 3-3"
         stroke="#d8b4fe"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
       />
     </svg>
@@ -103,7 +103,7 @@ function SupportIcon() {
 
 function GlobeIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke="#f5f3ff" strokeWidth="2" />
       <path d="M3 12h18" stroke="#f5f3ff" strokeWidth="2" />
       <path
@@ -117,7 +117,7 @@ function GlobeIcon() {
 
 function CartIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <circle cx="9" cy="20" r="1.8" fill="#f5f3ff" />
       <circle cx="18" cy="20" r="1.8" fill="#f5f3ff" />
       <path
@@ -133,11 +133,11 @@ function CartIcon() {
 
 function PixBoltIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
       <path
         d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"
         stroke="#f8fafc"
-        strokeWidth="2.2"
+        strokeWidth="2.1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -147,8 +147,8 @@ function PixBoltIcon() {
 
 function PlusIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M12 5v14M5 12h14" stroke="#f5f3ff" strokeWidth="2.2" strokeLinecap="round" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M12 5v14M5 12h14" stroke="#f5f3ff" strokeWidth="2.1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -288,21 +288,14 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
           <div style={brandText}>BtTech</div>
         </div>
 
-        {!isMobile && (
-          <div style={topNav}>
-            <span style={topNavItem}>Início</span>
-            <span style={topNavItem}>Produtos</span>
-            <span style={topNavItem}>Como funciona</span>
-            <span style={topNavItem}>Avaliações</span>
-            <span style={topNavItem}>Suporte</span>
-          </div>
-        )}
+        <div style={topNav}>
+          <span style={topNavItem}>Início</span>
+        </div>
 
         <div style={topActions}>
-          <button style={ghostTopBtn}>Entrar</button>
           <button style={cartTopBtn} onClick={() => setOpenCart(true)}>
             <CartIcon />
-            <span style={{ marginLeft: 10 }}>Carrinho</span>
+            <span style={{ marginLeft: 8 }}>Carrinho</span>
             {cartCount > 0 && <span style={topBadge}>{cartCount}</span>}
           </button>
         </div>
@@ -310,18 +303,27 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
 
       <div style={contentWrap}>
         <div style={isMobile ? mobileHero : desktopHero}>
-          <div style={imageCard}>
-            <div style={imageGlow} />
-            <img src={product.image} alt={product.name} style={productImage} />
-            <div style={sitePill}>
-              <GlobeIcon />
-              <span style={{ marginLeft: 10 }}>bouttech.vercel.app</span>
+          <div style={leftColumn}>
+            <div style={imageCard}>
+              <div style={imageGlow} />
+              <img src={product.image} alt={product.name} style={productImage} />
+              <div style={sitePill}>
+                <GlobeIcon />
+                <span style={{ marginLeft: 10 }}>bouttech.vercel.app</span>
+              </div>
+            </div>
+
+            <div style={descriptionCard}>
+              <div style={descriptionHeader}>
+                <div style={descriptionIconBox}>▣</div>
+                <div style={descriptionTitle}>Descrição</div>
+              </div>
+
+              <div style={descriptionText}>{productDescription}</div>
             </div>
           </div>
 
           <div style={centerColumn}>
-            <div style={stockBadge}>100+ EM ESTOQUE</div>
-
             <h1 style={title}>{product.name}</h1>
 
             {!isMobile && (
@@ -340,12 +342,12 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
 
             <button style={pixBtn}>
               <PixBoltIcon />
-              <span style={{ marginLeft: 12 }}>Pagar com Pix</span>
+              <span style={{ marginLeft: 10 }}>Pagar com Pix</span>
             </button>
 
             <button style={addCartBtn} onClick={() => addToCart(product)}>
               <PlusIcon />
-              <span style={{ marginLeft: 12 }}>Adicionar ao carrinho</span>
+              <span style={{ marginLeft: 10 }}>Adicionar ao carrinho</span>
             </button>
 
             <div style={securityMiniCard}>
@@ -408,15 +410,6 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
               </div>
             </div>
           </div>
-        </div>
-
-        <div style={descriptionCard}>
-          <div style={descriptionHeader}>
-            <div style={descriptionIconBox}>▣</div>
-            <div style={descriptionTitle}>Descrição</div>
-          </div>
-
-          <div style={descriptionText}>{productDescription}</div>
         </div>
       </div>
 
@@ -547,34 +540,36 @@ const brandWrap: CSSProperties = {
 };
 
 const brandLogoBox: CSSProperties = {
-  width: 48,
-  height: 48,
+  width: 42,
+  height: 42,
   borderRadius: 14,
   background: "linear-gradient(135deg, #7c14ff, #db4cff)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   fontWeight: "bold",
+  fontSize: 16,
   boxShadow: "0 0 22px rgba(183, 77, 255, 0.45)",
 };
 
 const brandText: CSSProperties = {
-  fontSize: 28,
+  fontSize: 24,
   fontWeight: 800,
-  letterSpacing: 0.5,
+  letterSpacing: 0.3,
   textShadow: "0 0 18px rgba(203, 110, 255, 0.35)",
 };
 
 const topNav: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 34,
+  gap: 24,
   color: "#ede9fe",
   fontSize: 15,
 };
 
 const topNavItem: CSSProperties = {
-  opacity: 0.92,
+  opacity: 0.96,
+  fontWeight: 700,
 };
 
 const topActions: CSSProperties = {
@@ -583,21 +578,10 @@ const topActions: CSSProperties = {
   gap: 12,
 };
 
-const ghostTopBtn: CSSProperties = {
-  height: 48,
-  padding: "0 22px",
-  borderRadius: 16,
-  border: "1px solid rgba(186, 104, 255, 0.25)",
-  background: "rgba(16, 6, 30, 0.65)",
-  color: "#f5f3ff",
-  fontWeight: 700,
-  backdropFilter: "blur(10px)",
-};
-
 const cartTopBtn: CSSProperties = {
-  height: 48,
-  padding: "0 18px",
-  borderRadius: 16,
+  height: 44,
+  padding: "0 16px",
+  borderRadius: 14,
   border: "1px solid rgba(186, 104, 255, 0.3)",
   background: "rgba(16, 6, 30, 0.65)",
   color: "#f5f3ff",
@@ -610,14 +594,14 @@ const cartTopBtn: CSSProperties = {
 
 const topBadge: CSSProperties = {
   marginLeft: 10,
-  minWidth: 24,
-  height: 24,
+  minWidth: 22,
+  height: 22,
   borderRadius: 999,
   background: "#b933ff",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 800,
   boxShadow: "0 0 14px rgba(185, 51, 255, 0.55)",
 };
@@ -633,7 +617,7 @@ const contentWrap: CSSProperties = {
 const desktopHero: CSSProperties = {
   display: "grid",
   gridTemplateColumns: "1.35fr 0.95fr 0.85fr",
-  gap: 22,
+  gap: 20,
   alignItems: "start",
 };
 
@@ -643,11 +627,17 @@ const mobileHero: CSSProperties = {
   gap: 16,
 };
 
+const leftColumn: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 18,
+};
+
 const imageCard: CSSProperties = {
   position: "relative",
-  minHeight: 490,
-  borderRadius: 26,
-  padding: 18,
+  minHeight: 430,
+  borderRadius: 24,
+  padding: 16,
   background: "rgba(14, 4, 28, 0.68)",
   border: "1px solid rgba(186, 104, 255, 0.4)",
   backdropFilter: "blur(18px)",
@@ -668,24 +658,25 @@ const productImage: CSSProperties = {
   position: "relative",
   zIndex: 1,
   width: "100%",
-  height: 455,
+  height: 395,
   objectFit: "cover",
-  borderRadius: 20,
+  borderRadius: 18,
   border: "1px solid rgba(203, 110, 255, 0.25)",
 };
 
 const sitePill: CSSProperties = {
   position: "absolute",
-  left: 28,
-  bottom: 26,
+  left: 24,
+  bottom: 22,
   zIndex: 2,
   display: "inline-flex",
   alignItems: "center",
-  padding: "10px 18px",
+  padding: "9px 16px",
   borderRadius: 999,
   background: "rgba(33, 12, 57, 0.8)",
   border: "1px solid rgba(205, 126, 255, 0.26)",
   fontWeight: 700,
+  fontSize: 14,
   boxShadow: "0 0 20px rgba(168,85,247,0.25)",
 };
 
@@ -694,23 +685,12 @@ const centerColumn: CSSProperties = {
   flexDirection: "column",
 };
 
-const stockBadge: CSSProperties = {
-  width: "fit-content",
-  padding: "8px 14px",
-  borderRadius: 999,
-  background: "linear-gradient(135deg, #5f10d1, #b63cff)",
-  color: "#faf5ff",
-  fontWeight: 800,
-  fontSize: 15,
-  boxShadow: "0 0 20px rgba(168,85,247,0.35)",
-};
-
 const title: CSSProperties = {
-  margin: "16px 0 8px 0",
-  fontSize: 58,
+  margin: "8px 0 8px 0",
+  fontSize: 42,
   lineHeight: 1,
   fontWeight: 900,
-  letterSpacing: -1,
+  letterSpacing: -0.5,
   textShadow: "0 0 16px rgba(195, 94, 255, 0.22)",
 };
 
@@ -718,46 +698,46 @@ const ratingRow: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 4,
-  marginBottom: 18,
+  marginBottom: 16,
 };
 
 const star: CSSProperties = {
   color: "#ffd84d",
-  fontSize: 22,
+  fontSize: 18,
   textShadow: "0 0 12px rgba(255,216,77,0.35)",
 };
 
 const ratingText: CSSProperties = {
   marginLeft: 8,
   color: "#ddd6fe",
-  fontSize: 18,
+  fontSize: 14,
 };
 
 const price: CSSProperties = {
-  fontSize: 54,
+  fontSize: 40,
   fontWeight: 900,
   color: "#f0abfc",
-  letterSpacing: -1,
-  marginTop: 4,
+  letterSpacing: -0.5,
+  marginTop: 2,
   textShadow: "0 0 18px rgba(216, 180, 254, 0.25)",
 };
 
 const pixText: CSSProperties = {
   color: "#f3e8ff",
   opacity: 0.9,
-  fontSize: 22,
+  fontSize: 18,
   marginTop: 4,
-  marginBottom: 22,
+  marginBottom: 20,
 };
 
 const pixBtn: CSSProperties = {
-  height: 82,
-  borderRadius: 22,
+  height: 64,
+  borderRadius: 18,
   border: "1px solid rgba(241, 204, 255, 0.26)",
   background: "linear-gradient(180deg, #e03cff 0%, #8e18ff 100%)",
   color: "#ffffff",
   fontWeight: 900,
-  fontSize: 30,
+  fontSize: 22,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -767,14 +747,14 @@ const pixBtn: CSSProperties = {
 };
 
 const addCartBtn: CSSProperties = {
-  marginTop: 18,
-  height: 82,
-  borderRadius: 22,
+  marginTop: 14,
+  height: 64,
+  borderRadius: 18,
   border: "1px solid rgba(192, 110, 255, 0.45)",
   background: "rgba(11, 2, 22, 0.45)",
   color: "#ffffff",
   fontWeight: 800,
-  fontSize: 30,
+  fontSize: 22,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -783,21 +763,21 @@ const addCartBtn: CSSProperties = {
 };
 
 const securityMiniCard: CSSProperties = {
-  marginTop: 22,
+  marginTop: 18,
   display: "flex",
   alignItems: "center",
   gap: 14,
-  padding: 18,
-  borderRadius: 22,
+  padding: 16,
+  borderRadius: 20,
   background: "rgba(18, 6, 34, 0.7)",
   border: "1px solid rgba(194, 120, 255, 0.22)",
   boxShadow: "0 0 26px rgba(168,85,247,0.12)",
 };
 
 const miniIconWrap: CSSProperties = {
-  width: 54,
-  height: 54,
-  borderRadius: 16,
+  width: 48,
+  height: 48,
+  borderRadius: 15,
   background: "rgba(180, 90, 255, 0.12)",
   border: "1px solid rgba(205,126,255,0.22)",
   display: "flex",
@@ -807,28 +787,28 @@ const miniIconWrap: CSSProperties = {
 };
 
 const miniCardTitle: CSSProperties = {
-  fontSize: 24,
+  fontSize: 18,
   fontWeight: 800,
 };
 
 const miniCardText: CSSProperties = {
   color: "#e9d5ff",
   opacity: 0.92,
-  fontSize: 17,
+  fontSize: 14,
   marginTop: 4,
 };
 
 const featureColumn: CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: 16,
+  gap: 14,
 };
 
 const featureCard: CSSProperties = {
   display: "flex",
-  gap: 16,
-  padding: 24,
-  borderRadius: 24,
+  gap: 14,
+  padding: 20,
+  borderRadius: 22,
   background: "rgba(18, 5, 35, 0.7)",
   border: "1px solid rgba(192, 110, 255, 0.3)",
   backdropFilter: "blur(18px)",
@@ -836,9 +816,9 @@ const featureCard: CSSProperties = {
 };
 
 const featureIconWrap: CSSProperties = {
-  width: 58,
-  height: 58,
-  borderRadius: 18,
+  width: 52,
+  height: 52,
+  borderRadius: 16,
   background: "rgba(180, 90, 255, 0.12)",
   border: "1px solid rgba(205,126,255,0.22)",
   display: "flex",
@@ -848,7 +828,7 @@ const featureIconWrap: CSSProperties = {
 };
 
 const featureTitle: CSSProperties = {
-  fontSize: 26,
+  fontSize: 18,
   fontWeight: 800,
   marginBottom: 6,
 };
@@ -856,14 +836,13 @@ const featureTitle: CSSProperties = {
 const featureText: CSSProperties = {
   color: "#e9d5ff",
   opacity: 0.92,
-  lineHeight: 1.5,
-  fontSize: 18,
+  lineHeight: 1.45,
+  fontSize: 15,
 };
 
 const descriptionCard: CSSProperties = {
-  marginTop: 22,
-  borderRadius: 26,
-  padding: 24,
+  borderRadius: 24,
+  padding: 20,
   background: "rgba(16, 5, 30, 0.78)",
   border: "1px solid rgba(192, 110, 255, 0.32)",
   boxShadow: "0 0 30px rgba(168,85,247,0.14)",
@@ -874,12 +853,12 @@ const descriptionHeader: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 12,
-  marginBottom: 18,
+  marginBottom: 14,
 };
 
 const descriptionIconBox: CSSProperties = {
-  width: 34,
-  height: 34,
+  width: 32,
+  height: 32,
   borderRadius: 10,
   background: "rgba(191, 90, 255, 0.12)",
   border: "1px solid rgba(205,126,255,0.22)",
@@ -891,7 +870,7 @@ const descriptionIconBox: CSSProperties = {
 };
 
 const descriptionTitle: CSSProperties = {
-  fontSize: 32,
+  fontSize: 22,
   fontWeight: 900,
   color: "#d946ef",
 };
@@ -899,17 +878,17 @@ const descriptionTitle: CSSProperties = {
 const descriptionText: CSSProperties = {
   whiteSpace: "pre-line",
   color: "#f5f3ff",
-  lineHeight: 1.62,
-  fontSize: 20,
+  lineHeight: 1.6,
+  fontSize: 16,
 };
 
 const floatingCartBtn: CSSProperties = {
   position: "fixed",
-  right: 26,
-  bottom: 26,
+  right: 24,
+  bottom: 24,
   zIndex: 30,
-  width: 78,
-  height: 78,
+  width: 72,
+  height: 72,
   borderRadius: "50%",
   border: "1px solid rgba(218, 160, 255, 0.28)",
   background: "linear-gradient(180deg, #ca3cff 0%, #7a19ff 100%)",
@@ -924,8 +903,8 @@ const floatingBadge: CSSProperties = {
   position: "absolute",
   top: -4,
   right: -4,
-  minWidth: 28,
-  height: 28,
+  minWidth: 26,
+  height: 26,
   padding: "0 7px",
   borderRadius: 999,
   background: "#c026d3",
@@ -933,7 +912,7 @@ const floatingBadge: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   color: "#fff",
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 900,
   boxShadow: "0 0 18px rgba(192, 38, 211, 0.5)",
 };
@@ -1017,7 +996,7 @@ const cartItemImage: CSSProperties = {
 
 const cartItemName: CSSProperties = {
   fontWeight: 800,
-  fontSize: 17,
+  fontSize: 16,
   lineHeight: 1.2,
   wordBreak: "break-word",
 };
@@ -1097,13 +1076,13 @@ const cartTotalValue: CSSProperties = {
 
 const checkoutBtn: CSSProperties = {
   width: "100%",
-  height: 58,
+  height: 56,
   borderRadius: 16,
   border: "1px solid rgba(255,255,255,0.14)",
   background: "linear-gradient(180deg, #ff4cff 0%, #9327ff 100%)",
   color: "#fff",
   fontWeight: 900,
-  fontSize: 21,
+  fontSize: 19,
   boxShadow: "0 0 24px rgba(197, 71, 255, 0.4)",
   cursor: "pointer",
 };
