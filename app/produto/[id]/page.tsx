@@ -16,8 +16,9 @@ type Product = {
   price: number;
   image: string;
   stock: number;
-  description?: string | null;
 };
+
+type CartItem = Product & { quantity: number };
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -31,173 +32,204 @@ export default function ProdutoPage() {
   const productId = String(params?.id ?? "");
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
-    function updateLayout() {
-      setIsMobile(window.innerWidth <= 768);
-    }
-
-    updateLayout();
-    window.addEventListener("resize", updateLayout);
-    return () => window.removeEventListener("resize", updateLayout);
+    loadProduct();
+    loadCart();
   }, []);
 
-  useEffect(() => {
-    if (!productId) return;
-    loadProduct();
-  }, [productId]);
-
   async function loadProduct() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("products")
       .select("*")
       .eq("id", productId)
       .single();
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
     setProduct(data);
   }
 
-  function sendWhatsApp() {
+  function loadCart() {
+    const saved = localStorage.getItem("cart");
+    if (saved) setCart(JSON.parse(saved));
+  }
+
+  function saveCart(newCart: CartItem[]) {
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+  }
+
+  function addToCart() {
     if (!product) return;
 
-    const text = `${product.name} - ${formatPrice(Number(product.price))}`;
+    const existing = cart.find((i) => i.id === product.id);
 
-    // ✅ CORRIGIDO (com crase)
-    window.open(
-      `https://wa.me/5541996265158?text=Pedido:%0A${text}`,
-      "_blank"
-    );
+    let newCart;
+
+    if (existing) {
+      newCart = cart.map((i) =>
+        i.id === product.id
+          ? { ...i, quantity: i.quantity + quantity }
+          : i
+      );
+    } else {
+      newCart = [...cart, { ...product, quantity }];
+    }
+
+    saveCart(newCart);
+    setShowPopup(false);
+    setQuantity(1);
   }
 
-  if (!product) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background:
-            "linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)",
-          color: "white",
-          padding: 40,
-        }}
-      >
-        Carregando...
-      </div>
-    );
+  function removeItem(id: string) {
+    const newCart = cart.filter((i) => i.id !== id);
+    saveCart(newCart);
   }
 
-  const productDescription =
-    product.description?.trim() ||
-    "Produto digital disponível para envio rápido. Após o pagamento, o pedido será combinado pelo WhatsApp.";
+  const total = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  if (!product) return <div>Carregando...</div>;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(180deg, #020014 0%, #0b041a 50%, #020014 100%)",
-        color: "white",
-        padding: isMobile ? 12 : 20,
-        fontFamily: "Arial",
-      }}
-    >
-      <Link
-        href="/"
-        style={{
-          color: "#c084fc",
-          fontWeight: "bold",
-          textDecoration: "none",
-        }}
-      >
-        ← Voltar
-      </Link>
+    <div style={{ padding: 20, color: "white", background: "#0b041a", minHeight: "100vh" }}>
+      
+      <Link href="/">← Voltar</Link>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-          gap: 20,
-          marginTop: 20,
-          background: "rgba(255,255,255,0.04)",
-          borderRadius: 20,
-          padding: 20,
-          backdropFilter: "blur(10px)",
-        }}
-      >
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 20 }}>
+        
         {/* IMAGEM */}
         <div>
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{
-              width: "100%",
-              height: isMobile ? 250 : 500,
-              objectFit: "cover",
-              borderRadius: 16,
-            }}
-          />
+          <img src={product.image} style={{ width: "100%", borderRadius: 16 }} />
 
-          {/* BOTÃO EMBAIXO DA IMAGEM */}
           <button
-            onClick={sendWhatsApp}
+            onClick={() => setShowPopup(true)}
             style={{
+              marginTop: 10,
               width: "100%",
-              marginTop: 12,
               padding: 14,
               borderRadius: 12,
+              background: "#9333ea",
+              color: "white",
               border: "none",
               fontWeight: "bold",
-              fontSize: 16,
-              background:
-                "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-              color: "white",
-              boxShadow: "0 0 20px rgba(168,85,247,0.8)",
               cursor: "pointer",
             }}
           >
-            Enviar pedido no WhatsApp
+            Adicionar ao carrinho
           </button>
         </div>
 
-        {/* INFO DIREITA */}
+        {/* INFO */}
         <div>
-          <h1 style={{ fontSize: 32 }}>{product.name}</h1>
-
-          <p
-            style={{
-              fontSize: 28,
-              fontWeight: "bold",
-              color: "#d8b4fe",
-            }}
-          >
-            {formatPrice(product.price)}
-          </p>
-
-          <p>
-            {product.stock > 0
-              ? `Estoque: ${product.stock}`
-              : "Sem estoque"}
-          </p>
-
-          {/* DESCRIÇÃO */}
-          <div
-            style={{
-              marginTop: 20,
-              padding: 16,
-              background: "rgba(255,255,255,0.05)",
-              borderRadius: 12,
-            }}
-          >
-            <h3>Descrição</h3>
-            <p>{productDescription}</p>
-          </div>
+          <h1>{product.name}</h1>
+          <h2>{formatPrice(product.price)}</h2>
+          <p>Estoque: {product.stock}</p>
         </div>
       </div>
+
+      {/* POPUP QUANTIDADE */}
+      {showPopup && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.7)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 999,
+        }}>
+          <div style={{ background: "#111", padding: 20, borderRadius: 12 }}>
+            <h3>Quantidade</h3>
+
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              min={1}
+              max={product.stock}
+              style={{ width: 80, padding: 8 }}
+            />
+
+            <div style={{ marginTop: 10 }}>
+              <button onClick={addToCart}>Confirmar</button>
+              <button onClick={() => setShowPopup(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTÃO CARRINHO */}
+      <div
+        onClick={() => setShowCart(true)}
+        style={{
+          position: "fixed",
+          bottom: 20,
+          right: 20,
+          width: 60,
+          height: 60,
+          borderRadius: "50%",
+          background: "#9333ea",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: 24,
+          cursor: "pointer",
+        }}
+      >
+        🛒
+        {cart.length > 0 && (
+          <span style={{
+            position: "absolute",
+            top: -5,
+            right: -5,
+            background: "red",
+            borderRadius: "50%",
+            padding: "4px 8px",
+            fontSize: 12,
+          }}>
+            {cart.length}
+          </span>
+        )}
+      </div>
+
+      {/* POPUP CARRINHO */}
+      {showCart && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.7)",
+          zIndex: 999,
+        }}>
+          <div style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: 300,
+            height: "100%",
+            background: "#111",
+            padding: 20,
+          }}>
+            <h2>Carrinho</h2>
+
+            {cart.map((item) => (
+              <div key={item.id}>
+                {item.name} x{item.quantity}
+                <button onClick={() => removeItem(item.id)}>X</button>
+              </div>
+            ))}
+
+            <h3>Total: {formatPrice(total)}</h3>
+
+            <button onClick={() => setShowCart(false)}>Fechar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
