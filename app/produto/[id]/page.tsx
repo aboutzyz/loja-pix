@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { CSSProperties, useEffect, useMemo, useState } from "react";
@@ -96,20 +97,6 @@ function SupportIcon() {
         stroke="#d8b4fe"
         strokeWidth="2.1"
         strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function GlobeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="#f5f3ff" strokeWidth="2" />
-      <path d="M3 12h18" stroke="#f5f3ff" strokeWidth="2" />
-      <path
-        d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"
-        stroke="#f5f3ff"
-        strokeWidth="2"
       />
     </svg>
   );
@@ -289,7 +276,9 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
         </div>
 
         <div style={topNav}>
-          <span style={topNavItem}>Início</span>
+          <Link href="/" style={topNavLink}>
+            Início
+          </Link>
         </div>
 
         <div style={topActions}>
@@ -307,10 +296,6 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
             <div style={imageCard}>
               <div style={imageGlow} />
               <img src={product.image} alt={product.name} style={productImage} />
-              <div style={sitePill}>
-                <GlobeIcon />
-                <span style={{ marginLeft: 10 }}>bouttech.vercel.app</span>
-              </div>
             </div>
 
             <div style={descriptionCard}>
@@ -572,6 +557,13 @@ const topNavItem: CSSProperties = {
   fontWeight: 700,
 };
 
+const topNavLink: CSSProperties = {
+  color: "#ede9fe",
+  textDecoration: "none",
+  opacity: 0.96,
+  fontWeight: 700,
+};
+
 const topActions: CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -662,22 +654,6 @@ const productImage: CSSProperties = {
   objectFit: "cover",
   borderRadius: 18,
   border: "1px solid rgba(203, 110, 255, 0.25)",
-};
-
-const sitePill: CSSProperties = {
-  position: "absolute",
-  left: 24,
-  bottom: 22,
-  zIndex: 2,
-  display: "inline-flex",
-  alignItems: "center",
-  padding: "9px 16px",
-  borderRadius: 999,
-  background: "rgba(33, 12, 57, 0.8)",
-  border: "1px solid rgba(205, 126, 255, 0.26)",
-  fontWeight: 700,
-  fontSize: 14,
-  boxShadow: "0 0 20px rgba(168,85,247,0.25)",
 };
 
 const centerColumn: CSSProperties = {
