@@ -42,9 +42,10 @@ export default function CategoriaPage({
 }: {
   params: { id: string };
 }) {
-  const categoryFilterValue = /^\d+$/.test(params.id)
-    ? Number(params.id)
-    : params.id;
+const { data: products, error } = await supabase
+  .from("products")
+  .select("*")
+  .eq("category_id", params.id);
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
