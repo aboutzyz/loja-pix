@@ -81,6 +81,10 @@ export default function CategoriaPage({
       .eq("category_id", params.id)
       .order("created_at", { ascending: false });
 
+    console.log("ID DA URL:", params.id);
+    console.log("PRODUTOS DA CATEGORIA:", data);
+    console.log("ERRO PRODUTOS:", error);
+
     if (error) {
       console.error("Erro ao buscar produtos da categoria:", error);
       return;
@@ -344,134 +348,153 @@ export default function CategoriaPage({
           <p style={{ color: "#d1d5db", marginTop: 0, fontSize: 16 }}>
             Escolha seus produtos e adicione ao carrinho.
           </p>
+          <div style={{ color: "#fff", marginTop: 10, fontSize: 14 }}>
+            Produtos encontrados: {filteredProducts.length}
+          </div>
         </section>
 
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-            gap: 18,
-            background: "rgba(10, 8, 20, 0.55)",
-            border: "1px solid rgba(168, 85, 247, 0.12)",
-            borderRadius: 24,
-            padding: 22,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-          }}
-        >
-          {filteredProducts.map((product) => {
-            const cartItem = cart.find((item) => item.id === product.id);
-            const quantityInCart = cartItem?.quantity ?? 0;
-            const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
+        {filteredProducts.length === 0 ? (
+          <section
+            style={{
+              background: "rgba(10, 8, 20, 0.55)",
+              border: "1px solid rgba(168, 85, 247, 0.12)",
+              borderRadius: 24,
+              padding: 22,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              color: "#fff",
+              fontSize: 18,
+            }}
+          >
+            Nenhum produto encontrado nessa categoria.
+          </section>
+        ) : (
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+              gap: 18,
+              background: "rgba(10, 8, 20, 0.55)",
+              border: "1px solid rgba(168, 85, 247, 0.12)",
+              borderRadius: 24,
+              padding: 22,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+            }}
+          >
+            {filteredProducts.map((product) => {
+              const cartItem = cart.find((item) => item.id === product.id);
+              const quantityInCart = cartItem?.quantity ?? 0;
+              const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
 
-            return (
-              <div
-                key={product.id}
-                style={{
-                  width: "100%",
-                  minWidth: 0,
-                  background: "rgba(12, 8, 24, 0.92)",
-                  borderRadius: 18,
-                  overflow: "hidden",
-                  boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
-                  border: "1px solid rgba(159, 122, 234, 0.18)",
-                }}
-              >
+              return (
                 <div
+                  key={product.id}
                   style={{
-                    background:
-                      "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                    padding: 12,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: 190,
+                    width: "100%",
+                    minWidth: 0,
+                    background: "rgba(12, 8, 24, 0.92)",
+                    borderRadius: 18,
+                    overflow: "hidden",
+                    boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
+                    border: "1px solid rgba(159, 122, 234, 0.18)",
                   }}
                 >
-                  <img
-                    src={product.image}
-                    alt={product.name}
+                  <div
                     style={{
-                      width: "100%",
-                      maxWidth: 160,
-                      maxHeight: 160,
-                      objectFit: "contain",
-                      borderRadius: 12,
-                    }}
-                  />
-                </div>
-
-                <div style={{ padding: 16 }}>
-                  <h3
-                    style={{
-                      margin: "0 0 8px 0",
-                      fontSize: 16,
-                      lineHeight: 1.35,
-                      minHeight: 44,
-                      color: "#ffffff",
-                      wordBreak: "break-word",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {product.name}
-                  </h3>
-
-                  <p
-                    style={{
-                      margin: "0 0 12px 0",
-                      color: "#d8b4fe",
-                      fontSize: 28,
-                      fontWeight: "bold",
-                      textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
-                    }}
-                  >
-                    {formatPrice(Number(product.price))}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: "0 0 8px 0",
-                      fontSize: 12,
-                      color: "#d8b4fe",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {remainingStock > 0
-                      ? `Estoque disponível: ${remainingStock}`
-                      : "Sem estoque"}
-                  </p>
-
-                  <button
-                    onClick={() => addToCart(product)}
-                    disabled={remainingStock <= 0}
-                    style={{
-                      width: "100%",
                       background:
-                        remainingStock <= 0
-                          ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
-                          : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
-                      color: "white",
-                      border: "1px solid rgba(216, 180, 254, 0.28)",
-                      borderRadius: 14,
-                      padding: "12px 14px",
-                      cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
-                      fontWeight: "bold",
-                      fontSize: 16,
-                      boxShadow:
-                        "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
-                      letterSpacing: "0.2px",
-                      opacity: remainingStock <= 0 ? 0.7 : 1,
+                        "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
+                      padding: 12,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: 190,
                     }}
                   >
-                    Comprar
-                  </button>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      style={{
+                        width: "100%",
+                        maxWidth: 160,
+                        maxHeight: 160,
+                        objectFit: "contain",
+                        borderRadius: 12,
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ padding: 16 }}>
+                    <h3
+                      style={{
+                        margin: "0 0 8px 0",
+                        fontSize: 16,
+                        lineHeight: 1.35,
+                        minHeight: 44,
+                        color: "#ffffff",
+                        wordBreak: "break-word",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {product.name}
+                    </h3>
+
+                    <p
+                      style={{
+                        margin: "0 0 12px 0",
+                        color: "#d8b4fe",
+                        fontSize: 28,
+                        fontWeight: "bold",
+                        textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
+                      }}
+                    >
+                      {formatPrice(Number(product.price))}
+                    </p>
+
+                    <p
+                      style={{
+                        margin: "0 0 8px 0",
+                        fontSize: 12,
+                        color: "#d8b4fe",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {remainingStock > 0
+                        ? `Estoque disponível: ${remainingStock}`
+                        : "Sem estoque"}
+                    </p>
+
+                    <button
+                      onClick={() => addToCart(product)}
+                      disabled={remainingStock <= 0}
+                      style={{
+                        width: "100%",
+                        background:
+                          remainingStock <= 0
+                            ? "linear-gradient(180deg, #3b2a55 0%, #241635 100%)"
+                            : "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
+                        color: "white",
+                        border: "1px solid rgba(216, 180, 254, 0.28)",
+                        borderRadius: 14,
+                        padding: "12px 14px",
+                        cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
+                        fontWeight: "bold",
+                        fontSize: 16,
+                        boxShadow:
+                          "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
+                        letterSpacing: "0.2px",
+                        opacity: remainingStock <= 0 ? 0.7 : 1,
+                      }}
+                    >
+                      Comprar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </section>
+              );
+            })}
+          </section>
+        )}
       </main>
 
       {showMiniCart && lastAddedProduct && (
