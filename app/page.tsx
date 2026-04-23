@@ -349,7 +349,7 @@ export default function Home() {
               textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
             }}
           >
-            💎 BtTech
+            💎 BoutBux
           </h1>
 
           <div

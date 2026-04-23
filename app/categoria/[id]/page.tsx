@@ -177,7 +177,7 @@ export default function CategoriaPage() {
               textDecoration: "none",
             }}
           >
-            💎 BtTech
+            💎 BoutBux
           </Link>
 
           <div

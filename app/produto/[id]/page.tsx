@@ -236,7 +236,7 @@ export default function ProdutoPage() {
       .join("%0A");
 
     const message =
-      `Pedido BtTech%0A%0A` +
+      `Pedido BoutBux%0A%0A` +
       `${itemsText}%0A%0A` +
       `Total: ${formatPrice(total)}`;
 
@@ -272,7 +272,7 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
       <div style={topBar}>
         <div style={brandWrap}>
           <div style={brandLogoBox}>BT</div>
-          <div style={brandText}>BtTech</div>
+          <div style={brandText}>BoutBux</div>
         </div>
 
         <div style={topNav}>
