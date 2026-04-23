@@ -325,190 +325,91 @@ export default function Home() {
             zIndex: 1,
             maxWidth: 1200,
             margin: "0 auto",
-            padding: isMobile ? "28px 12px 18px 12px" : "44px 20px 26px 20px",
+            padding: isMobile ? "24px 12px 18px 12px" : "40px 20px 24px 20px",
             display: "grid",
-            gridTemplateColumns: isMobile ? "1fr" : "1.1fr 0.9fr",
-            alignItems: "center",
-            gap: isMobile ? 22 : 30,
+            gridTemplateColumns: isMobile ? "1fr" : "1.05fr 0.95fr",
+            gap: isMobile ? 16 : 24,
+            alignItems: "stretch",
           }}
         >
           <div
             style={{
-              background: "rgba(20, 6, 40, 0.55)",
-              backdropFilter: "blur(16px)",
+              background: "rgba(20, 6, 40, 0.58)",
               border: "1px solid rgba(168, 85, 247, 0.16)",
-              borderRadius: 28,
+              borderRadius: isMobile ? 22 : 28,
               padding: isMobile ? 22 : 30,
+              backdropFilter: "blur(16px)",
               boxShadow:
                 "0 14px 30px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.14)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minHeight: isMobile ? "auto" : 320,
             }}
           >
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 12px",
-                borderRadius: 999,
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                color: "#f3e8ff",
-                fontWeight: "bold",
-                fontSize: 12,
-                boxShadow: "0 0 16px rgba(168,85,247,0.18)",
-                marginBottom: 14,
-              }}
-            >
-              Loja digital premium
-            </div>
-
             <h1
               style={{
                 margin: 0,
-                fontSize: isMobile ? 34 : 56,
-                lineHeight: 1.02,
+                fontSize: isMobile ? 38 : 62,
+                lineHeight: 0.96,
                 fontWeight: 900,
                 color: "#ffffff",
                 textShadow:
-                  "0 0 22px rgba(168,85,247,0.45), 0 2px 16px rgba(0,0,0,0.35)",
+                  "0 0 24px rgba(168,85,247,0.42), 0 2px 16px rgba(0,0,0,0.34)",
               }}
             >
-              Compra rápida
-              <br />
-              e segura
+              BoutBux
             </h1>
 
             <p
               style={{
                 marginTop: 14,
                 marginBottom: 0,
-                fontSize: isMobile ? 15 : 18,
-                lineHeight: 1.6,
-                color: "#ddd6fe",
-                maxWidth: 560,
+                fontSize: isMobile ? 16 : 20,
+                lineHeight: 1.5,
+                color: "#e9ddff",
+                maxWidth: 580,
+                fontWeight: 600,
               }}
             >
-              Receba seus produtos digitais com visual premium, pagamento via Pix
-              e experiência rápida em qualquer dispositivo.
+              Escolha sua categoria e compre com rapidez.
             </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: 12,
-                flexWrap: "wrap",
-                marginTop: 22,
-              }}
-            >
-              <a
-                href="#produtos-home"
-                style={{
-                  background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-                  color: "#fff",
-                  border: "1px solid rgba(216, 180, 254, 0.26)",
-                  borderRadius: 14,
-                  padding: isMobile ? "12px 16px" : "13px 18px",
-                  textDecoration: "none",
-                  fontWeight: "bold",
-                  boxShadow: "0 0 24px rgba(168,85,247,0.6)",
-                }}
-              >
-                Ver produtos
-              </a>
-
-              <a
-                href="#categorias-home"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  color: "#fff",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  borderRadius: 14,
-                  padding: isMobile ? "12px 16px" : "13px 18px",
-                  textDecoration: "none",
-                  fontWeight: "bold",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                Ver categorias
-              </a>
-            </div>
           </div>
 
           <div
             style={{
-              background: "rgba(20, 6, 40, 0.55)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(168, 85, 247, 0.16)",
-              borderRadius: 28,
-              padding: isMobile ? 18 : 24,
-              boxShadow:
-                "0 14px 30px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.14)",
-              minHeight: isMobile ? 240 : 340,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "grid",
+              gap: 14,
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+              alignContent: "stretch",
             }}
           >
             <div
               style={{
-                width: "100%",
-                height: "100%",
-                minHeight: isMobile ? 220 : 300,
-                borderRadius: 22,
-                background: `
-                  radial-gradient(circle at 30% 30%, rgba(168,85,247,0.24), transparent 30%),
-                  radial-gradient(circle at 70% 60%, rgba(139,92,246,0.18), transparent 28%),
-                  linear-gradient(180deg, rgba(18,12,32,0.95) 0%, rgba(10,8,22,0.98) 100%)
-                `,
-                border: "1px solid rgba(216, 180, 254, 0.16)",
-                boxShadow: "inset 0 0 40px rgba(168,85,247,0.08)",
-                display: "grid",
-                placeItems: "center",
-                position: "relative",
-                overflow: "hidden",
+                ...heroMiniCard,
+                gridColumn: isMobile ? "auto" : "1 / span 2",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  backgroundImage: `
-                    linear-gradient(rgba(179, 77, 255, 0.08) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(179, 77, 255, 0.08) 1px, transparent 1px)
-                  `,
-                  backgroundSize: "28px 28px",
-                  opacity: 0.65,
-                }}
-              />
-              <div
-                style={{
-                  position: "relative",
-                  zIndex: 1,
-                  textAlign: "center",
-                  padding: 20,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: isMobile ? 44 : 70,
-                    fontWeight: 900,
-                    color: "#ffffff",
-                    textShadow: "0 0 28px rgba(168,85,247,0.7)",
-                  }}
-                >
-                  BoutBux
-                </div>
-                <div
-                  style={{
-                    marginTop: 8,
-                    color: "#d8b4fe",
-                    fontWeight: "bold",
-                    letterSpacing: "0.4px",
-                    fontSize: isMobile ? 14 : 16,
-                  }}
-                >
-                  visual premium • pix • entrega rápida
-                </div>
+              <div style={miniIcon}>⚡</div>
+              <div>
+                <div style={miniTitle}>Pix imediato</div>
+                <div style={miniText}>Pagamento rápido e visual moderno na loja.</div>
+              </div>
+            </div>
+
+            <div style={heroMiniCard}>
+              <div style={miniIcon}>🛡️</div>
+              <div>
+                <div style={miniTitle}>Compra segura</div>
+                <div style={miniText}>Fluxo simples e organizado para comprar.</div>
+              </div>
+            </div>
+
+            <div style={heroMiniCard}>
+              <div style={miniIcon}>🚀</div>
+              <div>
+                <div style={miniTitle}>Entrega rápida</div>
+                <div style={miniText}>Escolha produtos digitais com acesso fácil.</div>
               </div>
             </div>
           </div>
@@ -1372,4 +1273,46 @@ const inputStyle: React.CSSProperties = {
   color: "#fff",
   backdropFilter: "blur(12px)",
   boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
+};
+
+const heroMiniCard: React.CSSProperties = {
+  background: "rgba(20, 6, 40, 0.58)",
+  border: "1px solid rgba(168, 85, 247, 0.16)",
+  borderRadius: 22,
+  padding: 18,
+  backdropFilter: "blur(16px)",
+  boxShadow:
+    "0 14px 30px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.14)",
+  display: "flex",
+  alignItems: "center",
+  gap: 14,
+  minHeight: 120,
+};
+
+const miniIcon: React.CSSProperties = {
+  width: 52,
+  height: 52,
+  minWidth: 52,
+  borderRadius: 16,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 24,
+  background: "linear-gradient(180deg, rgba(168,85,247,0.22), rgba(109,40,217,0.14))",
+  border: "1px solid rgba(216, 180, 254, 0.2)",
+  boxShadow: "0 0 18px rgba(168,85,247,0.22)",
+};
+
+const miniTitle: React.CSSProperties = {
+  color: "#fff",
+  fontWeight: 900,
+  fontSize: 18,
+  marginBottom: 4,
+  textShadow: "0 0 12px rgba(168,85,247,0.18)",
+};
+
+const miniText: React.CSSProperties = {
+  color: "#ddd6fe",
+  fontSize: 14,
+  lineHeight: 1.45,
 };
