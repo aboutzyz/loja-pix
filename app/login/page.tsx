@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -12,6 +12,19 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // 🔥 VERIFICA SE JÁ LOGOU AO VOLTAR DO EMAIL
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+
+      if (data.user) {
+        window.location.href = "/";
+      }
+    };
+
+    checkUser();
+  }, []);
 
   async function handleLogin() {
     if (!email) {
@@ -25,7 +38,8 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: window.location.origin,
+        // 🔥 ESSA LINHA É O SEGREDO
+        emailRedirectTo: window.location.origin + "/login",
       },
     });
 
@@ -55,7 +69,7 @@ export default function Login() {
         overflow: "hidden",
       }}
     >
-      {/* GRID FUNDO */}
+      {/* GRID */}
       <div
         style={{
           position: "absolute",
@@ -69,7 +83,6 @@ export default function Login() {
         }}
       />
 
-      {/* CARD */}
       <div
         style={{
           position: "relative",
@@ -84,7 +97,6 @@ export default function Login() {
           boxShadow: "0 0 40px rgba(168,85,247,0.25)",
         }}
       >
-        {/* LOGO */}
         <h1
           style={{
             textAlign: "center",
@@ -108,7 +120,6 @@ export default function Login() {
           Acesse sua conta com rapidez
         </p>
 
-        {/* INPUT */}
         <input
           type="email"
           placeholder="Digite seu email"
@@ -123,11 +134,9 @@ export default function Login() {
             color: "#fff",
             outline: "none",
             marginBottom: 16,
-            boxShadow: "0 0 15px rgba(124,58,237,0.15)",
           }}
         />
 
-        {/* BOTÃO */}
         <button
           onClick={handleLogin}
           disabled={loading}
@@ -142,14 +151,13 @@ export default function Login() {
             fontSize: 16,
             cursor: "pointer",
             boxShadow: "0 0 30px rgba(168,85,247,0.8)",
-            transition: "0.2s",
             opacity: loading ? 0.7 : 1,
           }}
         >
           {loading ? "Enviando..." : "Entrar / Registrar"}
         </button>
 
-        {/* MENSAGEM BONITA */}
+        {/* 🔥 MENSAGEM */}
         {message === "EMAIL_SENT" && (
           <div
             style={{
@@ -160,34 +168,12 @@ export default function Login() {
                 "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(109,40,217,0.2))",
               border: "1px solid rgba(168,85,247,0.4)",
               textAlign: "center",
-              boxShadow: "0 0 25px rgba(168,85,247,0.3)",
-              animation: "fadeIn 0.5s ease",
             }}
           >
-            <div
-              style={{
-                fontSize: 26,
-                marginBottom: 6,
-              }}
-            >
-              📩
-            </div>
-
-            <strong style={{ fontSize: 15 }}>
-              Verifique seu email
-            </strong>
-
-            <p
-              style={{
-                marginTop: 6,
-                fontSize: 13,
-                color: "#e9ddff",
-                lineHeight: 1.5,
-              }}
-            >
-              Enviamos um link para você entrar na sua conta.
-              <br />
-              Abra seu Gmail e clique no botão para continuar.
+            <div style={{ fontSize: 26 }}>📩</div>
+            <strong>Verifique seu email</strong>
+            <p style={{ marginTop: 6, fontSize: 13 }}>
+              Clique no link enviado para entrar automaticamente.
             </p>
           </div>
         )}
@@ -198,19 +184,6 @@ export default function Login() {
           </p>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }
