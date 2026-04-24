@@ -61,31 +61,21 @@ export default function CategoryPage() {
   }, [categoryId]);
 
   async function loadCategory() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("categories")
       .select("*")
       .eq("id", categoryId)
       .single();
 
-    if (error) {
-      console.error("Erro ao buscar categoria:", error);
-      return;
-    }
-
     setCategory(data as Category);
   }
 
   async function loadProducts() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("products")
       .select("*")
       .eq("category_id", categoryId)
       .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Erro ao buscar produtos:", error);
-      return;
-    }
 
     setProducts((data as Product[]) || []);
   }
@@ -115,7 +105,6 @@ export default function CategoryPage() {
               <p>
                 {filteredProducts.length} produto
                 {filteredProducts.length === 1 ? "" : "s"} disponível
-                {filteredProducts.length === 1 ? "" : "is"}
               </p>
             </div>
 
@@ -131,15 +120,15 @@ export default function CategoryPage() {
           {filteredProducts.length === 0 ? (
             <section className="empty">
               <h2>Nenhum produto encontrado</h2>
-              <p>Tente pesquisar outro nome ou volte para a loja.</p>
+              <p>Tente pesquisar outro nome.</p>
             </section>
           ) : (
             <section
               className="products"
               style={{
                 gridTemplateColumns: isMobile
-                  ? "repeat(2, minmax(0, 1fr))"
-                  : "repeat(3, minmax(0, 1fr))",
+                  ? "repeat(2, 1fr)"
+                  : "repeat(auto-fit, minmax(260px, 1fr))",
               }}
             >
               {filteredProducts.map((product) => (
@@ -155,7 +144,7 @@ export default function CategoryPage() {
                   <div className="info">
                     <h3>{product.name}</h3>
 
-                    <strong>{formatPrice(Number(product.price))}</strong>
+                    <strong>{formatPrice(product.price)}</strong>
 
                     <span>
                       {product.stock > 0
@@ -175,143 +164,65 @@ export default function CategoryPage() {
           .page {
             min-height: 100vh;
             position: relative;
-            overflow: hidden;
             color: #fff;
-            background: radial-gradient(
-                circle at 25% 20%,
-                rgba(168, 85, 247, 0.2),
-                transparent 30%
-              ),
-              radial-gradient(
-                circle at 85% 80%,
-                rgba(124, 58, 237, 0.16),
-                transparent 28%
-              ),
-              linear-gradient(180deg, #090114 0%, #100022 48%, #0a0117 100%);
+            background: linear-gradient(180deg, #090114, #0a0117);
           }
 
           .gridBg {
             position: absolute;
             inset: 0;
-            background-image: linear-gradient(
-                rgba(179, 77, 255, 0.1) 1px,
-                transparent 1px
-              ),
-              linear-gradient(
-                90deg,
-                rgba(179, 77, 255, 0.1) 1px,
-                transparent 1px
-              );
             background-size: 40px 40px;
-            opacity: 0.45;
-            pointer-events: none;
+            opacity: 0.3;
           }
 
           .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 28px 16px;
-            position: relative;
-            z-index: 1;
+            padding: 20px;
           }
 
           .top {
             display: flex;
             justify-content: space-between;
-            gap: 18px;
-            align-items: flex-end;
-            margin-bottom: 22px;
-            padding: 22px;
-            border-radius: 24px;
-            background: rgba(20, 6, 40, 0.55);
-            border: 1px solid rgba(216, 180, 254, 0.14);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
-          }
-
-          .back {
-            display: inline-block;
-            margin-bottom: 14px;
-            color: #d8b4fe;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-          }
-
-          h1 {
-            margin: 0;
-            font-size: 42px;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: -1px;
-          }
-
-          p {
-            margin: 10px 0 0;
-            color: #cfc6e8;
-            font-size: 15px;
-          }
-
-          .searchBox {
-            min-width: 280px;
-          }
-
-          input {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(216, 180, 254, 0.18);
-            background: rgba(18, 12, 32, 0.78);
-            color: #fff;
-            outline: none;
+            margin-bottom: 20px;
           }
 
           .products {
             display: grid;
-            gap: 16px;
-            padding: 18px;
-            border-radius: 24px;
-            background: rgba(10, 8, 20, 0.52);
-            border: 1px solid rgba(168, 85, 247, 0.1);
-            backdrop-filter: blur(14px);
+            gap: 18px;
           }
 
+          /* 🔥 CARD V5 */
           .card {
-            text-decoration: none;
-            color: #fff;
-            background: rgba(12, 8, 24, 0.92);
-            border: 1px solid rgba(216, 180, 254, 0.12);
-            border-radius: 18px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease,
-              background 0.2s ease;
+            background: rgba(15, 10, 30, 0.9);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.25);
+            transition: all 0.25s ease;
           }
 
           .card:hover {
-            border-color: rgba(216, 180, 254, 0.28);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.34);
-            background: rgba(18, 10, 34, 0.96);
+            transform: translateY(-4px);
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.6);
           }
 
+          /* IMAGEM FULL */
           .imageArea {
-            min-height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            background: linear-gradient(
-              180deg,
-              rgba(22, 14, 40, 0.95),
-              rgba(10, 8, 22, 0.98)
-            );
+            height: 200px;
+            overflow: hidden;
+            background: #000;
           }
 
           img {
             width: 100%;
-            max-width: 155px;
-            max-height: 155px;
-            object-fit: contain;
+            height: 100%;
+            object-fit: cover; /* 🔥 PREENCHE 100% */
+            transition: transform 0.3s ease;
+          }
+
+          .card:hover img {
+            transform: scale(1.05);
           }
 
           .info {
@@ -319,110 +230,27 @@ export default function CategoryPage() {
           }
 
           h3 {
-            margin: 0 0 10px;
-            font-size: 16px;
-            line-height: 1.35;
-            min-height: 44px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          }
-
-          strong {
-            display: block;
-            font-size: 25px;
-            color: #d8b4fe;
+            font-size: 15px;
             margin-bottom: 8px;
           }
 
+          strong {
+            font-size: 22px;
+            color: #c084fc;
+          }
+
           span {
-            display: block;
-            color: #bda9e9;
             font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            opacity: 0.7;
           }
 
           .button {
-            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
             text-align: center;
-            padding: 11px;
-            border-radius: 13px;
-            background: linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%);
-            border: 1px solid rgba(216, 180, 254, 0.22);
-            font-weight: 800;
-            box-shadow: 0 0 16px rgba(126, 34, 206, 0.28);
-          }
-
-          .empty {
-            padding: 28px;
-            border-radius: 22px;
-            background: rgba(20, 6, 40, 0.55);
-            border: 1px solid rgba(216, 180, 254, 0.14);
-            backdrop-filter: blur(16px);
-            text-align: center;
-          }
-
-          .empty h2 {
-            margin: 0;
-            font-size: 24px;
-          }
-
-          @media (max-width: 768px) {
-            .container {
-              padding: 16px 10px;
-            }
-
-            .top {
-              flex-direction: column;
-              align-items: stretch;
-              padding: 18px;
-              border-radius: 20px;
-            }
-
-            h1 {
-              font-size: 32px;
-            }
-
-            .searchBox {
-              min-width: 0;
-            }
-
-            .products {
-              gap: 12px;
-              padding: 12px;
-              border-radius: 18px;
-            }
-
-            .imageArea {
-              min-height: 120px;
-              padding: 10px;
-            }
-
-            img {
-              max-width: 92px;
-              max-height: 92px;
-            }
-
-            .info {
-              padding: 10px;
-            }
-
-            h3 {
-              font-size: 13px;
-              min-height: auto;
-              -webkit-line-clamp: 3;
-            }
-
-            strong {
-              font-size: 18px;
-            }
-
-            .button {
-              font-size: 13px;
-              padding: 10px;
-            }
+            border-radius: 12px;
+            background: linear-gradient(180deg, #8b2cf5, #5b21b6);
+            font-weight: bold;
           }
         `}</style>
       </div>
