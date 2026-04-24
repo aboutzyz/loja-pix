@@ -169,7 +169,9 @@ export default function Home() {
       prev.map((item) => {
         if (item.id !== productId) return item;
 
-        const currentProduct = products.find((product) => product.id === productId);
+        const currentProduct = products.find(
+          (product) => product.id === productId
+        );
         const availableStock = currentProduct?.stock ?? item.stock ?? 0;
 
         if (item.quantity >= availableStock) {
@@ -393,7 +395,9 @@ export default function Home() {
               <div style={miniIcon}>⚡</div>
               <div>
                 <div style={miniTitle}>Pix imediato</div>
-                <div style={miniText}>Pagamento rápido e visual moderno na loja.</div>
+                <div style={miniText}>
+                  Pagamento rápido e visual moderno na loja.
+                </div>
               </div>
             </div>
 
@@ -401,7 +405,9 @@ export default function Home() {
               <div style={miniIcon}>🛡️</div>
               <div>
                 <div style={miniTitle}>Compra segura</div>
-                <div style={miniText}>Fluxo simples e organizado para comprar.</div>
+                <div style={miniText}>
+                  Fluxo simples e organizado para comprar.
+                </div>
               </div>
             </div>
 
@@ -409,7 +415,9 @@ export default function Home() {
               <div style={miniIcon}>🚀</div>
               <div>
                 <div style={miniTitle}>Entrega rápida</div>
-                <div style={miniText}>Escolha produtos digitais com acesso fácil.</div>
+                <div style={miniText}>
+                  Escolha produtos digitais com acesso fácil.
+                </div>
               </div>
             </div>
           </div>
@@ -491,7 +499,8 @@ export default function Home() {
                   setShowMiniCart(false);
                 }}
                 style={{
-                  background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+                  background:
+                    "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                   color: "white",
                   border: "1px solid rgba(196, 181, 253, 0.35)",
                   borderRadius: 14,
@@ -521,21 +530,41 @@ export default function Home() {
           {!showCheckout && (
             <>
               {categories.length > 0 && (
-                <section id="categorias-home" className="fade-in" style={{ marginBottom: 28 }}>
+                <section
+                  id="categorias-home"
+                  className="fade-in"
+                  style={{ marginBottom: 34 }}
+                >
                   <section style={{ marginBottom: 18 }}>
                     <h2
                       style={{
-                        fontSize: isMobile ? 22 : 30,
-                        marginBottom: 8,
-                        color: "#ffffff",
-                        textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
+                        fontSize: isMobile ? 30 : 42,
+                        margin: 0,
+                        fontWeight: 900,
+                        letterSpacing: "-0.8px",
+                        width: "fit-content",
+                        background:
+                          "linear-gradient(180deg, #ffffff 0%, #d8b4fe 48%, #a855f7 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        textShadow:
+                          "0 0 18px rgba(168, 85, 247, 0.38), 0 8px 28px rgba(0,0,0,0.32)",
                       }}
                     >
                       Categorias
                     </h2>
-                    <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
-                      Navegue pelas categorias com o mesmo estilo premium da loja.
-                    </p>
+
+                    <div
+                      style={{
+                        width: isMobile ? 70 : 96,
+                        height: 4,
+                        marginTop: 10,
+                        borderRadius: 999,
+                        background:
+                          "linear-gradient(90deg, rgba(168,85,247,1), rgba(216,180,254,0.5), transparent)",
+                        boxShadow: "0 0 18px rgba(168,85,247,0.45)",
+                      }}
+                    />
                   </section>
 
                   <div
@@ -543,106 +572,135 @@ export default function Home() {
                       display: "grid",
                       gridTemplateColumns: isMobile
                         ? "1fr"
-                        : "repeat(auto-fit, minmax(260px, 1fr))",
-                      gap: 16,
+                        : "repeat(auto-fit, minmax(280px, 1fr))",
+                      gap: isMobile ? 14 : 20,
                     }}
                   >
-                    {categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        href={`/categoria/${category.id}`}
-                        className="fade-in"
-                        style={{
-                          position: "relative",
-                          border: "1px solid rgba(216, 180, 254, 0.16)",
-                          borderRadius: 24,
-                          overflow: "hidden",
-                          padding: 0,
-                          cursor: "pointer",
-                          background: "rgba(20, 6, 40, 0.7)",
-                          backdropFilter: "blur(16px)",
-                          minHeight: isMobile ? 180 : 220,
-                          textAlign: "left",
-                          boxShadow: "0 0 25px rgba(168, 85, 247, 0.25)",
-                          transition: "all 0.25s ease",
-                          textDecoration: "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "translateY(-6px) scale(1.015)";
-                          e.currentTarget.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.75)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "scale(1)";
-                          e.currentTarget.style.boxShadow = "0 0 25px rgba(168, 85, 247, 0.25)";
-                        }}
-                      >
-                        <img
-                          src={category.image}
-                          alt={category.name}
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
+                    {categories.map((category, index) => {
+                      const featured =
+                        !isMobile && index === 0 && categories.length >= 3;
 
-                        <div
+                      return (
+                        <Link
+                          key={category.id}
+                          href={`/categoria/${category.id}`}
+                          className="fade-in"
                           style={{
-                            position: "absolute",
-                            inset: 0,
+                            position: "relative",
+                            border: "1px solid rgba(216, 180, 254, 0.16)",
+                            borderRadius: 26,
+                            overflow: "hidden",
+                            padding: 0,
+                            cursor: "pointer",
                             background:
-                              "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.15) 28%, rgba(10,6,20,0.92) 100%)",
+                              "linear-gradient(180deg, rgba(25, 8, 48, 0.82), rgba(11, 5, 25, 0.94))",
+                            backdropFilter: "blur(16px)",
+                            minHeight: isMobile ? 190 : featured ? 300 : 230,
+                            gridColumn: featured ? "span 2" : "auto",
+                            textAlign: "left",
+                            boxShadow:
+                              "0 18px 40px rgba(0,0,0,0.34), 0 0 22px rgba(168, 85, 247, 0.18)",
+                            transition:
+                              "border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease",
+                            textDecoration: "none",
+                            willChange: "transform",
                           }}
-                        />
-
-                        <div
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "flex-end",
-                            padding: isMobile ? 16 : 18,
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform =
+                              "translateY(-4px)";
+                            e.currentTarget.style.borderColor =
+                              "rgba(216, 180, 254, 0.34)";
+                            e.currentTarget.style.boxShadow =
+                              "0 22px 44px rgba(0,0,0,0.42), 0 0 26px rgba(168, 85, 247, 0.28)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.borderColor =
+                              "rgba(216, 180, 254, 0.16)";
+                            e.currentTarget.style.boxShadow =
+                              "0 18px 40px rgba(0,0,0,0.34), 0 0 22px rgba(168, 85, 247, 0.18)";
                           }}
                         >
-                          <div
+                          <img
+                            src={category.image}
+                            alt={category.name}
                             style={{
-                              fontSize: isMobile ? 24 : 30,
-                              fontWeight: "bold",
-                              color: "#ffffff",
-                              lineHeight: 1.05,
-                              textShadow:
-                                "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
-                              wordBreak: "break-word",
+                              position: "absolute",
+                              inset: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              transform: "scale(1.02)",
                             }}
-                          >
-                            {category.name}
-                          </div>
+                          />
 
                           <div
                             style={{
-                              marginTop: 10,
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 8,
-                              width: "fit-content",
-                              padding: "8px 12px",
-                              borderRadius: 12,
-                              background: "rgba(255,255,255,0.10)",
-                              color: "#ffffff",
-                              fontWeight: "bold",
-                              fontSize: 13,
-                              backdropFilter: "blur(10px)",
-                              boxShadow: "0 0 18px rgba(168, 85, 247, 0.28)",
+                              position: "absolute",
+                              inset: 0,
+                              background:
+                                "linear-gradient(180deg, rgba(5,2,12,0.04) 0%, rgba(5,2,12,0.20) 34%, rgba(5,2,12,0.92) 100%)",
+                            }}
+                          />
+
+                          <div
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              background:
+                                "radial-gradient(circle at 18% 82%, rgba(168,85,247,0.38), transparent 34%)",
+                              opacity: 0.72,
+                            }}
+                          />
+
+                          <div
+                            style={{
+                              position: "absolute",
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              padding: isMobile ? 17 : featured ? 24 : 19,
                             }}
                           >
-                            Abrir categoria
+                            <div
+                              style={{
+                                fontSize: isMobile ? 25 : featured ? 40 : 29,
+                                fontWeight: 900,
+                                color: "#ffffff",
+                                lineHeight: 1.02,
+                                textShadow:
+                                  "0 0 20px rgba(168,85,247,0.58), 0 3px 18px rgba(0,0,0,0.72)",
+                                wordBreak: "break-word",
+                                maxWidth: "92%",
+                              }}
+                            >
+                              {category.name}
+                            </div>
+
+                            <div
+                              style={{
+                                marginTop: 12,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                width: "fit-content",
+                                padding: isMobile ? "8px 12px" : "9px 14px",
+                                borderRadius: 999,
+                                background: "rgba(255,255,255,0.11)",
+                                color: "#ffffff",
+                                fontWeight: 800,
+                                fontSize: isMobile ? 12 : 13,
+                                backdropFilter: "blur(12px)",
+                                border: "1px solid rgba(255,255,255,0.12)",
+                                boxShadow:
+                                  "inset 0 1px 0 rgba(255,255,255,0.10), 0 10px 24px rgba(0,0,0,0.26)",
+                              }}
+                            >
+                              Abrir categoria
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </section>
               )}
@@ -660,7 +718,13 @@ export default function Home() {
                     >
                       Produtos
                     </h2>
-                    <p style={{ color: "#d1d5db", marginTop: 0, fontSize: isMobile ? 15 : 16 }}>
+                    <p
+                      style={{
+                        color: "#d1d5db",
+                        marginTop: 0,
+                        fontSize: isMobile ? 15 : 16,
+                      }}
+                    >
                       Escolha seus produtos e adicione ao carrinho.
                     </p>
                   </section>
@@ -679,9 +743,14 @@ export default function Home() {
                     }}
                   >
                     {paginatedProducts.map((product) => {
-                      const cartItem = cart.find((item) => item.id === product.id);
+                      const cartItem = cart.find(
+                        (item) => item.id === product.id
+                      );
                       const quantityInCart = cartItem?.quantity ?? 0;
-                      const remainingStock = Math.max((product.stock ?? 0) - quantityInCart, 0);
+                      const remainingStock = Math.max(
+                        (product.stock ?? 0) - quantityInCart,
+                        0
+                      );
 
                       return (
                         <div
@@ -695,7 +764,8 @@ export default function Home() {
                             overflow: "hidden",
                             boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
                             border: "1px solid rgba(159, 122, 234, 0.18)",
-                            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                            transition:
+                              "transform 0.2s ease, box-shadow 0.2s ease",
                           }}
                         >
                           <div
@@ -746,7 +816,8 @@ export default function Home() {
                                 color: "#d8b4fe",
                                 fontSize: isMobile ? 18 : 28,
                                 fontWeight: "bold",
-                                textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
+                                textShadow:
+                                  "0 0 14px rgba(168, 85, 247, 0.22)",
                               }}
                             >
                               {formatPrice(Number(product.price))}
@@ -778,7 +849,10 @@ export default function Home() {
                                 border: "1px solid rgba(216, 180, 254, 0.28)",
                                 borderRadius: isMobile ? 12 : 14,
                                 padding: isMobile ? "10px 10px" : "12px 14px",
-                                cursor: remainingStock <= 0 ? "not-allowed" : "pointer",
+                                cursor:
+                                  remainingStock <= 0
+                                    ? "not-allowed"
+                                    : "pointer",
                                 fontWeight: "bold",
                                 fontSize: isMobile ? 14 : 16,
                                 boxShadow:
@@ -805,7 +879,9 @@ export default function Home() {
                     }}
                   >
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
                       disabled={currentPage === 1}
                       style={{
                         padding: isMobile ? "9px 12px" : "10px 14px",
@@ -826,7 +902,8 @@ export default function Home() {
                       style={{
                         padding: isMobile ? "9px 12px" : "10px 14px",
                         borderRadius: 12,
-                        background: "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
+                        background:
+                          "linear-gradient(180deg, #1b102f 0%, #0f0a1f 100%)",
                         color: "white",
                         fontWeight: "bold",
                         border: "1px solid rgba(168, 85, 247, 0.18)",
@@ -850,7 +927,9 @@ export default function Home() {
                             : "rgba(18, 12, 32, 0.92)",
                         color: "#fff",
                         cursor:
-                          currentPage === totalPages ? "not-allowed" : "pointer",
+                          currentPage === totalPages
+                            ? "not-allowed"
+                            : "pointer",
                       }}
                     >
                       Próxima página
@@ -871,11 +950,18 @@ export default function Home() {
                 backdropFilter: "blur(16px)",
                 borderRadius: 20,
                 padding: 20,
-                boxShadow: "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
+                boxShadow:
+                  "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
                 border: "1px solid rgba(168, 85, 247, 0.16)",
               }}
             >
-              <h2 style={{ marginTop: 0, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.5)" }}>
+              <h2
+                style={{
+                  marginTop: 0,
+                  color: "#fff",
+                  textShadow: "0 0 16px rgba(168,85,247,0.5)",
+                }}
+              >
                 Seu Carrinho
               </h2>
 
@@ -885,9 +971,13 @@ export default function Home() {
                 <>
                   <div style={{ display: "grid", gap: 14 }}>
                     {cart.map((item) => {
-                      const currentProduct = products.find((product) => product.id === item.id);
-                      const availableStock = currentProduct?.stock ?? item.stock ?? 0;
-                      const reachedStockLimit = item.quantity >= availableStock;
+                      const currentProduct = products.find(
+                        (product) => product.id === item.id
+                      );
+                      const availableStock =
+                        currentProduct?.stock ?? item.stock ?? 0;
+                      const reachedStockLimit =
+                        item.quantity >= availableStock;
 
                       return (
                         <div
@@ -928,7 +1018,9 @@ export default function Home() {
                               }}
                             />
                             <div>
-                              <strong style={{ color: "#fff" }}>{item.name}</strong>
+                              <strong style={{ color: "#fff" }}>
+                                {item.name}
+                              </strong>
                               <div style={{ color: "#d8b4fe", marginTop: 6 }}>
                                 {formatPrice(Number(item.price))}
                               </div>
@@ -977,7 +1069,9 @@ export default function Home() {
                                 color: "#fff",
                                 borderRadius: 10,
                                 padding: "8px 12px",
-                                cursor: reachedStockLimit ? "not-allowed" : "pointer",
+                                cursor: reachedStockLimit
+                                  ? "not-allowed"
+                                  : "pointer",
                                 opacity: reachedStockLimit ? 0.5 : 1,
                                 boxShadow: "0 0 14px rgba(124,58,237,0.18)",
                               }}
@@ -1006,7 +1100,12 @@ export default function Home() {
                   </div>
 
                   <div style={{ marginTop: 20 }}>
-                    <h3 style={{ color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.45)" }}>
+                    <h3
+                      style={{
+                        color: "#fff",
+                        textShadow: "0 0 16px rgba(168,85,247,0.45)",
+                      }}
+                    >
                       Total: {formatPrice(cartTotal)}
                     </h3>
 
@@ -1014,7 +1113,8 @@ export default function Home() {
                       <button
                         onClick={goToCheckout}
                         style={{
-                          background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+                          background:
+                            "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                           color: "white",
                           border: "1px solid rgba(216, 180, 254, 0.25)",
                           borderRadius: 12,
@@ -1059,11 +1159,18 @@ export default function Home() {
                 backdropFilter: "blur(16px)",
                 borderRadius: 20,
                 padding: 20,
-                boxShadow: "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
+                boxShadow:
+                  "0 10px 32px rgba(0,0,0,0.28), 0 0 24px rgba(124,58,237,0.16)",
                 border: "1px solid rgba(168, 85, 247, 0.16)",
               }}
             >
-              <h2 style={{ marginTop: 0, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.5)" }}>
+              <h2
+                style={{
+                  marginTop: 0,
+                  color: "#fff",
+                  textShadow: "0 0 16px rgba(168,85,247,0.5)",
+                }}
+              >
                 Finalizar Pedido
               </h2>
               <p style={{ color: "#d1d5db" }}>
@@ -1077,17 +1184,72 @@ export default function Home() {
                   gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
                 }}
               >
-                <input placeholder="Nome completo *" value={customerName} onChange={(e) => setCustomerName(e.target.value)} style={inputStyle} />
-                <input placeholder="Telefone *" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} style={inputStyle} />
-                <input placeholder="Email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} style={inputStyle} />
-                <input placeholder="CEP" value={cep} onChange={(e) => setCep(e.target.value)} style={inputStyle} />
-                <input placeholder="Endereço *" value={address} onChange={(e) => setAddress(e.target.value)} style={inputStyle} />
-                <input placeholder="Número *" value={number} onChange={(e) => setNumber(e.target.value)} style={inputStyle} />
-                <input placeholder="Bairro *" value={district} onChange={(e) => setDistrict(e.target.value)} style={inputStyle} />
-                <input placeholder="Cidade *" value={city} onChange={(e) => setCity(e.target.value)} style={inputStyle} />
-                <input placeholder="Estado *" value={stateName} onChange={(e) => setStateName(e.target.value)} style={inputStyle} />
-                <input placeholder="Complemento" value={complement} onChange={(e) => setComplement(e.target.value)} style={inputStyle} />
-                <input placeholder="Referência" value={reference} onChange={(e) => setReference(e.target.value)} style={inputStyle} />
+                <input
+                  placeholder="Nome completo *"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Telefone *"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="CEP"
+                  value={cep}
+                  onChange={(e) => setCep(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Endereço *"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Número *"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Bairro *"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Cidade *"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Estado *"
+                  value={stateName}
+                  onChange={(e) => setStateName(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Complemento"
+                  value={complement}
+                  onChange={(e) => setComplement(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
+                  placeholder="Referência"
+                  value={reference}
+                  onChange={(e) => setReference(e.target.value)}
+                  style={inputStyle}
+                />
               </div>
 
               <div
@@ -1100,7 +1262,12 @@ export default function Home() {
                   backdropFilter: "blur(10px)",
                 }}
               >
-                <h3 style={{ color: "#fff", textShadow: "0 0 14px rgba(168,85,247,0.4)" }}>
+                <h3
+                  style={{
+                    color: "#fff",
+                    textShadow: "0 0 14px rgba(168,85,247,0.4)",
+                  }}
+                >
                   Resumo do Pedido
                 </h3>
                 <div style={{ display: "grid", gap: 8, color: "#d1d5db" }}>
@@ -1111,7 +1278,13 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <h3 style={{ marginTop: 16, color: "#fff", textShadow: "0 0 16px rgba(168,85,247,0.45)" }}>
+                <h3
+                  style={{
+                    marginTop: 16,
+                    color: "#fff",
+                    textShadow: "0 0 16px rgba(168,85,247,0.45)",
+                  }}
+                >
                   Total: {formatPrice(cartTotal)}
                 </h3>
               </div>
@@ -1143,7 +1316,8 @@ export default function Home() {
                 <button
                   onClick={finishOrder}
                   style={{
-                    background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+                    background:
+                      "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                     color: "white",
                     border: "1px solid rgba(216, 180, 254, 0.25)",
                     borderRadius: 12,
@@ -1167,7 +1341,8 @@ export default function Home() {
               position: "fixed",
               bottom: 12,
               right: 12,
-              background: "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
+              background:
+                "linear-gradient(135deg, rgba(109,40,217,0.95), rgba(147,51,234,0.95))",
               color: "white",
               padding: "10px 16px",
               borderRadius: 16,
@@ -1184,7 +1359,12 @@ export default function Home() {
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <strong style={{ fontSize: 12, textShadow: "0 0 10px rgba(255,255,255,0.25)" }}>
+              <strong
+                style={{
+                  fontSize: 12,
+                  textShadow: "0 0 10px rgba(255,255,255,0.25)",
+                }}
+              >
                 🛒 Produto adicionado
               </strong>
               <span style={{ fontSize: 11 }}>
@@ -1272,7 +1452,8 @@ const inputStyle: React.CSSProperties = {
   background: "rgba(18, 12, 32, 0.72)",
   color: "#fff",
   backdropFilter: "blur(12px)",
-  boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
+  boxShadow:
+    "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.14)",
 };
 
 const heroMiniCard: React.CSSProperties = {
@@ -1298,7 +1479,8 @@ const miniIcon: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   fontSize: 24,
-  background: "linear-gradient(180deg, rgba(168,85,247,0.22), rgba(109,40,217,0.14))",
+  background:
+    "linear-gradient(180deg, rgba(168,85,247,0.22), rgba(109,40,217,0.14))",
   border: "1px solid rgba(216, 180, 254, 0.2)",
   boxShadow: "0 0 18px rgba(168,85,247,0.22)",
 };
