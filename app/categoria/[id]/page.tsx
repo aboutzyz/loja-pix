@@ -140,7 +140,7 @@ export default function CategoryPage() {
                 gridTemplateColumns: isMobile
                   ? "repeat(2, minmax(0, 1fr))"
                   : filteredProducts.length === 1
-                  ? "minmax(280px, 420px)"
+                  ? "minmax(280px, 430px)"
                   : "repeat(auto-fit, minmax(280px, 1fr))",
                 justifyContent:
                   filteredProducts.length === 1 ? "center" : "initial",
@@ -229,12 +229,16 @@ export default function CategoryPage() {
             align-items: flex-end;
             margin-bottom: 22px;
             padding: 24px;
-            border-radius: 24px;
-            background: rgba(20, 6, 40, 0.62);
-            border: 1px solid rgba(216, 180, 254, 0.18);
+            border-radius: 30px;
+            background: linear-gradient(
+              135deg,
+              rgba(28, 8, 55, 0.75),
+              rgba(10, 4, 26, 0.72)
+            );
+            border: 1px solid rgba(216, 180, 254, 0.22);
             backdrop-filter: blur(16px);
             box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26),
-              0 0 24px rgba(168, 85, 247, 0.14);
+              0 0 30px rgba(168, 85, 247, 0.18);
           }
 
           .back {
@@ -242,13 +246,17 @@ export default function CategoryPage() {
             margin-bottom: 14px;
             color: #f3e8ff;
             text-decoration: none;
-            font-weight: 800;
+            font-weight: 900;
             font-size: 14px;
-            padding: 9px 13px;
+            padding: 10px 14px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(216, 180, 254, 0.18);
-            box-shadow: 0 0 16px rgba(168, 85, 247, 0.16);
+            background: linear-gradient(
+              180deg,
+              rgba(168, 85, 247, 0.22),
+              rgba(109, 40, 217, 0.16)
+            );
+            border: 1px solid rgba(216, 180, 254, 0.28);
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.22);
           }
 
           h1 {
@@ -274,62 +282,86 @@ export default function CategoryPage() {
           input {
             width: 100%;
             padding: 13px 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(216, 180, 254, 0.25);
+            border-radius: 18px;
+            border: 1px solid rgba(216, 180, 254, 0.28);
             background: rgba(18, 12, 32, 0.82);
             color: #fff;
             outline: none;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-              0 0 18px rgba(124, 58, 237, 0.15);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+              0 0 20px rgba(168, 85, 247, 0.18);
           }
 
           .products {
             display: grid;
-            gap: 22px;
-            padding: 22px;
-            border-radius: 26px;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(168, 85, 247, 0.18);
+            gap: 24px;
+            padding: 24px;
+            border-radius: 32px;
+            background: linear-gradient(
+              135deg,
+              rgba(0, 0, 0, 0.45),
+              rgba(30, 8, 65, 0.25)
+            );
+            border: 1px solid rgba(216, 180, 254, 0.22);
             backdrop-filter: blur(14px);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-              0 18px 45px rgba(0, 0, 0, 0.34);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+              0 20px 50px rgba(0, 0, 0, 0.38),
+              0 0 35px rgba(168, 85, 247, 0.12);
           }
 
           .card {
+            position: relative;
             text-decoration: none;
             color: #fff;
-            background: linear-gradient(
-              180deg,
-              rgba(18, 10, 40, 0.98),
-              rgba(8, 5, 20, 0.98)
-            );
-            border: 1px solid rgba(168, 85, 247, 0.28);
-            border-radius: 24px;
+            border-radius: 30px;
+            padding: 2px;
             overflow: hidden;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45),
-              0 0 18px rgba(168, 85, 247, 0.18);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease,
-              transform 0.2s ease;
+            background: linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.34),
+              rgba(216, 180, 254, 0.24),
+              rgba(168, 85, 247, 0.9),
+              rgba(88, 28, 135, 0.35)
+            );
+            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.48),
+              0 0 28px rgba(168, 85, 247, 0.24);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+          }
+
+          .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            padding: 2px;
+            background: linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.55),
+              rgba(192, 132, 252, 0.2),
+              rgba(168, 85, 247, 0.75),
+              rgba(255, 255, 255, 0.12)
+            );
+            pointer-events: none;
+            opacity: 0.65;
           }
 
           .card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(216, 180, 254, 0.42);
-            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5),
-              0 0 28px rgba(168, 85, 247, 0.28);
+            transform: translateY(-5px);
+            box-shadow: 0 26px 55px rgba(0, 0, 0, 0.54),
+              0 0 38px rgba(168, 85, 247, 0.38);
           }
 
           .imageArea {
             height: 220px;
             position: relative;
             overflow: hidden;
+            border-radius: 28px 28px 0 0;
             background: radial-gradient(
                 circle at 50% 30%,
-                rgba(168, 85, 247, 0.2),
+                rgba(168, 85, 247, 0.24),
                 transparent 42%
               ),
               #08040f;
-            border-bottom: 1px solid rgba(216, 180, 254, 0.12);
+            border-bottom: 1px solid rgba(216, 180, 254, 0.16);
           }
 
           .imageArea::after {
@@ -339,7 +371,7 @@ export default function CategoryPage() {
             background: linear-gradient(
               180deg,
               transparent 48%,
-              rgba(8, 4, 15, 0.5) 100%
+              rgba(8, 4, 15, 0.52) 100%
             );
             pointer-events: none;
           }
@@ -352,12 +384,16 @@ export default function CategoryPage() {
           }
 
           .info {
+            position: relative;
+            z-index: 1;
             padding: 18px;
+            border-radius: 0 0 28px 28px;
             background: linear-gradient(
               180deg,
-              rgba(20, 10, 42, 0.72),
-              rgba(8, 5, 20, 0.92)
+              rgba(24, 10, 52, 0.96),
+              rgba(8, 5, 20, 0.98)
             );
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
           }
 
           h3 {
@@ -385,15 +421,20 @@ export default function CategoryPage() {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #e9d5ff;
+            color: #f0ddff;
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 900;
             padding: 8px 11px;
             border-radius: 999px;
-            background: rgba(168, 85, 247, 0.11);
-            border: 1px solid rgba(216, 180, 254, 0.18);
+            background: linear-gradient(
+              180deg,
+              rgba(168, 85, 247, 0.18),
+              rgba(88, 28, 135, 0.18)
+            );
+            border: 1px solid rgba(216, 180, 254, 0.24);
             margin-bottom: 15px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+              0 0 16px rgba(168, 85, 247, 0.14);
           }
 
           .stockDot {
@@ -408,19 +449,20 @@ export default function CategoryPage() {
             width: 100%;
             text-align: center;
             padding: 13px;
-            border-radius: 15px;
-            background: linear-gradient(180deg, #b65cff 0%, #7c2bd9 100%);
-            border: 1px solid rgba(216, 180, 254, 0.3);
+            border-radius: 18px;
+            background: linear-gradient(180deg, #d946ef 0%, #9333ea 48%, #6d28d9 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             font-weight: 900;
-            box-shadow: 0 0 20px rgba(126, 34, 206, 0.38),
-              inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            color: white;
+            box-shadow: 0 0 24px rgba(217, 70, 239, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.22);
           }
 
           .empty {
             padding: 28px;
-            border-radius: 22px;
+            border-radius: 28px;
             background: rgba(20, 6, 40, 0.55);
-            border: 1px solid rgba(216, 180, 254, 0.14);
+            border: 1px solid rgba(216, 180, 254, 0.18);
             backdrop-filter: blur(16px);
             text-align: center;
           }
@@ -439,7 +481,7 @@ export default function CategoryPage() {
               flex-direction: column;
               align-items: stretch;
               padding: 18px;
-              border-radius: 20px;
+              border-radius: 24px;
             }
 
             h1 {
@@ -451,17 +493,23 @@ export default function CategoryPage() {
             }
 
             .products {
-              gap: 13px;
-              padding: 13px;
-              border-radius: 20px;
+              gap: 14px;
+              padding: 14px;
+              border-radius: 24px;
+            }
+
+            .card {
+              border-radius: 22px;
             }
 
             .imageArea {
               height: 140px;
+              border-radius: 20px 20px 0 0;
             }
 
             .info {
               padding: 11px;
+              border-radius: 0 0 20px 20px;
             }
 
             h3 {
@@ -485,6 +533,7 @@ export default function CategoryPage() {
             .button {
               font-size: 13px;
               padding: 10px;
+              border-radius: 14px;
             }
           }
         `}</style>
