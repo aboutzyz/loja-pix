@@ -285,13 +285,14 @@ export default function CategoryPage() {
 
           .products {
             display: grid;
-            gap: 18px;
-            padding: 18px;
-            border-radius: 24px;
-            background: rgba(10, 8, 20, 0.55);
-            border: 1px solid rgba(168, 85, 247, 0.13);
+            gap: 22px;
+            padding: 22px;
+            border-radius: 26px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(168, 85, 247, 0.18);
             backdrop-filter: blur(14px);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+              0 18px 45px rgba(0, 0, 0, 0.34);
           }
 
           .card {
@@ -299,35 +300,36 @@ export default function CategoryPage() {
             color: #fff;
             background: linear-gradient(
               180deg,
-              rgba(20, 10, 42, 0.96),
-              rgba(10, 6, 24, 0.96)
+              rgba(18, 10, 40, 0.98),
+              rgba(8, 5, 20, 0.98)
             );
-            border: 1px solid rgba(216, 180, 254, 0.16);
-            border-radius: 22px;
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34),
-              0 0 20px rgba(168, 85, 247, 0.13);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45),
+              0 0 18px rgba(168, 85, 247, 0.18);
             transition: border-color 0.2s ease, box-shadow 0.2s ease,
               transform 0.2s ease;
           }
 
           .card:hover {
             transform: translateY(-4px);
-            border-color: rgba(216, 180, 254, 0.32);
-            box-shadow: 0 22px 44px rgba(0, 0, 0, 0.42),
-              0 0 26px rgba(168, 85, 247, 0.24);
+            border-color: rgba(216, 180, 254, 0.42);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5),
+              0 0 28px rgba(168, 85, 247, 0.28);
           }
 
           .imageArea {
-            height: 210px;
+            height: 220px;
             position: relative;
             overflow: hidden;
             background: radial-gradient(
                 circle at 50% 30%,
-                rgba(168, 85, 247, 0.18),
-                transparent 40%
+                rgba(168, 85, 247, 0.2),
+                transparent 42%
               ),
               #08040f;
+            border-bottom: 1px solid rgba(216, 180, 254, 0.12);
           }
 
           .imageArea::after {
@@ -336,8 +338,8 @@ export default function CategoryPage() {
             inset: 0;
             background: linear-gradient(
               180deg,
-              transparent 45%,
-              rgba(8, 4, 15, 0.42) 100%
+              transparent 48%,
+              rgba(8, 4, 15, 0.5) 100%
             );
             pointer-events: none;
           }
@@ -350,11 +352,16 @@ export default function CategoryPage() {
           }
 
           .info {
-            padding: 16px;
+            padding: 18px;
+            background: linear-gradient(
+              180deg,
+              rgba(20, 10, 42, 0.72),
+              rgba(8, 5, 20, 0.92)
+            );
           }
 
           h3 {
-            margin: 0 0 12px;
+            margin: 0 0 13px;
             font-size: 17px;
             line-height: 1.3;
             min-height: 44px;
@@ -366,46 +373,47 @@ export default function CategoryPage() {
           }
 
           .price {
-            font-size: 28px;
+            font-size: 29px;
             line-height: 1;
             font-weight: 900;
             color: #f3e8ff;
-            margin-bottom: 12px;
-            text-shadow: 0 0 18px rgba(168, 85, 247, 0.28);
+            margin-bottom: 13px;
+            text-shadow: 0 0 18px rgba(168, 85, 247, 0.32);
           }
 
           .stock {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #dcc9ff;
+            color: #e9d5ff;
             font-size: 12px;
             font-weight: 800;
-            padding: 8px 10px;
+            padding: 8px 11px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(216, 180, 254, 0.12);
-            margin-bottom: 14px;
+            background: rgba(168, 85, 247, 0.11);
+            border: 1px solid rgba(216, 180, 254, 0.18);
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
           }
 
           .stockDot {
             width: 7px;
             height: 7px;
             border-radius: 999px;
-            background: #a855f7;
-            box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
+            background: #c084fc;
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.95);
           }
 
           .button {
             width: 100%;
             text-align: center;
-            padding: 12px;
-            border-radius: 14px;
-            background: linear-gradient(180deg, #a855f7 0%, #6d28d9 100%);
-            border: 1px solid rgba(216, 180, 254, 0.26);
+            padding: 13px;
+            border-radius: 15px;
+            background: linear-gradient(180deg, #b65cff 0%, #7c2bd9 100%);
+            border: 1px solid rgba(216, 180, 254, 0.3);
             font-weight: 900;
-            box-shadow: 0 0 18px rgba(126, 34, 206, 0.35),
-              inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 20px rgba(126, 34, 206, 0.38),
+              inset 0 1px 0 rgba(255, 255, 255, 0.16);
           }
 
           .empty {
@@ -443,13 +451,13 @@ export default function CategoryPage() {
             }
 
             .products {
-              gap: 12px;
-              padding: 12px;
-              border-radius: 18px;
+              gap: 13px;
+              padding: 13px;
+              border-radius: 20px;
             }
 
             .imageArea {
-              height: 135px;
+              height: 140px;
             }
 
             .info {
