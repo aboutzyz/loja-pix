@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "@/components/Header";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
@@ -27,10 +28,6 @@ type Category = {
   created_at?: string;
 };
 
-type CartItem = Product & {
-  quantity: number;
-};
-
 function formatPrice(value: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -38,18 +35,20 @@ function formatPrice(value: number) {
   }).format(value);
 }
 
-export default function CategoriaPage() {
+export default function CategoryPage() {
   const params = useParams();
   const categoryId = String(params?.id ?? "");
 
-  const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const updateLayout = () => setIsMobile(window.innerWidth <= 768);
+    function updateLayout() {
+      setIsMobile(window.innerWidth <= 768);
+    }
+
     updateLayout();
     window.addEventListener("resize", updateLayout);
     return () => window.removeEventListener("resize", updateLayout);
@@ -59,12 +58,7 @@ export default function CategoriaPage() {
     if (!categoryId) return;
     loadCategory();
     loadProducts();
-    loadCart();
   }, [categoryId]);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
 
   async function loadCategory() {
     const { data, error } = await supabase
@@ -89,18 +83,11 @@ export default function CategoriaPage() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Erro ao buscar produtos da categoria:", error);
+      console.error("Erro ao buscar produtos:", error);
       return;
     }
 
     setProducts((data as Product[]) || []);
-  }
-
-  function loadCart() {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
   }
 
   const filteredProducts = useMemo(() => {
@@ -109,376 +96,336 @@ export default function CategoriaPage() {
     );
   }, [products, search]);
 
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: `
-          radial-gradient(circle at 25% 20%, rgba(170, 60, 255, 0.22), transparent 30%),
-          radial-gradient(circle at 85% 82%, rgba(208, 80, 255, 0.2), transparent 25%),
-          linear-gradient(180deg, #090114 0%, #100022 48%, #0a0117 100%)
-        `,
-        color: "#f5f5f5",
-        fontFamily: "Arial, sans-serif",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(179, 77, 255, 0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(179, 77, 255, 0.12) 1px, transparent 1px)
-          `,
-          backgroundSize: "40px 40px",
-          opacity: 0.6,
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
+    <>
+      <Header />
 
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "rgba(8, 6, 16, 0.62)",
-          color: "white",
-          padding: isMobile ? "14px 12px" : "16px 20px",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.35)",
-          borderBottom: "1px solid rgba(168, 85, 247, 0.18)",
-          backdropFilter: "blur(14px)",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            display: "flex",
-            gap: 12,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              margin: 0,
-              fontWeight: "bold",
-              fontSize: isMobile ? 24 : 36,
-              letterSpacing: "1px",
-              color: "#ffffff",
-              textShadow: "0 0 20px rgba(168, 85, 247, 0.75)",
-              textDecoration: "none",
-            }}
-          >
-            💎 BoutBux
-          </Link>
+      <div className="page">
+        <div className="gridBg" />
 
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              alignItems: "center",
-              flexWrap: "wrap",
-              width: isMobile ? "100%" : "auto",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Pesquisar produto..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                padding: isMobile ? "9px 10px" : "10px 12px",
-                borderRadius: 14,
-                border: "1px solid rgba(173, 133, 255, 0.25)",
-                minWidth: isMobile ? 0 : 260,
-                width: isMobile ? "100%" : 260,
-                outline: "none",
-                background: "rgba(18, 12, 32, 0.72)",
-                color: "#fff",
-                backdropFilter: "blur(12px)",
-                boxShadow:
-                  "inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 16px rgba(124,58,237,0.18)",
-              }}
-            />
-
-            <div
-              style={{
-                background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
-                color: "white",
-                border: "1px solid rgba(196, 181, 253, 0.35)",
-                borderRadius: 14,
-                padding: isMobile ? "9px 12px" : "10px 14px",
-                fontWeight: "bold",
-                boxShadow: "0 0 26px rgba(168, 85, 247, 0.82)",
-                width: isMobile ? "100%" : "auto",
-                textAlign: "center",
-              }}
-            >
-              Carrinho ({cartCount})
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: isMobile ? 12 : 20,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {category && (
-          <section
-            style={{
-              position: "relative",
-              border: "1px solid rgba(216, 180, 254, 0.16)",
-              borderRadius: 28,
-              overflow: "hidden",
-              background: "rgba(20, 6, 40, 0.7)",
-              backdropFilter: "blur(16px)",
-              minHeight: isMobile ? 190 : 240,
-              boxShadow:
-                "0 14px 30px rgba(0,0,0,0.30), 0 0 24px rgba(124,58,237,0.16)",
-              marginBottom: 28,
-            }}
-          >
-            <img
-              src={category.image}
-              alt={category.name}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(180deg, rgba(10,6,20,0.08) 0%, rgba(10,6,20,0.15) 28%, rgba(10,6,20,0.92) 100%)",
-              }}
-            />
-
-            <div
-              style={{
-                position: "relative",
-                zIndex: 2,
-                padding: isMobile ? 18 : 24,
-                minHeight: isMobile ? 190 : 240,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-              }}
-            >
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: isMobile ? 30 : 42,
-                  fontWeight: "bold",
-                  color: "#ffffff",
-                  lineHeight: 1.05,
-                  textShadow:
-                    "0 0 22px rgba(168,85,247,0.55), 0 2px 16px rgba(0,0,0,0.55)",
-                  wordBreak: "break-word",
-                }}
-              >
-                {category.name}
-              </h1>
-            </div>
-          </section>
-        )}
-
-        <section style={{ marginBottom: 24 }}>
-          <h2
-            style={{
-              fontSize: isMobile ? 22 : 30,
-              marginBottom: 8,
-              color: "#ffffff",
-              textShadow: "0 0 12px rgba(168, 85, 247, 0.22)",
-            }}
-          >
-            Produtos
-          </h2>
-          <p
-            style={{
-              color: "#d1d5db",
-              marginTop: 0,
-              fontSize: isMobile ? 15 : 16,
-            }}
-          >
-            Clique no produto para abrir a página dele.
-          </p>
-          <div style={{ color: "#fff", marginTop: 10, fontSize: 14 }}>
-            Produtos encontrados: {filteredProducts.length}
-          </div>
-        </section>
-
-        {filteredProducts.length === 0 ? (
-          <section
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(168, 85, 247, 0.12)",
-              borderRadius: 24,
-              padding: 22,
-              boxShadow:
-                "0 10px 30px rgba(0,0,0,0.25), 0 0 24px rgba(124,58,237,0.16)",
-              color: "#fff",
-              fontSize: 18,
-            }}
-          >
-            Nenhum produto encontrado nessa categoria.
-          </section>
-        ) : (
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: isMobile
-                ? "repeat(2, minmax(0, 1fr))"
-                : "repeat(3, minmax(0, 1fr))",
-              gap: isMobile ? 12 : 18,
-              background: "rgba(10, 8, 20, 0.55)",
-              border: "1px solid rgba(168, 85, 247, 0.12)",
-              borderRadius: isMobile ? 18 : 24,
-              padding: isMobile ? 12 : 22,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-              backdropFilter: "blur(14px)",
-            }}
-          >
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/produto/${product.id}`}
-                style={{
-                  width: "100%",
-                  maxWidth: "100%",
-                  minWidth: 0,
-                  background: "rgba(12, 8, 24, 0.92)",
-                  borderRadius: isMobile ? 14 : 18,
-                  overflow: "hidden",
-                  boxShadow: "0 14px 30px rgba(0,0,0,0.35)",
-                  border: "1px solid rgba(159, 122, 234, 0.18)",
-                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  textDecoration: "none",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-6px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 0 30px rgba(168, 85, 247, 0.45)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 14px 30px rgba(0,0,0,0.35)";
-                }}
-              >
-                <div
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(22,14,40,0.95) 0%, rgba(10,8,22,0.98) 100%)",
-                    padding: isMobile ? 10 : 12,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: isMobile ? 120 : 190,
-                  }}
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: "100%",
-                      maxWidth: isMobile ? 92 : 160,
-                      maxHeight: isMobile ? 92 : 160,
-                      objectFit: "contain",
-                      borderRadius: 12,
-                    }}
-                  />
-                </div>
-
-                <div style={{ padding: isMobile ? 10 : 16 }}>
-                  <h3
-                    style={{
-                      margin: "0 0 8px 0",
-                      fontSize: isMobile ? 14 : 16,
-                      lineHeight: 1.35,
-                      minHeight: isMobile ? "auto" : 44,
-                      color: "#ffffff",
-                      wordBreak: "break-word",
-                      display: "-webkit-box",
-                      WebkitLineClamp: isMobile ? 5 : 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {product.name}
-                  </h3>
-
-                  <p
-                    style={{
-                      margin: "0 0 12px 0",
-                      color: "#d8b4fe",
-                      fontSize: isMobile ? 18 : 28,
-                      fontWeight: "bold",
-                      textShadow: "0 0 14px rgba(168, 85, 247, 0.22)",
-                    }}
-                  >
-                    {formatPrice(Number(product.price))}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: "0 0 10px 0",
-                      fontSize: isMobile ? 11 : 12,
-                      color: "#d8b4fe",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {product.stock > 0
-                      ? `Estoque disponível: ${product.stock}`
-                      : "Sem estoque"}
-                  </p>
-
-                  <div
-                    style={{
-                      width: "100%",
-                      background:
-                        "linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%)",
-                      color: "white",
-                      border: "1px solid rgba(216, 180, 254, 0.28)",
-                      borderRadius: isMobile ? 12 : 14,
-                      padding: isMobile ? "10px 10px" : "12px 14px",
-                      fontWeight: "bold",
-                      fontSize: isMobile ? 14 : 16,
-                      boxShadow:
-                        "0 0 18px rgba(126, 34, 206, 0.38), inset 0 1px 0 rgba(255,255,255,0.12)",
-                      letterSpacing: "0.2px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Abrir produto
-                  </div>
-                </div>
+        <main className="container">
+          <section className="top">
+            <div>
+              <Link href="/" className="back">
+                ← Voltar
               </Link>
-            ))}
+
+              <h1>{category?.name || "Categoria"}</h1>
+
+              <p>
+                {filteredProducts.length} produto
+                {filteredProducts.length === 1 ? "" : "s"} disponível
+                {filteredProducts.length === 1 ? "" : "is"}
+              </p>
+            </div>
+
+            <div className="searchBox">
+              <input
+                placeholder="Buscar produto..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </section>
-        )}
-      </main>
-    </div>
+
+          {filteredProducts.length === 0 ? (
+            <section className="empty">
+              <h2>Nenhum produto encontrado</h2>
+              <p>Tente pesquisar outro nome ou volte para a loja.</p>
+            </section>
+          ) : (
+            <section
+              className="products"
+              style={{
+                gridTemplateColumns: isMobile
+                  ? "repeat(2, minmax(0, 1fr))"
+                  : "repeat(3, minmax(0, 1fr))",
+              }}
+            >
+              {filteredProducts.map((product) => (
+                <Link
+                  href={`/produto/${product.id}`}
+                  key={product.id}
+                  className="card"
+                >
+                  <div className="imageArea">
+                    <img src={product.image} alt={product.name} />
+                  </div>
+
+                  <div className="info">
+                    <h3>{product.name}</h3>
+
+                    <strong>{formatPrice(Number(product.price))}</strong>
+
+                    <span>
+                      {product.stock > 0
+                        ? `Estoque: ${product.stock}`
+                        : "Sem estoque"}
+                    </span>
+
+                    <div className="button">Abrir produto</div>
+                  </div>
+                </Link>
+              ))}
+            </section>
+          )}
+        </main>
+
+        <style jsx>{`
+          .page {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            background: radial-gradient(
+                circle at 25% 20%,
+                rgba(168, 85, 247, 0.2),
+                transparent 30%
+              ),
+              radial-gradient(
+                circle at 85% 80%,
+                rgba(124, 58, 237, 0.16),
+                transparent 28%
+              ),
+              linear-gradient(180deg, #090114 0%, #100022 48%, #0a0117 100%);
+          }
+
+          .gridBg {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(
+                rgba(179, 77, 255, 0.1) 1px,
+                transparent 1px
+              ),
+              linear-gradient(
+                90deg,
+                rgba(179, 77, 255, 0.1) 1px,
+                transparent 1px
+              );
+            background-size: 40px 40px;
+            opacity: 0.45;
+            pointer-events: none;
+          }
+
+          .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 16px;
+            position: relative;
+            z-index: 1;
+          }
+
+          .top {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-end;
+            margin-bottom: 22px;
+            padding: 22px;
+            border-radius: 24px;
+            background: rgba(20, 6, 40, 0.55);
+            border: 1px solid rgba(216, 180, 254, 0.14);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+          }
+
+          .back {
+            display: inline-block;
+            margin-bottom: 14px;
+            color: #d8b4fe;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+          }
+
+          h1 {
+            margin: 0;
+            font-size: 42px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -1px;
+          }
+
+          p {
+            margin: 10px 0 0;
+            color: #cfc6e8;
+            font-size: 15px;
+          }
+
+          .searchBox {
+            min-width: 280px;
+          }
+
+          input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(216, 180, 254, 0.18);
+            background: rgba(18, 12, 32, 0.78);
+            color: #fff;
+            outline: none;
+          }
+
+          .products {
+            display: grid;
+            gap: 16px;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(10, 8, 20, 0.52);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            backdrop-filter: blur(14px);
+          }
+
+          .card {
+            text-decoration: none;
+            color: #fff;
+            background: rgba(12, 8, 24, 0.92);
+            border: 1px solid rgba(216, 180, 254, 0.12);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease,
+              background 0.2s ease;
+          }
+
+          .card:hover {
+            border-color: rgba(216, 180, 254, 0.28);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.34);
+            background: rgba(18, 10, 34, 0.96);
+          }
+
+          .imageArea {
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: linear-gradient(
+              180deg,
+              rgba(22, 14, 40, 0.95),
+              rgba(10, 8, 22, 0.98)
+            );
+          }
+
+          img {
+            width: 100%;
+            max-width: 155px;
+            max-height: 155px;
+            object-fit: contain;
+          }
+
+          .info {
+            padding: 16px;
+          }
+
+          h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            line-height: 1.35;
+            min-height: 44px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          strong {
+            display: block;
+            font-size: 25px;
+            color: #d8b4fe;
+            margin-bottom: 8px;
+          }
+
+          span {
+            display: block;
+            color: #bda9e9;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+          }
+
+          .button {
+            width: 100%;
+            text-align: center;
+            padding: 11px;
+            border-radius: 13px;
+            background: linear-gradient(180deg, #8b2cf5 0%, #5b21b6 100%);
+            border: 1px solid rgba(216, 180, 254, 0.22);
+            font-weight: 800;
+            box-shadow: 0 0 16px rgba(126, 34, 206, 0.28);
+          }
+
+          .empty {
+            padding: 28px;
+            border-radius: 22px;
+            background: rgba(20, 6, 40, 0.55);
+            border: 1px solid rgba(216, 180, 254, 0.14);
+            backdrop-filter: blur(16px);
+            text-align: center;
+          }
+
+          .empty h2 {
+            margin: 0;
+            font-size: 24px;
+          }
+
+          @media (max-width: 768px) {
+            .container {
+              padding: 16px 10px;
+            }
+
+            .top {
+              flex-direction: column;
+              align-items: stretch;
+              padding: 18px;
+              border-radius: 20px;
+            }
+
+            h1 {
+              font-size: 32px;
+            }
+
+            .searchBox {
+              min-width: 0;
+            }
+
+            .products {
+              gap: 12px;
+              padding: 12px;
+              border-radius: 18px;
+            }
+
+            .imageArea {
+              min-height: 120px;
+              padding: 10px;
+            }
+
+            img {
+              max-width: 92px;
+              max-height: 92px;
+            }
+
+            .info {
+              padding: 10px;
+            }
+
+            h3 {
+              font-size: 13px;
+              min-height: auto;
+              -webkit-line-clamp: 3;
+            }
+
+            strong {
+              font-size: 18px;
+            }
+
+            .button {
+              font-size: 13px;
+              padding: 10px;
+            }
+          }
+        `}</style>
+      </div>
+    </>
   );
 }
