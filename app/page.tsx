@@ -621,18 +621,17 @@ export default function Home() {
                               "0 18px 40px rgba(0,0,0,0.34), 0 0 22px rgba(168, 85, 247, 0.18)";
                           }}
                         >
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            style={{
-                              position: "absolute",
-                              inset: 0,
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              transform: "scale(1.02)",
-                            }}
-                          />
+<img
+  src={category.image}
+  alt={category.name}
+  style={{
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  }}
+/>
 
                           <div
                             style={{
