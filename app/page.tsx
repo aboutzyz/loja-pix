@@ -31,6 +31,17 @@ type CartItem = Product & {
   quantity: number;
 };
 
+type PixData = {
+  paymentId?: string;
+  qrCodeImage?: string;
+  copiaCola?: string;
+  payload?: string;
+  encodedImage?: string;
+  valor?: number;
+  value?: number;
+  status?: string;
+};
+
 const PRODUCTS_PER_PAGE = 9;
 
 function formatPrice(value: number) {
@@ -54,6 +65,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerCpfCnpj, setCustomerCpfCnpj] = useState("");
   const [cep, setCep] = useState("");
   const [address, setAddress] = useState("");
   const [number, setNumber] = useState("");
@@ -65,6 +77,11 @@ export default function Home() {
 
   const [columns, setColumns] = useState(3);
   const [isMobile, setIsMobile] = useState(false);
+
+  const [pix, setPix] = useState<PixData | null>(null);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState("");
+  const [pixCopied, setPixCopied] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -229,6 +246,9 @@ export default function Home() {
     setShowCheckout(true);
     setShowCart(false);
     setShowMiniCart(false);
+    setPix(null);
+    setPixError("");
+    setPixCopied(false);
 
     setTimeout(() => {
       const checkoutSection = document.getElementById("checkout");
@@ -247,7 +267,7 @@ export default function Home() {
     }, 100);
   }
 
-  function finishOrder() {
+  async function finishOrder() {
     if (
       !customerName ||
       !customerPhone ||
@@ -261,31 +281,88 @@ export default function Home() {
       return;
     }
 
-    const itemsText = cart
-      .map(
-        (item) =>
-          `- ${item.name} | Qtd: ${item.quantity} | ${formatPrice(
-            Number(item.price) * item.quantity
-          )}`
-      )
-      .join("%0A");
+    if (cart.length === 0) {
+      alert("Seu carrinho está vazio.");
+      return;
+    }
 
-    const message =
-      `Novo pedido%0A%0A` +
-      `Nome: ${customerName}%0A` +
-      `Telefone: ${customerPhone}%0A` +
-      `Email: ${customerEmail || "Não informado"}%0A%0A` +
-      `Endereço:%0A` +
-      `${address}, ${number}%0A` +
-      `Bairro: ${district}%0A` +
-      `Cidade: ${city} - ${stateName}%0A` +
-      `CEP: ${cep || "Não informado"}%0A` +
-      `Complemento: ${complement || "Não informado"}%0A` +
-      `Referência: ${reference || "Não informado"}%0A%0A` +
-      `Itens:%0A${itemsText}%0A%0A` +
-      `Total: ${formatPrice(cartTotal)}`;
+    try {
+      setPixLoading(true);
+      setPixError("");
+      setPix(null);
+      setPixCopied(false);
 
-    window.open(`https://wa.me/5541996265158?text=${message}`, "_blank");
+      const items = cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        price: Number(item.price),
+        subtotal: Number(item.price) * item.quantity,
+      }));
+
+      const res = await fetch("/api/criar-pix", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: customerName,
+          telefone: customerPhone,
+          email: customerEmail || "",
+          cpfCnpj: customerCpfCnpj || "",
+          valor: Number(cartTotal.toFixed(2)),
+          descricao: `Compra BoutBux - ${cart.length} item(ns)`,
+          endereco: {
+            cep,
+            address,
+            number,
+            district,
+            city,
+            stateName,
+            complement,
+            reference,
+          },
+          items,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Erro ao gerar Pix:", data);
+        setPixError(
+          data?.message ||
+            data?.error?.message ||
+            "Não foi possível gerar o Pix. Verifique a API do Asaas."
+        );
+        return;
+      }
+
+      setPix(data);
+
+      setTimeout(() => {
+        const pixSection = document.getElementById("pix-area");
+        pixSection?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    } catch (error) {
+      console.error("Erro inesperado ao gerar Pix:", error);
+      setPixError("Erro inesperado ao gerar Pix. Tente novamente.");
+    } finally {
+      setPixLoading(false);
+    }
+  }
+
+  async function copyPixCode() {
+    const code = pix?.copiaCola || pix?.payload || "";
+
+    if (!code) return;
+
+    await navigator.clipboard.writeText(code);
+    setPixCopied(true);
+
+    setTimeout(() => {
+      setPixCopied(false);
+    }, 1800);
   }
 
   return (
@@ -1202,6 +1279,12 @@ export default function Home() {
                   style={inputStyle}
                 />
                 <input
+                  placeholder="CPF/CNPJ"
+                  value={customerCpfCnpj}
+                  onChange={(e) => setCustomerCpfCnpj(e.target.value)}
+                  style={inputStyle}
+                />
+                <input
                   placeholder="CEP"
                   value={cep}
                   onChange={(e) => setCep(e.target.value)}
@@ -1314,21 +1397,272 @@ export default function Home() {
 
                 <button
                   onClick={finishOrder}
+                  disabled={pixLoading}
                   style={{
-                    background:
-                      "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+                    background: pixLoading
+                      ? "linear-gradient(180deg, #5b3b86 0%, #3b235f 100%)"
+                      : "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
                     color: "white",
                     border: "1px solid rgba(216, 180, 254, 0.25)",
                     borderRadius: 12,
                     padding: "12px 16px",
-                    cursor: "pointer",
+                    cursor: pixLoading ? "not-allowed" : "pointer",
                     fontWeight: "bold",
                     boxShadow: "0 0 26px rgba(168, 85, 247, 0.78)",
+                    opacity: pixLoading ? 0.85 : 1,
                   }}
                 >
-                  Enviar pedido no WhatsApp
+                  {pixLoading ? "Gerando Pix..." : "Finalizar compra com Pix"}
                 </button>
               </div>
+
+              {pixError && (
+                <div
+                  style={{
+                    marginTop: 18,
+                    padding: 14,
+                    borderRadius: 14,
+                    background: "rgba(239, 68, 68, 0.12)",
+                    border: "1px solid rgba(248, 113, 113, 0.28)",
+                    color: "#fecaca",
+                    fontWeight: 700,
+                  }}
+                >
+                  {pixError}
+                </div>
+              )}
+
+              {pix && (
+                <section
+                  id="pix-area"
+                  className="fade-in"
+                  style={{
+                    marginTop: 22,
+                    padding: isMobile ? 16 : 22,
+                    borderRadius: 22,
+                    background:
+                      "linear-gradient(180deg, rgba(26, 8, 48, 0.92), rgba(12, 5, 27, 0.96))",
+                    border: "1px solid rgba(216, 180, 254, 0.22)",
+                    boxShadow:
+                      "0 18px 42px rgba(0,0,0,0.36), 0 0 30px rgba(168,85,247,0.24)",
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "radial-gradient(circle at 18% 20%, rgba(168,85,247,0.24), transparent 34%), radial-gradient(circle at 86% 85%, rgba(216,180,254,0.12), transparent 32%)",
+                      pointerEvents: "none",
+                    }}
+                  />
+
+                  <div style={{ position: "relative", zIndex: 1 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "7px 12px",
+                            borderRadius: 999,
+                            background: "rgba(34, 197, 94, 0.12)",
+                            border: "1px solid rgba(74, 222, 128, 0.22)",
+                            color: "#bbf7d0",
+                            fontWeight: 900,
+                            fontSize: 13,
+                            marginBottom: 10,
+                          }}
+                        >
+                          ⚡ Pix gerado com sucesso
+                        </div>
+
+                        <h2
+                          style={{
+                            margin: 0,
+                            color: "#fff",
+                            fontSize: isMobile ? 24 : 34,
+                            fontWeight: 900,
+                            textShadow: "0 0 18px rgba(168,85,247,0.5)",
+                          }}
+                        >
+                          Pague para concluir
+                        </h2>
+
+                        <p
+                          style={{
+                            margin: "8px 0 0 0",
+                            color: "#ddd6fe",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          Escaneie o QR Code ou copie o código Pix abaixo.
+                        </p>
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: 16,
+                          background: "rgba(255,255,255,0.06)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: "#fff",
+                          fontWeight: 900,
+                          boxShadow: "0 0 18px rgba(168,85,247,0.12)",
+                        }}
+                      >
+                        {formatPrice(Number(pix.valor || pix.value || cartTotal))}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: 20,
+                        display: "grid",
+                        gridTemplateColumns: isMobile ? "1fr" : "280px 1fr",
+                        gap: 18,
+                        alignItems: "stretch",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#fff",
+                          borderRadius: 22,
+                          padding: 14,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          boxShadow:
+                            "0 14px 30px rgba(0,0,0,0.32), 0 0 24px rgba(216,180,254,0.18)",
+                          minHeight: 250,
+                        }}
+                      >
+                        {pix.qrCodeImage || pix.encodedImage ? (
+                          <img
+                            src={`data:image/png;base64,${
+                              pix.qrCodeImage || pix.encodedImage
+                            }`}
+                            alt="QR Code Pix"
+                            style={{
+                              width: "100%",
+                              maxWidth: 235,
+                              height: "auto",
+                              display: "block",
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              color: "#3b0764",
+                              fontWeight: 900,
+                              textAlign: "center",
+                            }}
+                          >
+                            QR Code não retornado pela API.
+                          </div>
+                        )}
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 12,
+                          minWidth: 0,
+                        }}
+                      >
+                        <div
+                          style={{
+                            padding: 14,
+                            borderRadius: 18,
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.09)",
+                          }}
+                        >
+                          <strong style={{ color: "#fff", fontSize: 15 }}>
+                            Pix copia e cola
+                          </strong>
+
+                          <textarea
+                            value={pix.copiaCola || pix.payload || ""}
+                            readOnly
+                            style={{
+                              marginTop: 10,
+                              width: "100%",
+                              minHeight: 126,
+                              resize: "none",
+                              borderRadius: 14,
+                              border: "1px solid rgba(216,180,254,0.2)",
+                              outline: "none",
+                              padding: 12,
+                              background: "rgba(7, 3, 18, 0.72)",
+                              color: "#f5f3ff",
+                              fontSize: 13,
+                              lineHeight: 1.45,
+                              boxShadow:
+                                "inset 0 0 0 1px rgba(255,255,255,0.03)",
+                            }}
+                          />
+                        </div>
+
+                        <button
+                          onClick={copyPixCode}
+                          disabled={!(pix.copiaCola || pix.payload)}
+                          style={{
+                            width: "100%",
+                            background: pixCopied
+                              ? "linear-gradient(180deg, #22c55e 0%, #15803d 100%)"
+                              : "linear-gradient(180deg, #d8b4fe 0%, #9333ea 100%)",
+                            color: "white",
+                            border: "1px solid rgba(255,255,255,0.16)",
+                            borderRadius: 14,
+                            padding: "13px 16px",
+                            cursor:
+                              pix.copiaCola || pix.payload
+                                ? "pointer"
+                                : "not-allowed",
+                            fontWeight: 900,
+                            fontSize: 15,
+                            boxShadow: "0 0 24px rgba(168,85,247,0.36)",
+                          }}
+                        >
+                          {pixCopied ? "Pix copiado!" : "Copiar código Pix"}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setPix(null);
+                            setPixError("");
+                          }}
+                          style={{
+                            width: "100%",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#fff",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            borderRadius: 14,
+                            padding: "12px 16px",
+                            cursor: "pointer",
+                            fontWeight: 800,
+                          }}
+                        >
+                          Gerar outro Pix / editar dados
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              )}
             </section>
           )}
         </main>
