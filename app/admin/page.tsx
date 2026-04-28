@@ -15,6 +15,9 @@ type Product = {
   image: string;
   stock: number;
   category_id?: string | null;
+  description?: string | null;
+  rating?: string | number | null;
+  reviews?: string | number | null;
   created_at?: string;
 };
 
@@ -45,6 +48,9 @@ export default function AdminPage() {
   const [stock, setStock] = useState("0");
   const [image, setImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [description, setDescription] = useState("");
+  const [rating, setRating] = useState("4.9");
+  const [reviews, setReviews] = useState("2456");
 
   const [categoryName, setCategoryName] = useState("");
   const [categoryImage, setCategoryImage] = useState("");
@@ -113,6 +119,9 @@ export default function AdminPage() {
     setStock("0");
     setImage("");
     setCategoryId("");
+    setDescription("");
+    setRating("4.9");
+    setReviews("2456");
     setEditingId(null);
   }
 
@@ -198,10 +207,26 @@ export default function AdminPage() {
       image: image.trim(),
       stock: Number(stock || 0),
       category_id: categoryId.trim(),
+      description: description.trim() || null,
+      rating: rating.trim() || "4.9",
+      reviews: reviews.trim() || "2456",
     };
 
     if (Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
       alert("Preço e estoque precisam ser números válidos.");
+      return;
+    }
+
+    const ratingNumber = Number(String(payload.rating).replace(",", "."));
+    const reviewsNumber = Number(String(payload.reviews).replace(/\D/g, ""));
+
+    if (Number.isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 5) {
+      alert("A nota precisa ser um número entre 0 e 5. Exemplo: 4.9");
+      return;
+    }
+
+    if (Number.isNaN(reviewsNumber) || reviewsNumber < 0) {
+      alert("A quantidade de avaliações precisa ser um número válido.");
       return;
     }
 
@@ -281,6 +306,9 @@ export default function AdminPage() {
     setStock(String(product.stock ?? 0));
     setImage(product.image);
     setCategoryId(product.category_id ?? "");
+    setDescription(product.description ?? "");
+    setRating(String(product.rating ?? "4.9"));
+    setReviews(String(product.reviews ?? "2456"));
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -432,6 +460,27 @@ export default function AdminPage() {
                   </option>
                 ))}
               </select>
+
+              <textarea
+                placeholder="Descrição do produto (aparece na página do produto)"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                style={textareaStyle}
+              />
+
+              <input
+                placeholder="Nota fake do produto (ex: 4.9)"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                style={inputStyle}
+              />
+
+              <input
+                placeholder="Quantidade de avaliações fake (ex: 2456)"
+                value={reviews}
+                onChange={(e) => setReviews(e.target.value.replace(/\D/g, ""))}
+                style={inputStyle}
+              />
 
               <input
                 placeholder="Link da imagem"
@@ -602,6 +651,12 @@ export default function AdminPage() {
                         </div>
                         <div style={smallMutedStyle}>
                           Estoque: {product.stock ?? 0}
+                        </div>
+                        <div style={smallMutedStyle}>
+                          Avaliação: {product.rating || "4.9"} ⭐ / {product.reviews || "2456"} avaliações
+                        </div>
+                        <div style={smallMutedStyle}>
+                          Descrição: {product.description ? `${product.description.slice(0, 70)}${product.description.length > 70 ? "..." : ""}` : "Sem descrição personalizada"}
                         </div>
                         <div style={smallMutedStyle}>
                           Categoria: {getCategoryName(product.category_id)}
@@ -783,6 +838,13 @@ const inputStyle: React.CSSProperties = {
   color: "white",
   outline: "none",
   fontSize: 14,
+};
+
+const textareaStyle: React.CSSProperties = {
+  ...inputStyle,
+  minHeight: 120,
+  resize: "vertical",
+  lineHeight: 1.5,
 };
 
 const primaryButtonStyle: React.CSSProperties = {

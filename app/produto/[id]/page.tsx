@@ -17,6 +17,8 @@ type Product = {
   image: string;
   stock: number;
   description?: string | null;
+  rating?: string | number | null;
+  reviews?: string | number | null;
 };
 
 type CartItem = Product & { quantity: number };
@@ -56,6 +58,25 @@ function formatPixTimer(seconds: number) {
 
 function isPaidStatus(status?: string) {
   return ["RECEIVED", "CONFIRMED", "RECEIVED_IN_CASH"].includes(String(status || "").toUpperCase());
+}
+
+function getProductRating(product: Product) {
+  const rawRating = product.rating ?? "4.9";
+  const ratingNumber = Number(String(rawRating).replace(",", "."));
+
+  if (Number.isNaN(ratingNumber) || ratingNumber <= 0) {
+    return "4.9";
+  }
+
+  return Math.min(5, ratingNumber).toFixed(1);
+}
+
+function getProductReviews(product: Product) {
+  const rawReviews = product.reviews ?? "2456";
+  const onlyDigits = String(rawReviews).replace(/\D/g, "");
+  const reviewsNumber = Number(onlyDigits || 2456);
+
+  return new Intl.NumberFormat("pt-BR").format(reviewsNumber);
 }
 
 function LightningIcon() {
@@ -449,6 +470,9 @@ No chat do seu pedido, siga o tutorial enviado.
 No celular e no PC, siga o passo a passo enviado no atendimento.
 A entrega é digital e o suporte fica disponível para te ajudar.`;
 
+  const productRating = getProductRating(product);
+  const productReviews = getProductReviews(product);
+
   return (
     <div style={page}>
       <div style={gridOverlay} />
@@ -497,12 +521,18 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
 
             {!isMobile && (
               <div style={ratingRow}>
-                <span style={star}>★</span>
-                <span style={star}>★</span>
-                <span style={star}>★</span>
-                <span style={star}>★</span>
-                <span style={star}>★</span>
-                <span style={ratingText}>(4.9) 2.456 avaliações</span>
+                {[0, 1, 2, 3, 4].map((index) => (
+                  <span
+                    key={index}
+                    className="animated-star"
+                    style={{ ...star, animationDelay: `${index * 0.13}s` }}
+                  >
+                    ★
+                  </span>
+                ))}
+                <span style={ratingText}>
+                  ({productRating}) {productReviews} avaliações
+                </span>
               </div>
             )}
 
@@ -724,6 +754,25 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .animated-star {
+          display: inline-block;
+          animation: starPulse 1.75s ease-in-out infinite;
+          transform-origin: center;
+        }
+
+        @keyframes starPulse {
+          0%, 100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 6px rgba(255, 216, 77, 0.32));
+          }
+          45% {
+            transform: scale(1.22) rotate(-5deg);
+            filter: drop-shadow(0 0 14px rgba(255, 216, 77, 0.75));
+          }
+        }
+      `}</style>
     </div>
   );
 }
