@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     // CPF válido para teste/produção temporário
     // Depois o ideal é pedir o CPF real do cliente no checkout
-    const cpfCnpj = body.cpfCnpj || "04792093910";
+    const cpfCnpj = String(body.cpfCnpj || "04792093910").replace(/\D/g, "");
 
     if (!process.env.ASAAS_API_KEY || !process.env.ASAAS_API_URL) {
       return NextResponse.json(
@@ -35,12 +35,12 @@ export async function POST(req: Request) {
     const customerRes = await fetch(`${process.env.ASAAS_API_URL}/customers`, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        name: nome,
-        cpfCnpj,
-        ...(email ? { email } : {}),
-        notificationDisabled: true,
-      }),
+body: JSON.stringify({
+  name: nome,
+  ...(email ? { email } : {}),
+  cpfCnpj,
+  notificationDisabled: true,
+})
     });
 
     const customer = await customerRes.json();
