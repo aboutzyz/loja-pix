@@ -2,14 +2,19 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { nome, email, cpfCnpj, valor, descricao } = await req.json();
+    const body = await req.json();
+
+    const nome = body.nome || "Cliente BoutBux";
+    const email = body.email || null;
+    const valor = Number(body.valor);
+    const descricao = body.descricao || "Compra na loja";
 
     const headers = {
       "Content-Type": "application/json",
       access_token: process.env.ASAAS_API_KEY as string,
     };
 
-    // Criar cliente
+    // 🔹 Criar cliente (SEM CPF fake)
     const customerRes = await fetch(
       `${process.env.ASAAS_API_URL}/customers`,
       {
@@ -17,8 +22,7 @@ export async function POST(req: Request) {
         headers,
         body: JSON.stringify({
           name: nome,
-          email,
-          cpfCnpj,
+          ...(email ? { email } : {}),
           notificationDisabled: true,
         }),
       }
@@ -27,10 +31,11 @@ export async function POST(req: Request) {
     const customer = await customerRes.json();
 
     if (!customerRes.ok) {
+      console.error("Erro cliente:", customer);
       return NextResponse.json({ error: customer }, { status: 400 });
     }
 
-    // Criar pagamento PIX
+    // 🔹 Criar pagamento PIX
     const paymentRes = await fetch(
       `${process.env.ASAAS_API_URL}/payments`,
       {
@@ -39,9 +44,9 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           customer: customer.id,
           billingType: "PIX",
-          value: Number(valor),
+          value: valor,
           dueDate: new Date().toISOString().split("T")[0],
-          description: descricao || "Compra na loja",
+          description: descricao,
         }),
       }
     );
@@ -49,10 +54,11 @@ export async function POST(req: Request) {
     const payment = await paymentRes.json();
 
     if (!paymentRes.ok) {
+      console.error("Erro pagamento:", payment);
       return NextResponse.json({ error: payment }, { status: 400 });
     }
 
-    // Buscar QR Code
+    // 🔹 Buscar QR Code
     const qrRes = await fetch(
       `${process.env.ASAAS_API_URL}/payments/${payment.id}/pixQrCode`,
       {
@@ -64,6 +70,7 @@ export async function POST(req: Request) {
     const qr = await qrRes.json();
 
     if (!qrRes.ok) {
+      console.error("Erro QR:", qr);
       return NextResponse.json({ error: qr }, { status: 400 });
     }
 
@@ -74,6 +81,7 @@ export async function POST(req: Request) {
       status: payment.status,
     });
   } catch (err) {
+    console.error("Erro geral:", err);
     return NextResponse.json(
       { error: "Erro ao gerar Pix" },
       { status: 500 }
