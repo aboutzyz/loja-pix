@@ -479,7 +479,7 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
 
       <div style={topBar}>
         <div style={brandWrap}>
-          <div style={brandLogoBox}>macaco</div>
+          <div style={brandLogoBox}></div>
           <div style={brandText}>BoutBux</div>
         </div>
 
