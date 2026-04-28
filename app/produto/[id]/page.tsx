@@ -29,11 +29,33 @@ type PixData = {
   error?: unknown;
 };
 
+type PaymentStatus = "idle" | "waiting" | "paid" | "expired";
+
+type CustomerData = {
+  nome: string;
+  email: string;
+  cpfCnpj: string;
+};
+
 function formatPrice(value: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(value);
+}
+
+function onlyNumbers(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function formatPixTimer(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
+}
+
+function isPaidStatus(status?: string) {
+  return ["RECEIVED", "CONFIRMED", "RECEIVED_IN_CASH"].includes(String(status || "").toUpperCase());
 }
 
 function LightningIcon() {
@@ -160,6 +182,13 @@ export default function ProdutoPage() {
   const [pixLoading, setPixLoading] = useState(false);
   const [pixError, setPixError] = useState("");
   const [copiedPix, setCopiedPix] = useState(false);
+  const [pixStatus, setPixStatus] = useState<PaymentStatus>("idle");
+  const [pixTimer, setPixTimer] = useState(15 * 60);
+  const [customerData, setCustomerData] = useState<CustomerData>({
+    nome: "",
+    email: "",
+    cpfCnpj: "",
+  });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 900);
@@ -172,6 +201,41 @@ export default function ProdutoPage() {
     if (!id) return;
     loadProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (!pix?.paymentId || pixStatus !== "waiting") return;
+
+    const countdown = setInterval(() => {
+      setPixTimer((current) => {
+        if (current <= 1) {
+          setPixStatus((previous) => previous === "paid" ? previous : "expired");
+          clearInterval(countdown);
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [pix?.paymentId, pixStatus]);
+
+  useEffect(() => {
+    if (!pix?.paymentId || pixStatus !== "waiting") return;
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`/api/status-pix?paymentId=${pix.paymentId}`, { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok && isPaidStatus(data?.status)) setPixStatus("paid");
+      } catch (error) {
+        console.error("Erro ao consultar status do Pix:", error);
+      }
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 5000);
+    return () => clearInterval(interval);
+  }, [pix?.paymentId, pixStatus]);
 
   async function loadProduct() {
     const { data, error } = await supabase
@@ -238,51 +302,88 @@ export default function ProdutoPage() {
   async function gerarPix(items: CartItem[]) {
     if (items.length === 0 || pixLoading) return;
 
+    const cpfCnpj = onlyNumbers(customerData.cpfCnpj);
+    const nome = customerData.nome.trim();
+    const email = customerData.email.trim();
+
+    if (!nome) {
+      setPixError("Preencha seu nome completo para gerar o Pix.");
+      return;
+    }
+    if (!email || !email.includes("@")) {
+      setPixError("Preencha um email válido para gerar o Pix.");
+      return;
+    }
+    if (cpfCnpj.length !== 11 && cpfCnpj.length !== 14) {
+      setPixError("Preencha um CPF com 11 números ou CNPJ com 14 números.");
+      return;
+    }
+
     setPix(null);
     setPixError("");
     setCopiedPix(false);
     setPixLoading(true);
+    setPixStatus("idle");
+    setPixTimer(15 * 60);
     setOpenCart(true);
 
-    const valorTotal = items.reduce(
-      (acc, item) => acc + Number(item.price) * item.quantity,
-      0
-    );
-
-    const descricao = items
-      .map((item) => `${item.name} x${item.quantity}`)
-      .join(" | ");
+    const valorTotal = items.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
+    const descricao = items.map((item) => `${item.name} x${item.quantity}`).join(" | ");
 
     try {
       const res = await fetch("/api/criar-pix", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: "Cliente BoutBux",
-          email: "cliente@boutbux.com",
-          cpfCnpj: "00000000000",
-          valor: valorTotal,
-          descricao: `Pedido BoutBux - ${descricao}`,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, cpfCnpj, valor: valorTotal, descricao: `Pedido BoutBux - ${descricao}` }),
       });
 
       const data = await res.json();
-
       if (!res.ok || data?.error) {
         console.error("Erro ao gerar Pix:", data);
-        setPixError("Não foi possível gerar o Pix agora. Confira o token do Asaas e tente novamente.");
+        setPixError("Não foi possível gerar o Pix agora. Confira seus dados e tente novamente.");
         return;
       }
 
       setPix(data);
+      setPixStatus(isPaidStatus(data?.status) ? "paid" : "waiting");
     } catch (error) {
       console.error("Erro ao chamar API Pix:", error);
       setPixError("Erro de conexão ao gerar Pix. Tente novamente em instantes.");
     } finally {
       setPixLoading(false);
     }
+  }
+
+  function updateCustomerData(field: keyof CustomerData, value: string) {
+    setCustomerData((current) => ({
+      ...current,
+      [field]: field === "cpfCnpj" ? value.replace(/\D/g, "").slice(0, 14) : value,
+    }));
+    setPixError("");
+  }
+
+  function resetPix() {
+    setPix(null);
+    setPixError("");
+    setCopiedPix(false);
+    setPixStatus("idle");
+    setPixTimer(15 * 60);
+  }
+
+  function getStatusText() {
+    if (pixStatus === "paid") return "Pagamento aprovado";
+    if (pixStatus === "expired") return "Pix expirado";
+    if (pixLoading) return "Gerando Pix";
+    if (pix?.paymentId) return "Aguardando pagamento";
+    return "Preencha os dados";
+  }
+
+  function getStatusDescription() {
+    if (pixStatus === "paid") return "Seu pagamento foi confirmado com sucesso.";
+    if (pixStatus === "expired") return "Este Pix expirou. Gere um novo para pagar.";
+    if (pixLoading) return "Criando cobrança segura no Asaas...";
+    if (pix?.paymentId) return "Assim que o Pix for pago, o status muda sozinho.";
+    return "Informe seus dados para gerar o QR Code Pix.";
   }
 
   function checkoutPix() {
@@ -297,7 +398,8 @@ export default function ProdutoPage() {
       if (exists) return prev;
       return [...prev, item];
     });
-    gerarPix([item]);
+    resetPix();
+    setOpenCart(true);
   }
 
   async function copyPixCode() {
@@ -526,44 +628,61 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
           )}
         </div>
 
-        {(pixLoading || pixError || pix?.qrCodeImage || pix?.copiaCola) && (
+        {cart.length > 0 && (
           <div style={pixBox}>
             <div style={pixHeaderRow}>
               <div>
                 <div style={pixSmallLabel}>Pagamento</div>
-                <div style={pixTitle}>Pix gerado na hora</div>
+                <div style={pixTitle}>Pix seguro</div>
               </div>
               <div style={pixBadge}>PIX</div>
             </div>
 
-            {pixLoading && (
-              <div style={pixLoadingBox}>
-                <div style={pixSpinner} />
-                <span>Gerando QR Code seguro...</span>
+            <div style={{ ...pixStatusBox, ...(pixStatus === "paid" ? pixStatusPaidBox : {}), ...(pixStatus === "expired" ? pixStatusExpiredBox : {}) }}>
+              <div style={pixStatusIcon}>{pixStatus === "paid" ? "✓" : pixStatus === "expired" ? "!" : "⌛"}</div>
+              <div>
+                <div style={pixStatusTitle}>{getStatusText()}</div>
+                <div style={pixStatusDescription}>{getStatusDescription()}</div>
+              </div>
+            </div>
+
+            {!pix?.paymentId && (
+              <div style={customerFormBox}>
+                <input placeholder="Nome completo *" value={customerData.nome} onChange={(e) => updateCustomerData("nome", e.target.value)} style={checkoutInput} />
+                <input placeholder="Email *" value={customerData.email} onChange={(e) => updateCustomerData("email", e.target.value)} style={checkoutInput} />
+                <input placeholder="CPF ou CNPJ *" value={customerData.cpfCnpj} onChange={(e) => updateCustomerData("cpfCnpj", e.target.value)} style={checkoutInput} inputMode="numeric" />
               </div>
             )}
 
+            {pixLoading && <div style={pixLoadingBox}><div style={pixSpinner} /><span>Gerando QR Code seguro...</span></div>}
             {pixError && <div style={pixErrorBox}>{pixError}</div>}
 
-            {!pixLoading && pix?.qrCodeImage && (
-              <div style={qrWrap}>
-                <img
-                  src={`data:image/png;base64,${pix.qrCodeImage}`}
-                  alt="QR Code Pix"
-                  style={qrImage}
-                />
+            {!pixLoading && pix?.paymentId && (
+              <div style={pixTimerBox}>
+                <span>{pixStatus === "paid" ? "Status" : "Expira em"}</span>
+                <strong>{pixStatus === "paid" ? "Pago" : formatPixTimer(pixTimer)}</strong>
               </div>
             )}
 
-            {!pixLoading && pix?.copiaCola && (
+            {!pixLoading && pix?.qrCodeImage && pixStatus !== "paid" && <div style={qrWrap}><img src={`data:image/png;base64,${pix.qrCodeImage}`} alt="QR Code Pix" style={qrImage} /></div>}
+
+            {!pixLoading && pixStatus === "paid" && (
+              <div style={paidBox}>
+                <div style={paidIcon}>✓</div>
+                <div style={paidTitle}>Pagamento confirmado!</div>
+                <div style={paidText}>Seu pedido foi aprovado. Aguarde a entrega ou acompanhe pelo suporte.</div>
+              </div>
+            )}
+
+            {!pixLoading && pix?.copiaCola && pixStatus !== "paid" && (
               <>
                 <div style={copyLabel}>Pix copia e cola</div>
                 <textarea value={pix.copiaCola} readOnly style={pixTextarea} />
-                <button style={copyPixBtn} onClick={copyPixCode}>
-                  {copiedPix ? "Pix copiado!" : "Copiar Pix"}
-                </button>
+                <button style={copyPixBtn} onClick={copyPixCode}>{copiedPix ? "Pix copiado!" : "Copiar Pix"}</button>
               </>
             )}
+
+            {pix?.paymentId && pixStatus !== "paid" && <button style={newPixBtn} onClick={resetPix}>Gerar outro Pix</button>}
           </div>
         )}
 
@@ -582,7 +701,7 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
             onClick={checkoutPix}
             disabled={cart.length === 0}
           >
-            {pixLoading ? "Gerando Pix..." : "Ir para a compra"}
+            {pix?.paymentId ? "Ver pagamento" : pixLoading ? "Gerando Pix..." : "Gerar Pix agora"}
           </button>
         </div>
       </div>
@@ -1290,6 +1409,22 @@ const copyPixBtn: CSSProperties = {
   cursor: "pointer",
   boxShadow: "0 0 20px rgba(168,85,247,0.34)",
 };
+
+
+const checkoutInput: CSSProperties = { width: "100%", height: 46, borderRadius: 14, border: "1px solid rgba(216,180,254,0.18)", background: "rgba(8,2,18,0.72)", color: "#fff", outline: "none", padding: "0 13px", fontSize: 14, fontWeight: 700, boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.02)" };
+const customerFormBox: CSSProperties = { display: "grid", gap: 10, marginBottom: 12 };
+const pixStatusBox: CSSProperties = { display: "flex", alignItems: "center", gap: 12, padding: 12, marginBottom: 12, borderRadius: 16, background: "rgba(255,255,255,0.045)", border: "1px solid rgba(216,180,254,0.16)" };
+const pixStatusPaidBox: CSSProperties = { background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.34)" };
+const pixStatusExpiredBox: CSSProperties = { background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.28)" };
+const pixStatusIcon: CSSProperties = { width: 38, height: 38, borderRadius: 14, background: "linear-gradient(180deg, #e03cff 0%, #8e18ff 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, flexShrink: 0, boxShadow: "0 0 18px rgba(224,60,255,0.28)" };
+const pixStatusTitle: CSSProperties = { color: "#fff", fontWeight: 900, fontSize: 15 };
+const pixStatusDescription: CSSProperties = { color: "#ddd6fe", fontWeight: 700, fontSize: 12, marginTop: 3, lineHeight: 1.35 };
+const pixTimerBox: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "12px 14px", borderRadius: 14, marginBottom: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(216,180,254,0.14)", color: "#ddd6fe", fontWeight: 900 };
+const paidBox: CSSProperties = { padding: 18, borderRadius: 18, textAlign: "center", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.34)" };
+const paidIcon: CSSProperties = { width: 56, height: 56, borderRadius: "50%", margin: "0 auto 10px auto", background: "linear-gradient(180deg, #22c55e 0%, #16a34a 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, fontWeight: 900, boxShadow: "0 0 22px rgba(34,197,94,0.4)" };
+const paidTitle: CSSProperties = { color: "#fff", fontSize: 18, fontWeight: 900 };
+const paidText: CSSProperties = { color: "#dcfce7", fontSize: 13, fontWeight: 700, lineHeight: 1.4, marginTop: 6 };
+const newPixBtn: CSSProperties = { width: "100%", height: 42, marginTop: 10, borderRadius: 13, border: "1px solid rgba(216,180,254,0.18)", background: "rgba(255,255,255,0.05)", color: "#fff", fontWeight: 900, cursor: "pointer" };
 
 const loadingWrap: CSSProperties = {
   minHeight: "100vh",
