@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     // CPF válido para teste/produção temporário
     // Depois o ideal é pedir o CPF real do cliente no checkout
-    const cpfCnpj = body.cpfCnpj || "12345678909";
+    const cpfCnpj = body.cpfCnpj || "04792093910";
 
     if (!process.env.ASAAS_API_KEY || !process.env.ASAAS_API_URL) {
       return NextResponse.json(
