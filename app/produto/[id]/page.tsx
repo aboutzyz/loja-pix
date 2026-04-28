@@ -21,6 +21,14 @@ type Product = {
 
 type CartItem = Product & { quantity: number };
 
+type PixData = {
+  qrCodeImage?: string;
+  copiaCola?: string;
+  paymentId?: string;
+  status?: string;
+  error?: unknown;
+};
+
 function formatPrice(value: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -148,6 +156,10 @@ export default function ProdutoPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [openCart, setOpenCart] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [pix, setPix] = useState<PixData | null>(null);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState("");
+  const [copiedPix, setCopiedPix] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 900);
@@ -223,24 +235,75 @@ export default function ProdutoPage() {
     [cart]
   );
 
-  function checkoutWhatsApp() {
-    if (cart.length === 0) return;
+  async function gerarPix(items: CartItem[]) {
+    if (items.length === 0 || pixLoading) return;
 
-    const itemsText = cart
-      .map(
-        (item) =>
-          `- ${item.name} | Qtd: ${item.quantity} | ${formatPrice(
-            Number(item.price) * item.quantity
-          )}`
-      )
-      .join("%0A");
+    setPix(null);
+    setPixError("");
+    setCopiedPix(false);
+    setPixLoading(true);
+    setOpenCart(true);
 
-    const message =
-      `Pedido BoutBux%0A%0A` +
-      `${itemsText}%0A%0A` +
-      `Total: ${formatPrice(total)}`;
+    const valorTotal = items.reduce(
+      (acc, item) => acc + Number(item.price) * item.quantity,
+      0
+    );
 
-    window.open(`https://wa.me/5541996265158?text=${message}`, "_blank");
+    const descricao = items
+      .map((item) => `${item.name} x${item.quantity}`)
+      .join(" | ");
+
+    try {
+      const res = await fetch("/api/criar-pix", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: "Cliente BoutBux",
+          email: "cliente@boutbux.com",
+          cpfCnpj: "00000000000",
+          valor: valorTotal,
+          descricao: `Pedido BoutBux - ${descricao}`,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data?.error) {
+        console.error("Erro ao gerar Pix:", data);
+        setPixError("Não foi possível gerar o Pix agora. Confira o token do Asaas e tente novamente.");
+        return;
+      }
+
+      setPix(data);
+    } catch (error) {
+      console.error("Erro ao chamar API Pix:", error);
+      setPixError("Erro de conexão ao gerar Pix. Tente novamente em instantes.");
+    } finally {
+      setPixLoading(false);
+    }
+  }
+
+  function checkoutPix() {
+    gerarPix(cart);
+  }
+
+  function pagarProdutoComPix() {
+    if (!product || product.stock <= 0) return;
+    const item: CartItem = { ...product, quantity: 1 };
+    setCart((prev) => {
+      const exists = prev.find((cartItem) => cartItem.id === product.id);
+      if (exists) return prev;
+      return [...prev, item];
+    });
+    gerarPix([item]);
+  }
+
+  async function copyPixCode() {
+    if (!pix?.copiaCola) return;
+    await navigator.clipboard.writeText(pix.copiaCola);
+    setCopiedPix(true);
   }
 
   if (!product) {
@@ -325,9 +388,9 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
             <div style={price}>{formatPrice(Number(product.price))}</div>
             <div style={pixText}>À vista no Pix ✥</div>
 
-            <button style={pixBtn}>
+            <button style={pixBtn} onClick={pagarProdutoComPix} disabled={pixLoading || product.stock <= 0}>
               <PixBoltIcon />
-              <span style={{ marginLeft: 10 }}>Pagar com Pix</span>
+              <span style={{ marginLeft: 10 }}>{pixLoading ? "Gerando Pix..." : "Pagar com Pix"}</span>
             </button>
 
             <button style={addCartBtn} onClick={() => addToCart(product)}>
@@ -463,6 +526,47 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
           )}
         </div>
 
+        {(pixLoading || pixError || pix?.qrCodeImage || pix?.copiaCola) && (
+          <div style={pixBox}>
+            <div style={pixHeaderRow}>
+              <div>
+                <div style={pixSmallLabel}>Pagamento</div>
+                <div style={pixTitle}>Pix gerado na hora</div>
+              </div>
+              <div style={pixBadge}>PIX</div>
+            </div>
+
+            {pixLoading && (
+              <div style={pixLoadingBox}>
+                <div style={pixSpinner} />
+                <span>Gerando QR Code seguro...</span>
+              </div>
+            )}
+
+            {pixError && <div style={pixErrorBox}>{pixError}</div>}
+
+            {!pixLoading && pix?.qrCodeImage && (
+              <div style={qrWrap}>
+                <img
+                  src={`data:image/png;base64,${pix.qrCodeImage}`}
+                  alt="QR Code Pix"
+                  style={qrImage}
+                />
+              </div>
+            )}
+
+            {!pixLoading && pix?.copiaCola && (
+              <>
+                <div style={copyLabel}>Pix copia e cola</div>
+                <textarea value={pix.copiaCola} readOnly style={pixTextarea} />
+                <button style={copyPixBtn} onClick={copyPixCode}>
+                  {copiedPix ? "Pix copiado!" : "Copiar Pix"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         <div style={cartFooter}>
           <div style={cartTotalBox}>
             <span style={cartTotalLabel}>Valor total:</span>
@@ -475,10 +579,10 @@ A entrega é digital e o suporte fica disponível para te ajudar.`;
               opacity: cart.length === 0 ? 0.65 : 1,
               cursor: cart.length === 0 ? "not-allowed" : "pointer",
             }}
-            onClick={checkoutWhatsApp}
+            onClick={checkoutPix}
             disabled={cart.length === 0}
           >
-            Ir para a compra
+            {pixLoading ? "Gerando Pix..." : "Ir para a compra"}
           </button>
         </div>
       </div>
@@ -1061,6 +1165,130 @@ const checkoutBtn: CSSProperties = {
   fontSize: 19,
   boxShadow: "0 0 24px rgba(197, 71, 255, 0.4)",
   cursor: "pointer",
+};
+
+const pixBox: CSSProperties = {
+  margin: "0 20px 14px 20px",
+  padding: 16,
+  borderRadius: 20,
+  background:
+    "linear-gradient(180deg, rgba(37, 8, 62, 0.94), rgba(15, 4, 30, 0.96))",
+  border: "1px solid rgba(216,180,254,0.24)",
+  boxShadow: "0 0 26px rgba(202, 60, 255, 0.18)",
+};
+
+const pixHeaderRow: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 12,
+  marginBottom: 14,
+};
+
+const pixSmallLabel: CSSProperties = {
+  color: "#c4b5fd",
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: 0.8,
+};
+
+const pixTitle: CSSProperties = {
+  color: "#fff",
+  fontSize: 20,
+  fontWeight: 900,
+  marginTop: 3,
+};
+
+const pixBadge: CSSProperties = {
+  padding: "8px 11px",
+  borderRadius: 999,
+  background: "linear-gradient(180deg, #e03cff 0%, #8e18ff 100%)",
+  color: "#fff",
+  fontWeight: 900,
+  fontSize: 12,
+  boxShadow: "0 0 18px rgba(224,60,255,0.38)",
+};
+
+const pixLoadingBox: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  color: "#f5f3ff",
+  fontWeight: 800,
+  padding: "14px 12px",
+  borderRadius: 14,
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
+};
+
+const pixSpinner: CSSProperties = {
+  width: 18,
+  height: 18,
+  borderRadius: "50%",
+  border: "3px solid rgba(255,255,255,0.22)",
+  borderTopColor: "#fff",
+};
+
+const pixErrorBox: CSSProperties = {
+  color: "#fecaca",
+  background: "rgba(239,68,68,0.12)",
+  border: "1px solid rgba(239,68,68,0.28)",
+  borderRadius: 14,
+  padding: 12,
+  fontWeight: 800,
+  lineHeight: 1.4,
+};
+
+const qrWrap: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  padding: 14,
+  borderRadius: 18,
+  background: "rgba(255,255,255,0.96)",
+  boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.08)",
+};
+
+const qrImage: CSSProperties = {
+  width: 210,
+  maxWidth: "100%",
+  borderRadius: 12,
+};
+
+const copyLabel: CSSProperties = {
+  marginTop: 14,
+  marginBottom: 8,
+  color: "#ddd6fe",
+  fontSize: 13,
+  fontWeight: 900,
+};
+
+const pixTextarea: CSSProperties = {
+  width: "100%",
+  minHeight: 86,
+  resize: "none",
+  borderRadius: 14,
+  padding: 12,
+  border: "1px solid rgba(216,180,254,0.22)",
+  background: "rgba(8,2,18,0.92)",
+  color: "#fff",
+  outline: "none",
+  fontSize: 12,
+  lineHeight: 1.35,
+};
+
+const copyPixBtn: CSSProperties = {
+  width: "100%",
+  height: 48,
+  marginTop: 10,
+  borderRadius: 14,
+  border: "1px solid rgba(255,255,255,0.14)",
+  background: "linear-gradient(180deg, #a855f7 0%, #6d28d9 100%)",
+  color: "#fff",
+  fontWeight: 900,
+  fontSize: 16,
+  cursor: "pointer",
+  boxShadow: "0 0 20px rgba(168,85,247,0.34)",
 };
 
 const loadingWrap: CSSProperties = {
