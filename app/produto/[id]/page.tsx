@@ -203,6 +203,25 @@ export default function ProdutoPage() {
   }, [id]);
 
   useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (!savedCart) return;
+
+    try {
+      const parsedCart = JSON.parse(savedCart);
+      if (Array.isArray(parsedCart)) {
+        setCart(parsedCart);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar carrinho salvo:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+
+  useEffect(() => {
     if (!pix?.paymentId || pixStatus !== "waiting") return;
 
     const countdown = setInterval(() => {
