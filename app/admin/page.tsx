@@ -25,7 +25,7 @@ type Category = {
   created_at?: string;
 };
 
-const ADMIN_PASSWORD = "1234";
+const ADMIN_PASSWORD = "1310";
 const BUCKET_NAME = "product-images";
 
 export default function AdminPage() {
